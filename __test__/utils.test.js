@@ -7,6 +7,7 @@ const {
     getReviewers,
     parseExistingComments,
     getFileDiffs,
+    getFilteredLists,
     getPullRequestBody,
 } = require('../utils');
 
@@ -143,7 +144,7 @@ describe('push or set to bin', () => {
 });
 
 describe('get notified', () => {
-    it('should work', async () => {
+    it('should work', () => {
         const notifiedFile = `# comment
 .github/**          @githubUser
 *.js                @yipstanley @githubUser
@@ -157,7 +158,7 @@ describe('get notified', () => {
         ];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        expect(await getNotified(filesChanged, fileDiffs, notifiedFile)).toEqual({
+        expect(getNotified(filesChanged, fileDiffs, notifiedFile)).toEqual({
             '@yipstanley': ['.github/workflows/pr-notify.js'],
             '@githubUser': [
                 '.github/NOTIFIED',
@@ -170,8 +171,8 @@ describe('get notified', () => {
 });
 
 describe('get reviewers', () => {
-    it('should work', async () => {
-        const notifiedFile = `# comment
+    it('should work', () => {
+        const reviewersFile = `# comment
 .github/**          @githubUser!
 *.js                @yipstanley! @githubUser
 "/test/ig"          @testperson
@@ -183,11 +184,11 @@ describe('get reviewers', () => {
         ];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = await getReviewers(
+        const {requiredReviewers, reviewers} = getReviewers(
             filesChanged,
             fileDiffs,
             'yipstanley',
-            notifiedFile,
+            reviewersFile,
         );
         expect(reviewers).toEqual({
             '@githubUser': ['.github/workflows/pr-notify.js'],
@@ -200,6 +201,35 @@ describe('get reviewers', () => {
                 '.github/workflows/pr-notify.yml',
             ],
         });
+    });
+});
+
+describe('get filtered lists', () => {
+    it('should work', () => {
+        const sampleFile = `# comment
+.github/**          @githubUser!
+*.js                @yipstanley! @githubUser
+"/test/ig"          @testperson
+# *                 @otherperson`;
+        const filesChanged = [
+            '.github/workflows/pr-notify.js',
+            '.github/workflows/pr-notify.yml',
+            '.github/NOTIFIED',
+        ];
+        const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
+
+        const {requiredReviewers, reviewers} = getReviewers(
+            filesChanged,
+            fileDiffs,
+            'yipstanley',
+            sampleFile,
+        );
+        const notified = getNotified(filesChanged, fileDiffs, sampleFile);
+        const actualReviewers = getFilteredLists(reviewers, requiredReviewers, notified, [
+            'yipstanley',
+            'testperson',
+        ]);
+        expect(actualReviewers).toEqual(expect.arrayContaining(['githubUser']));
     });
 });
 
@@ -218,20 +248,24 @@ describe('parse existing comments', () => {
                 {user: {login: 'github-actions[bot]'}, body: 'another irrelevant comment'},
                 reviewers,
                 {
-                    user: {login: 'github-actions[bot]'},
-                    body: 'would you believe it, a third irrelevant comment',
+                    user: {login: 'yipstanley'},
+                    body: '#removeme',
                 },
                 reqReviewers,
             ],
         };
 
-        const {notifiedComment, reviewersComment, reqReviewersComment} = parseExistingComments(
-            existingComments,
-        );
+        const {
+            notifiedComment,
+            reviewersComment,
+            reqReviewersComment,
+            removedJustNames,
+        } = parseExistingComments(existingComments);
 
         expect(notifiedComment).toEqual(notify);
         expect(reviewersComment).toEqual(reviewers);
         expect(reqReviewersComment).toEqual(reqReviewers);
+        expect(removedJustNames).toEqual(['yipstanley']);
     });
 });
 

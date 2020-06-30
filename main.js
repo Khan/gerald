@@ -1,9 +1,5 @@
 const path = require('path');
 const octokit = require('@actions/github');
-const personalGithub = new octokit.GitHub(process.argv[2]);
-const github = new octokit.GitHub(process.argv[3]);
-const context = octokit.context;
-const ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
 
 const {
     getReviewers,
@@ -11,16 +7,31 @@ const {
     getFileDiffs,
     parseExistingComments,
     getPullRequestBody,
+    getFilteredLists,
 } = require('./utils');
 const {execCmd} = require('./execCmd');
 
+const personalGithub = new octokit.GitHub(process.argv[2]);
+const github = new octokit.GitHub(process.argv[3]);
+const context = octokit.context;
+const ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
+const separator =
+    '__________________________________________________________________________________________________________________________________';
+
+/**
+ * @desc Helper function to update, delete, or create a comment
+ * @param comment - existing GithubComment to update/delete or undefined
+ * @param title - Currently "Reviewers" | "Required Reviewers" | "Notified", but this will end up being the first line of the comment
+ * @param people - {[username: string] filesChanged: string[]} Object of the people to tag in the comment and the list of files that make it necessary
+ */
 const updateComment = async (comment, title, people) => {
     let body = title;
     const entries = Object.entries(people);
     if (people && entries.length) {
         entries.forEach(([person, files]) => {
-            body += `${person} for changes to ${files.join(', ')}\n`;
+            body += `${person} for changes to \`${files.join('`, `')}\`\n`;
         });
+        body += `\n${separator}\n_Don't want to be involved in this pull request? Comment \`#removeme\` and we won't notify you of further changes._`;
 
         if (comment) {
             await github.issues.updateComment({
@@ -53,8 +64,8 @@ const run = async () => {
     ).split('\n');
     const fileDiffs = await getFileDiffs(context);
 
-    const notified = await getNotified(filesChanged, fileDiffs);
-    const {reviewers, requiredReviewers} = await getReviewers(
+    const notified = getNotified(filesChanged, fileDiffs);
+    const {reviewers, requiredReviewers} = getReviewers(
         filesChanged,
         fileDiffs,
         context.payload.pull_request.user.login,
@@ -65,21 +76,25 @@ const run = async () => {
         issue_number: context.issue.number,
     });
 
-    const {notifiedComment, reviewersComment, reqReviewersComment} = parseExistingComments(
-        existingComments,
-    );
+    const {
+        notifiedComment,
+        reviewersComment,
+        reqReviewersComment,
+        removedJustNames,
+    } = parseExistingComments(existingComments);
 
-    const allReviewers = Object.keys(requiredReviewers).concat(
-        Object.keys(reviewers).filter(
-            reviewer => !Object.keys(requiredReviewers).includes(reviewer),
-        ),
+    const actualReviewers = getFilteredLists(
+        reviewers,
+        requiredReviewers,
+        notified,
+        removedJustNames,
     );
 
     await personalGithub.pulls.createReviewRequest({
         ...ownerAndRepo,
         pull_number: context.issue.number,
-        reviewers: allReviewers.map(reviewer => reviewer.slice(1)),
-        team_reviewers: allReviewers.map(reviewer => reviewer.slice(1)),
+        reviewers: actualReviewers,
+        team_reviewers: actualReviewers,
     });
 
     await github.pulls.update({

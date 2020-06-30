@@ -57,7 +57,7 @@ const pushOrSetToBin = (bin, username, files) => {
     }
 };
 
-const getNotified = async (filesChanged, fileDiffs, __testContent = undefined) => {
+const getNotified = (filesChanged, fileDiffs, __testContent = undefined) => {
     const buf = __testContent || fs.readFileSync('.github/NOTIFIED', 'utf-8');
     const matches = buf.match(/^[^\#\n].*/gm); // ignore comments
     const notified = {}; // object of type {[name: string]: string[]}
@@ -87,7 +87,7 @@ const getNotified = async (filesChanged, fileDiffs, __testContent = undefined) =
     return notified;
 };
 
-const getReviewers = async (filesChanged, fileDiffs, issuer, __testContent = undefined) => {
+const getReviewers = (filesChanged, fileDiffs, issuer, __testContent = undefined) => {
     const buf = __testContent || fs.readFileSync('.github/REVIEWERS', 'utf-8');
     const matches = buf.match(/^[^\#\n].*/gm); // ignore comments
     const reviewers = {};
@@ -132,16 +132,48 @@ const getReviewers = async (filesChanged, fileDiffs, issuer, __testContent = und
     return {reviewers, requiredReviewers};
 };
 
-const parseExistingComments = existingComments => {
-    const actionBotComments = existingComments.data.filter(
-        d => d.user.login === 'github-actions[bot]',
-    );
+const getFilteredLists = (reviewers, requiredReviewers, notified, removedJustNames) => {
+    for (const justName of removedJustNames) {
+        const username = `@${justName}`;
+        if (reviewers[username]) {
+            delete reviewers[username];
+        }
+        if (requiredReviewers[username]) {
+            delete requiredReviewers[username];
+        }
+        if (notified[username]) {
+            delete notified[username];
+        }
+    }
 
-    const peopleNotified = {};
-    const peopleToNotify = {};
+    const actualReviewers = Object.keys(requiredReviewers)
+        .concat(
+            Object.keys(reviewers).filter(
+                reviewer => !Object.keys(requiredReviewers).includes(reviewer),
+            ),
+        )
+        .map(username => username.slice(1));
+
+    return actualReviewers;
+};
+
+const parseExistingComments = existingComments => {
+    const actionBotComments = [];
+    let removedJustNames = [];
     let reqReviewersComment;
     let notifiedComment;
-    let reviewersComment = undefined;
+    let reviewersComment;
+
+    existingComments.data.map(cmnt => {
+        if (cmnt.user.login === 'github-actions[bot]') {
+            actionBotComments.push(cmnt);
+        } else {
+            const removeMeMatch = cmnt.body.match(/\#removeme/i);
+            if (removeMeMatch) {
+                removedJustNames.push(cmnt.user.login);
+            }
+        }
+    });
 
     actionBotComments.forEach(comment => {
         const notifiedMatch = comment.body.match(/^Notified:/i);
@@ -160,7 +192,7 @@ const parseExistingComments = existingComments => {
         }
     });
 
-    return {notifiedComment, reviewersComment, reqReviewersComment};
+    return {notifiedComment, reviewersComment, reqReviewersComment, removedJustNames};
 };
 
 const getFileDiffs = async context => {
@@ -206,4 +238,5 @@ module.exports = {
     parseExistingComments,
     getFileDiffs,
     getPullRequestBody,
+    getFilteredLists,
 };
