@@ -19,7 +19,6 @@ const {
     getNotified,
     getFileDiffs,
     parseExistingComments,
-    getPullRequestBody,
     getFilteredLists,
 } = require('./utils');
 const {execCmd} = require('./execCmd');
@@ -121,12 +120,6 @@ const run = async () => {
         pull_number: context.issue.number,
         reviewers: actualReviewers,
         team_reviewers: actualReviewers,
-    });
-
-    await github.pulls.update({
-        ...ownerAndRepo,
-        pull_number: context.issue.number,
-        body: getPullRequestBody(requiredReviewers, context.payload.pull_request.body), // flow-uncovered-line
     });
 
     await updateComment(notifiedComment, 'Notified:\n\n', notified);

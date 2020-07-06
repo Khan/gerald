@@ -1,7 +1,7 @@
 // @flow
 
 const fs = require('fs');
-const glob = require('glob');
+const glob = require('glob'); // flow-uncovered-line
 
 const {execCmd} = require('./execCmd');
 const globOptions = {
@@ -133,7 +133,7 @@ const getNotified = (
             }
             // handle dealing with glob matches
             else {
-                const matchedFiles = glob.sync(pattern, globOptions);
+                const matchedFiles: string[] = glob.sync(pattern, globOptions); //flow-uncovered-line
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
                 for (const name of names) {
@@ -186,7 +186,7 @@ const getReviewers = (
                 maybeAddIfMatch(regex, username, fileDiffs, correctBin);
             }
         } else {
-            const matchedFiles = glob.sync(pattern, globOptions);
+            const matchedFiles: string[] = glob.sync(pattern, globOptions); //flow-uncovered-line
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
             for (const name of names) {
                 // don't add yourself as a reviewer
@@ -320,21 +320,6 @@ const getFileDiffs = async (
     return fileToDiff;
 };
 
-/**
- * @desc Read the pull request body and update or add the Required Reviewers section.
- */
-const getPullRequestBody = (requiredReviewers: NameToFiles, currentBody: string) => {
-    const comment = '\n## Required Reviewers:\n\n' + Object.keys(requiredReviewers).join(', ');
-    let body: string;
-    const bodyUntilHeader = currentBody.match(/^(.|\s(?!## Required Reviewers:))*/gim);
-    if (bodyUntilHeader) {
-        body = bodyUntilHeader[0] + comment;
-    } else {
-        body = currentBody + comment;
-    }
-    return body;
-};
-
 const __maybeAddIfMatch = maybeAddIfMatch;
 const __turnPatternIntoRegex = turnPatternIntoRegex;
 const __parseUsername = parseUsername;
@@ -349,6 +334,5 @@ module.exports = {
     getReviewers,
     parseExistingComments,
     getFileDiffs,
-    getPullRequestBody,
     getFilteredLists,
 };

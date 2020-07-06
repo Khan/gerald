@@ -16,7 +16,6 @@ const {
     parseExistingComments,
     getFileDiffs,
     getFilteredLists,
-    getPullRequestBody,
 } = require('../utils');
 
 const mockTestFileDiff = `a/testFile b/testFile
@@ -291,115 +290,5 @@ describe('test get file diffs', () => {
         expect(result['testFile']).toEqual(mockTestFileDiff);
 
         expect(result['otherFile.js']).toEqual(mockOtherFileDiff);
-    });
-});
-
-describe('test get pull request body', () => {
-    it('should work', () => {
-        const testBody = `A title
-
-## Summary:
-A summary paragraph that includes some things.
-
-Issue: MOB-1234
-
-## Test Plan:
-Lorem tests
-`;
-        const requiredReviewers = {
-            '@yipstanley': ['file1.js', 'file2'],
-            '@testPerson': ['file1.js', 'file3.md'],
-            '@testTeam': ['file2'],
-        };
-
-        expect(getPullRequestBody(requiredReviewers, testBody)).toMatchInlineSnapshot(`
-            "A title
-
-            ## Summary:
-            A summary paragraph that includes some things.
-
-            Issue: MOB-1234
-
-            ## Test Plan:
-            Lorem tests
-
-            ## Required Reviewers:
-
-            @yipstanley, @testPerson, @testTeam"
-        `);
-    });
-
-    it('should work', () => {
-        const testBody = `A title
-
-## Summary:
-A summary paragraph that includes some things.
-
-Issue: MOB-1234
-
-## Test Plan:
-Lorem tests
-
-## Required Reviewers:
-`;
-        const requiredReviewers = {
-            '@yipstanley': ['file1.js', 'file2'],
-            '@testPerson': ['file1.js', 'file3.md'],
-            '@testTeam': ['file2'],
-        };
-
-        expect(getPullRequestBody(requiredReviewers, testBody)).toMatchInlineSnapshot(`
-            "A title
-
-            ## Summary:
-            A summary paragraph that includes some things.
-
-            Issue: MOB-1234
-
-            ## Test Plan:
-            Lorem tests
-
-            ## Required Reviewers:
-
-            @yipstanley, @testPerson, @testTeam"
-        `);
-    });
-
-    it('should work', () => {
-        const testBody = `A title
-
-## Summary:
-A summary paragraph that includes some things.
-
-Issue: MOB-1234
-
-## Test Plan:
-Lorem tests
-
-## Required Reviewers:
-
-@yipstanley, @testTeam
-`;
-        const requiredReviewers = {
-            '@yipstanley': ['file1.js', 'file2'],
-            '@testPerson': ['file1.js', 'file3.md'],
-            '@testTeam': ['file2'],
-        };
-
-        expect(getPullRequestBody(requiredReviewers, testBody)).toMatchInlineSnapshot(`
-            "A title
-
-            ## Summary:
-            A summary paragraph that includes some things.
-
-            Issue: MOB-1234
-
-            ## Test Plan:
-            Lorem tests
-
-            ## Required Reviewers:
-
-            @yipstanley, @testPerson, @testTeam"
-        `);
     });
 });
