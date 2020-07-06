@@ -92,7 +92,7 @@ const parseUsername = (
  * @param username - The key that determines where to check for / push files.
  * @param files - The list of files to push.
  */
-const pushOrSetToBin = (bin: NameToFiles, username: string, files: string[]): void => {
+const pushOrSetToBin = (bin: NameToFiles, username: string, files: Array<string>): void => {
     if (bin[username]) {
         for (const file of files) {
             if (!bin[username].includes(file)) {
@@ -109,15 +109,27 @@ const pushOrSetToBin = (bin: NameToFiles, username: string, files: string[]): vo
  * unique person to notify and the files that they are being notified for.
  * @param filesChanged - List of changed files.
  * @param filesDiffs - Map of changed files to their diffs.
+ * @param on - Which section of the NOTIFIED file are we looking at, the 'pull_request' section or the 'push' section?
  * @param __testContent - For testing, mimicks .github/NOTIFIED content.
  */
 const getNotified = (
-    filesChanged: string[],
+    filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
+    on: 'pull_request' | 'push',
     __testContent: ?string = undefined,
 ): NameToFiles => {
     const buf = __testContent || fs.readFileSync('.github/NOTIFIED', 'utf-8');
-    const matches = buf.match(/^[^\#\n].*/gm); // ignore comments
+    const section = buf.match(
+        on === 'pull_request'
+            ? /(.|\n)*(?=^## ON PUSH WITHOUT PULL REQUEST$)/gim
+            : /(?<=^## ON PUSH WITHOUT PULL REQUEST)(.|\n)*/gim,
+    );
+    if (!section) {
+        throw new Error(
+            "Invalid NOTIFIED file. Could not find a line with the text: '## ON PUSH WITHOUT PULL REQUEST'. Please add the line back. This line separates the list of rules that are employed on pull-requests and on pushes to master and develop.",
+        );
+    }
+    const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
     const notified: NameToFiles = {};
     if (matches) {
         for (const match of matches) {
@@ -160,6 +172,7 @@ const getReviewers = (
     __testContent: ?string = undefined,
 ): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
     const buf = __testContent || fs.readFileSync('.github/REVIEWERS', 'utf-8');
+
     const matches = buf.match(/^[^\#\n].*/gm); // ignore comments
     const reviewers: {[string]: Array<string>, ...} = {};
     const requiredReviewers: {[string]: Array<string>, ...} = {};
@@ -216,8 +229,8 @@ const getFilteredLists = (
     reviewers: NameToFiles,
     requiredReviewers: NameToFiles,
     notified: NameToFiles,
-    removedJustNames: string[],
-): string[] => {
+    removedJustNames: Array<string>,
+): Array<string> => {
     for (const justName of removedJustNames) {
         const username = `@${justName}`;
         if (reviewers[username]) {
@@ -300,13 +313,9 @@ const parseExistingComments = <
  * @desc Get the diff of each file that has been changed.
  * @param context - @actions/github context from which to find the base of the pull request.
  */
-const getFileDiffs = async (
-    context: Context | {payload: {pull_request: {base: {ref: string}}}},
-): {[string]: string, ...} => {
+const getFileDiffs = async (diffString: string): {[string]: string, ...} => {
     // get raw diff and split it by 'diff --git', which appears at the start of every new file.
-    const rawDiffs = (
-        await execCmd('git', ['diff', 'origin/' + context.payload.pull_request.base.ref])
-    ).split(/^diff --git /m);
+    const rawDiffs = (await execCmd('git', ['diff', diffString])).split(/^diff --git /m);
     const fileToDiff: {[string]: string, ...} = {}; // object of {[file: string]: string}
 
     for (const diff of rawDiffs) {

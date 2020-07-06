@@ -4,6 +4,7 @@ import {
     type Octokit,
     type Octokit$IssuesListCommentsResponseItem,
     type Octokit$PullsListResponseItem,
+    type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
 const path = require('path');
@@ -11,7 +12,13 @@ const octokit = require('@actions/github'); //flow-uncovered-line
 
 type Context = {|
     issue: {|owner: string, repo: string, number: number|},
-    payload: {|pull_request: Octokit$PullsListResponseItem|},
+    payload: {|
+        pull_request: Octokit$PullsListResponseItem,
+        before: string,
+        after: string,
+        commits: {id: string, ...Octokit$PullsListCommitsResponseItemCommit}[],
+    |},
+    actor: string,
 |};
 
 const {
@@ -40,7 +47,7 @@ const separator =
  * @param title - this will end up being the first line of the comment
  * @param people - people to tag mapped to the files that each person is tagged for
  */
-const updateComment = async (
+const updatePullRequestComment = async (
     comment: ?Octokit$IssuesListCommentsResponseItem,
     title: 'Reviewers:\n\n' | 'Required reviewers:\n\n' | 'Notified:\n\n',
     people: {[string]: Array<string>, ...},
@@ -75,7 +82,26 @@ const updateComment = async (
     }
 };
 
-const run = async () => {
+const makeCommitComments = async (peopleToFiles: {[string]: Array<string>, ...}) => {
+    const names: string[] = Object.keys(peopleToFiles);
+    if (peopleToFiles && names.length) {
+        let body: string = 'Notify of Push Without Pull Request\n\n';
+        names.forEach((person: string) => {
+            const files = peopleToFiles[person];
+            body += `${person} for changes to \`${files.join('`, `')}\`\n`;
+        });
+
+        for (const commit of context.payload.commits) {
+            await personalGithub.repos.createCommitComment({
+                ...ownerAndRepo,
+                commit_sha: commit.id,
+                body: body,
+            });
+        }
+    }
+};
+
+const runPullRequest = async () => {
     // get the files changed between the head of this branch and the origin of the base branch
     const filesChanged = (
         await execCmd('git', [
@@ -85,10 +111,10 @@ const run = async () => {
         ])
     ).split('\n');
     // get the actual diff between the head of this branch adn the origin of the base branch, split by files
-    const fileDiffs = await getFileDiffs(context);
+    const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
 
     // figure out who to notify and request reviews from
-    const notified = getNotified(filesChanged, fileDiffs);
+    const notified = getNotified(filesChanged, fileDiffs, 'pull_request');
     const {reviewers, requiredReviewers} = getReviewers(
         filesChanged,
         fileDiffs,
@@ -122,9 +148,31 @@ const run = async () => {
         team_reviewers: actualReviewers,
     });
 
-    await updateComment(notifiedComment, 'Notified:\n\n', notified);
-    await updateComment(reviewersComment, 'Reviewers:\n\n', reviewers);
-    await updateComment(reqReviewersComment, 'Required reviewers:\n\n', requiredReviewers);
+    await updatePullRequestComment(notifiedComment, 'Notified:\n\n', notified);
+    await updatePullRequestComment(reviewersComment, 'Reviewers:\n\n', reviewers);
+    await updatePullRequestComment(
+        reqReviewersComment,
+        'Required reviewers:\n\n',
+        requiredReviewers,
+    );
 };
 
-module.exports = {run};
+const runPush = async () => {
+    const filesChanged = (
+        await execCmd('git', [
+            'diff',
+            `${context.payload.before}...${context.payload.after}`,
+            '--name-only',
+        ])
+    ).split('\n');
+    const fileDiffs = await getFileDiffs(`${context.payload.before}...${context.payload.after}`);
+    const notified = getNotified(filesChanged, fileDiffs, 'push');
+
+    // no such thing as reviewers on a push
+    // no need to look thru existing comments, a new push can't have existing comments
+    // no need to filter out, since we're not requesting reviewers
+
+    await makeCommitComments(notified);
+};
+
+module.exports = {runPullRequest, runPush};

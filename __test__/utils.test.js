@@ -160,7 +160,11 @@ describe('get notified', () => {
 .github/**          @githubUser
 *.js                @yipstanley @githubUser
 "/test/ig"          @testperson
-# *                 @otherperson`;
+# *                 @otherperson
+
+## ON PUSH WITHOUT PULL REQUEST
+
+*.js                @owner`;
 
         const filesChanged = [
             '.github/workflows/pr-notify.js',
@@ -169,7 +173,7 @@ describe('get notified', () => {
         ];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        expect(getNotified(filesChanged, fileDiffs, notifiedFile)).toEqual({
+        expect(getNotified(filesChanged, fileDiffs, 'pull_request', notifiedFile)).toEqual({
             '@yipstanley': ['.github/workflows/pr-notify.js'],
             '@githubUser': [
                 '.github/NOTIFIED',
@@ -177,6 +181,10 @@ describe('get notified', () => {
                 '.github/workflows/pr-notify.yml',
             ],
             '@testperson': ['yaml.yml'],
+        });
+
+        expect(getNotified(filesChanged, fileDiffs, 'push', notifiedFile)).toEqual({
+            '@owner': ['.github/workflows/pr-notify.js'],
         });
     });
 });
@@ -221,7 +229,9 @@ describe('get filtered lists', () => {
 .github/**          @githubUser!
 *.js                @yipstanley! @githubUser
 "/test/ig"          @testperson
-# *                 @otherperson`;
+# *                 @otherperson
+
+## ON PUSH WITHOUT PULL REQUEST`;
         const filesChanged = [
             '.github/workflows/pr-notify.js',
             '.github/workflows/pr-notify.yml',
@@ -235,7 +245,7 @@ describe('get filtered lists', () => {
             'yipstanley',
             sampleFile,
         );
-        const notified = getNotified(filesChanged, fileDiffs, sampleFile);
+        const notified = getNotified(filesChanged, fileDiffs, 'pull_request', sampleFile);
         const actualReviewers = getFilteredLists(reviewers, requiredReviewers, notified, [
             'yipstanley',
             'testperson',
@@ -285,7 +295,7 @@ describe('parse existing comments', () => {
 
 describe('test get file diffs', () => {
     it('should work', async () => {
-        const result = await getFileDiffs({payload: {pull_request: {base: {ref: ''}}}});
+        const result = await getFileDiffs('');
 
         expect(result['testFile']).toEqual(mockTestFileDiff);
 
