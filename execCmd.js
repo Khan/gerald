@@ -1,9 +1,18 @@
-const exec = require('@actions/exec');
+// @flow
 
-const execCmd = async (cmd, args) => {
+const exec = require('@actions/exec'); //flow-uncovered-line
+
+/**
+ * @desc Asynchronously calls @actions/exec to execute a command.
+ * @param cmd - Command that we are calling.
+ * @param args - List of arguments to call with the command.
+ * @throws if the command errors.
+ */
+const execCmd = async (cmd: string, args: string[]): Promise<string> => {
     let output = '';
     let error = '';
     const options = {};
+    /* flow-uncovered-block */
     options.listeners = {
         stdout: data => {
             output += data.toString();
@@ -16,6 +25,7 @@ const execCmd = async (cmd, args) => {
     if (error) {
         throw error;
     }
+    /* end flow-uncovered-block */
     return output;
 };
 

@@ -1,3 +1,11 @@
+// @flow
+
+import {
+    type Octokit$PullsListResponseItem,
+    type Octokit$IssuesListCommentsResponseItem,
+    type Octokit$Response,
+} from '@octokit/rest';
+
 const {
     __maybeAddIfMatch,
     __turnPatternIntoRegex,
@@ -33,15 +41,17 @@ export const testFn = () => {
 }
 `;
 
+/* flow-uncovered-block */
 jest.mock('../execCmd.js', () => ({
     ...jest.requireActual('../execCmd.js'),
-    execCmd: async (cmd, args) => {
+    execCmd: async (cmd: string, args: string[]) => {
         return await new Promise((res, rej) => {
             const string = `diff --git ${mockTestFileDiff}diff --git ${mockOtherFileDiff}`;
             process.nextTick(() => res(string));
         });
     },
 }));
+/* end flow-uncovered-block */
 
 describe('maybe add', () => {
     it('should work', () => {
@@ -95,8 +105,10 @@ describe('turn into regex', () => {
 
         try {
             __turnPatternIntoRegex(pattern);
+            /* flow-uncovered-block */
         } catch (e) {
-            expect(e).toEqual(new Error("somehow this isn't valid"));
+            expect(e).toEqual(new Error(`The RegExp: ${pattern} isn't valid`));
+            /* end flow-uncovered-block */
         }
     });
 });
@@ -235,7 +247,10 @@ describe('get filtered lists', () => {
 
 describe('parse existing comments', () => {
     it('should work', () => {
-        const notify = {user: {login: 'github-actions[bot]'}, body: 'notified:'};
+        const notify = {
+            user: {login: 'github-actions[bot]'},
+            body: 'notified:',
+        };
         const reviewers = {user: {login: 'github-actions[bot]'}, body: 'Reviewers:\n\n:'};
         const reqReviewers = {
             user: {login: 'github-actions[bot]'},

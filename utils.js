@@ -1,3 +1,5 @@
+// @flow
+
 const fs = require('fs');
 const glob = require('glob');
 
@@ -8,8 +10,34 @@ const globOptions = {
     ignore: ['node_modules/**', 'coverage/**', '.git/**'],
 };
 
-const maybeAddIfMatch = (pattern, name, fileDiffs, nameToFilesObj) => {
-    for (const [file, diff] of Object.entries(fileDiffs)) {
+import {
+    type Octokit$PullsListResponseItem,
+    type Octokit$IssuesListCommentsResponseItem,
+    type Octokit$Response,
+} from '@octokit/rest';
+
+type Context = {|
+    issue: {|owner: string, repo: string, number: number|},
+    payload: {|pull_request: Octokit$PullsListResponseItem|},
+|};
+type NameToFiles = {[name: string]: string[], ...};
+
+/**
+ * @desc Add the username/files pair to the nameToFilesObj if the
+ * diff of the file matches the pattern.
+ * @param pattern - Pattern to test against file diffs.
+ * @param name - Username of the person to add if the pattern matches the diff.
+ * @param fileDiffs - Object of files to diffs.
+ * @param namesToFilesObj - Object to add username/files pair to.
+ */
+const maybeAddIfMatch = (
+    pattern: RegExp,
+    name: string,
+    fileDiffs: {[string]: string, ...},
+    nameToFilesObj: NameToFiles,
+): void => {
+    for (const file of Object.keys(fileDiffs)) {
+        const diff = fileDiffs[file];
         if (pattern.test(diff)) {
             if (nameToFilesObj[name]) {
                 if (!nameToFilesObj[name].includes(file)) {
@@ -22,16 +50,29 @@ const maybeAddIfMatch = (pattern, name, fileDiffs, nameToFilesObj) => {
     }
 };
 
-const turnPatternIntoRegex = pattern => {
+/**
+ * @desc Turn a RegExp surrounded by double quotes (") into an actual RegExp.
+ * @param pattern - Something of the form "<regexp>" including double quotes.
+ * @throws if no RegExp can be interpreted from the pattern
+ */
+const turnPatternIntoRegex = (pattern: string): RegExp => {
     const match = /^"\/(.*?)\/([a-z]*)"$/.exec(pattern);
     if (!match) {
-        throw new Error("somehow this isn't valid");
+        throw new Error(`The RegExp: ${pattern} isn't valid`);
     }
     const [_, regexPattern, regexFlags] = match;
     return new RegExp(regexPattern, regexFlags);
 };
 
-const parseUsername = original => {
+/**
+ * @desc Parse a username of the form '@<username>(!|)' and splits it up into
+ * @<username>, <username>, and whether or not there is a ! at the end.
+ * @param original - Original username string: '@' + <username> + <maybe exclamation>
+ * @throws if the string is not of the specified form.
+ */
+const parseUsername = (
+    original: string,
+): {original: string, username: string, justName: string, isRequired: boolean} => {
     const justName = original.match(/\w+/);
     if (justName && justName[0]) {
         const isRequired = original.endsWith('!');
@@ -45,7 +86,13 @@ const parseUsername = original => {
     throw new Error('String cannot be parsed as a name');
 };
 
-const pushOrSetToBin = (bin, username, files) => {
+/**
+ * @desc Helper function that pushes a list of files to the correct bin without duplicates.
+ * @param bin - The object to do the things on.
+ * @param username - The key that determines where to check for / push files.
+ * @param files - The list of files to push.
+ */
+const pushOrSetToBin = (bin: NameToFiles, username: string, files: string[]): void => {
     if (bin[username]) {
         for (const file of files) {
             if (!bin[username].includes(file)) {
@@ -57,10 +104,21 @@ const pushOrSetToBin = (bin, username, files) => {
     }
 };
 
-const getNotified = (filesChanged, fileDiffs, __testContent = undefined) => {
+/**
+ * @desc Parse .github/NOTIFIED and return an object where each entry is a
+ * unique person to notify and the files that they are being notified for.
+ * @param filesChanged - List of changed files.
+ * @param filesDiffs - Map of changed files to their diffs.
+ * @param __testContent - For testing, mimicks .github/NOTIFIED content.
+ */
+const getNotified = (
+    filesChanged: string[],
+    fileDiffs: {[string]: string, ...},
+    __testContent: ?string = undefined,
+): NameToFiles => {
     const buf = __testContent || fs.readFileSync('.github/NOTIFIED', 'utf-8');
     const matches = buf.match(/^[^\#\n].*/gm); // ignore comments
-    const notified = {}; // object of type {[name: string]: string[]}
+    const notified: NameToFiles = {};
     if (matches) {
         for (const match of matches) {
             const [untrimmedPattern, ...names] = match.split(/ (?=@)/).filter(Boolean);
@@ -87,11 +145,24 @@ const getNotified = (filesChanged, fileDiffs, __testContent = undefined) => {
     return notified;
 };
 
-const getReviewers = (filesChanged, fileDiffs, issuer, __testContent = undefined) => {
+/**
+ * @desc Parse .github/REVIEWERS and return an object where each entry is a
+ * unique person to notify and the files that they wanted to be reviewers of.
+ * @param filesChanged - List of changed files.
+ * @param filesDiffs - Map of changed files to their diffs.
+ * @param issuer - The person making the pull request should not be a reviewer.
+ * @param __testContent - For testing, mimicks .github/REVIEWERS content.
+ */
+const getReviewers = (
+    filesChanged: string[],
+    fileDiffs: {[string]: string, ...},
+    issuer: string,
+    __testContent: ?string = undefined,
+): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
     const buf = __testContent || fs.readFileSync('.github/REVIEWERS', 'utf-8');
     const matches = buf.match(/^[^\#\n].*/gm); // ignore comments
-    const reviewers = {};
-    const requiredReviewers = {};
+    const reviewers: {[string]: Array<string>, ...} = {};
+    const requiredReviewers: {[string]: Array<string>, ...} = {};
     if (!matches) {
         return {reviewers, requiredReviewers};
     }
@@ -105,7 +176,7 @@ const getReviewers = (filesChanged, fileDiffs, issuer, __testContent = undefined
             const regex = turnPatternIntoRegex(pattern);
 
             for (const name of names) {
-                const {_, username, justName, isRequired} = parseUsername(name);
+                const {original, username, justName, isRequired} = parseUsername(name);
                 // don't add yourself as a reviewer
                 if (justName === issuer) {
                     continue;
@@ -119,7 +190,7 @@ const getReviewers = (filesChanged, fileDiffs, issuer, __testContent = undefined
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
             for (const name of names) {
                 // don't add yourself as a reviewer
-                const {_, username, justName, isRequired} = parseUsername(name);
+                const {original, username, justName, isRequired} = parseUsername(name);
                 if (justName === issuer) {
                     continue;
                 }
@@ -132,7 +203,21 @@ const getReviewers = (filesChanged, fileDiffs, issuer, __testContent = undefined
     return {reviewers, requiredReviewers};
 };
 
-const getFilteredLists = (reviewers, requiredReviewers, notified, removedJustNames) => {
+/**
+ * @desc Filter out from reviewers, requiredRevieweres, and notified any names
+ * that show up in removedJustNames. Used to filter out people who have commented
+ * #removeme on the pull request.
+ * @param reviewers - List of reviewers generated from getReviewers
+ * @param requiredReviewers - List of required reviewers generated from getReviewers
+ * @param notified - List of people to notify generated from getNotified
+ * @param removedJustNames - List of people who have commented #removeme
+ */
+const getFilteredLists = (
+    reviewers: NameToFiles,
+    requiredReviewers: NameToFiles,
+    notified: NameToFiles,
+    removedJustNames: string[],
+): string[] => {
     for (const justName of removedJustNames) {
         const username = `@${justName}`;
         if (reviewers[username]) {
@@ -146,25 +231,41 @@ const getFilteredLists = (reviewers, requiredReviewers, notified, removedJustNam
         }
     }
 
-    const actualReviewers = Object.keys(requiredReviewers)
+    const actualReviewers: string[] = Object.keys(requiredReviewers)
         .concat(
             Object.keys(reviewers).filter(
-                reviewer => !Object.keys(requiredReviewers).includes(reviewer),
+                (reviewer: string) => !Object.keys(requiredReviewers).includes(reviewer),
             ),
         )
-        .map(username => username.slice(1));
+        .map((username: string) => username.slice(1));
 
     return actualReviewers;
 };
 
-const parseExistingComments = existingComments => {
-    const actionBotComments = [];
-    let removedJustNames = [];
-    let reqReviewersComment;
-    let notifiedComment;
-    let reviewersComment;
+/**
+ * @desc Parse existing comments on the pull request to get the comments that
+ * denote reviewers, required revieweres, and notifiees. Also find all the
+ * #removeme comments to figure out who shouldn't be readded on the pull request.
+ * @param existingComments - List of existing Github comments.
+ */
+const parseExistingComments = <
+    T: {|user: {|login: string|}, body: string|} | Octokit$IssuesListCommentsResponseItem,
+>(
+    existingComments: Octokit$Response<T[]> | {data: T[]},
+): {
+    notifiedComment: ?T,
+    reviewersComment: ?T,
+    reqReviewersComment: ?T,
+    removedJustNames: string[],
+} => {
+    const actionBotComments: T[] = [];
+    const removedJustNames: string[] = [];
+    let reqReviewersComment: ?T;
+    let notifiedComment: ?T;
+    let reviewersComment: ?T;
 
     existingComments.data.map(cmnt => {
+        // only look at comments made by github-actions[bot] for <required> reviewers / notified comments
         if (cmnt.user.login === 'github-actions[bot]') {
             actionBotComments.push(cmnt);
         } else {
@@ -195,14 +296,21 @@ const parseExistingComments = existingComments => {
     return {notifiedComment, reviewersComment, reqReviewersComment, removedJustNames};
 };
 
-const getFileDiffs = async context => {
+/**
+ * @desc Get the diff of each file that has been changed.
+ * @param context - @actions/github context from which to find the base of the pull request.
+ */
+const getFileDiffs = async (
+    context: Context | {payload: {pull_request: {base: {ref: string}}}},
+): {[string]: string, ...} => {
+    // get raw diff and split it by 'diff --git', which appears at the start of every new file.
     const rawDiffs = (
         await execCmd('git', ['diff', 'origin/' + context.payload.pull_request.base.ref])
     ).split(/^diff --git /m);
-    const fileToDiff = {}; // object of {[file: string]: string}
+    const fileToDiff: {[string]: string, ...} = {}; // object of {[file: string]: string}
 
     for (const diff of rawDiffs) {
-        // each diff starts with 'a/<relativeFilePath', so we can grab the filename from that
+        // each diff starts with 'a/<relativeFilePath>', so we can grab the filename from that
         const fileName = diff.match(/(?<=^a\/)\S*/);
         if (fileName) {
             fileToDiff[fileName[0]] = diff;
@@ -212,11 +320,15 @@ const getFileDiffs = async context => {
     return fileToDiff;
 };
 
-const getPullRequestBody = (requiredReviewers, currentBody) => {
+/**
+ * @desc Read the pull request body and update or add the Required Reviewers section.
+ */
+const getPullRequestBody = (requiredReviewers: NameToFiles, currentBody: string) => {
     const comment = '\n## Required Reviewers:\n\n' + Object.keys(requiredReviewers).join(', ');
-    let body;
-    if (currentBody.match(/^## Required Reviewers:$/im)) {
-        body = currentBody.match(/^(.|\s(?!## Required Reviewers:))*/gi) + comment;
+    let body: string;
+    const bodyUntilHeader = currentBody.match(/^(.|\s(?!## Required Reviewers:))*/gim);
+    if (bodyUntilHeader) {
+        body = bodyUntilHeader[0] + comment;
     } else {
         body = currentBody + comment;
     }
