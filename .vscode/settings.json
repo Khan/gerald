@@ -1,0 +1,24 @@
+{
+    "eslint.nodePath": "./third_part/khan-linter-src/node_modules",
+    "eslint.enable": true,
+    "flow.useNPMPackagedFlow": true,
+    "flow.enabled": true,
+    "editor.formatOnSave": false,
+    "[javascript]": {
+        "editor.formatOnSave": true
+    },
+    "javascript.validate.enable": false,
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/genfiles": true,
+        "**/*.pyc": true
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/*.pyc": true
+    }
+}
