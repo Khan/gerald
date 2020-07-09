@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "dist": "ncc build lib/pr-notify.js"
+  },
   "dependencies": {
     "@actions/core": "^1.2.4",
     "@actions/exec": "^1.0.4",
@@ -10,6 +13,7 @@
     "jest": "^26.1.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.10.4",
     "babel-jest": "^26.1.0",
     "metro-react-native-babel-preset": "^0.60.0"
   }
