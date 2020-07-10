@@ -31,8 +31,8 @@ const {
 const {execCmd} = require('./execCmd');
 
 /* flow-uncovered-block */
-// argv looks like: ['node', '.github/workflows/pr-notify.js', personalAuthToken, githubActionsToken]
-const personalGithub: Octokit = new octokit.GitHub(process.argv[2]);
+// argv looks like: ['node', '.github/workflows/pr-notify.js', authTokenWithRepoAccess, githubActionsToken]
+const extraPermGithub: Octokit = new octokit.GitHub(process.argv[2]);
 const github: Octokit = new octokit.GitHub(process.argv[3]);
 const context: Context = octokit.context;
 /* end flow-uncovered-block */
@@ -40,6 +40,22 @@ const context: Context = octokit.context;
 const ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
 const separator =
     '__________________________________________________________________________________________________________________________________';
+
+const makeCommentBody = (
+    peopleToFiles: {[string]: Array<string>, ...},
+    sectionHeader: 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n',
+) => {
+    const names: string[] = Object.keys(peopleToFiles);
+    if (names.length) {
+        let body = `### ${sectionHeader}`;
+        names.forEach((person: string) => {
+            const files = peopleToFiles[person];
+            body += `${person} for changes to \`${files.join('`, `')}\`\n\n`;
+        });
+        return body;
+    }
+    return '';
+};
 
 /**
  * @desc Helper function to update, delete, or create a comment
@@ -49,16 +65,15 @@ const separator =
  */
 const updatePullRequestComment = async (
     comment: ?Octokit$IssuesListCommentsResponseItem,
-    title: 'Reviewers:\n\n' | 'Required reviewers:\n\n' | 'Notified:\n\n',
-    people: {[string]: Array<string>, ...},
+    notifyees: {[string]: Array<string>, ...},
+    reviewers: {[string]: Array<string>, ...},
+    requiredReviewers: {[string]: Array<string>, ...},
 ) => {
-    let body: string = title;
-    const names: string[] = Object.keys(people);
-    if (people && names.length) {
-        names.forEach((person: string) => {
-            const files = people[person];
-            body += `${person} for changes to \`${files.join('`, `')}\`\n`;
-        });
+    let body: string = '# Gerald:\n\n';
+    body += makeCommentBody(notifyees, 'Notified:\n');
+    body += makeCommentBody(reviewers, 'Reviewers:\n');
+    body += makeCommentBody(requiredReviewers, 'Required reviewers:\n');
+    if (body.match(/^### (Reviewers:|Required Reviewers:|Notified:)$/m)) {
         body += `\n${separator}\n_Don't want to be involved in this pull request? Comment \`#removeme\` and we won't notify you of further changes._`;
 
         if (comment) {
@@ -92,7 +107,7 @@ const makeCommitComments = async (peopleToFiles: {[string]: Array<string>, ...})
         });
 
         for (const commit of context.payload.commits) {
-            await personalGithub.repos.createCommitComment({
+            await extraPermGithub.repos.createCommitComment({
                 ...ownerAndRepo,
                 commit_sha: commit.id,
                 body: body,
@@ -127,34 +142,26 @@ const runPullRequest = async () => {
         issue_number: context.issue.number,
     });
     const {
-        notifiedComment,
-        reviewersComment,
-        reqReviewersComment,
+        megaComment,
         removedJustNames,
     } = parseExistingComments<Octokit$IssuesListCommentsResponseItem>(existingComments);
 
     // filter out anyone that has commented #removeme
-    const actualReviewers = getFilteredLists(
+    const {actualReviewers, teamReviewers} = getFilteredLists(
         reviewers,
         requiredReviewers,
         notified,
         removedJustNames,
     );
 
-    await personalGithub.pulls.createReviewRequest({
+    await extraPermGithub.pulls.createReviewRequest({
         ...ownerAndRepo,
         pull_number: context.issue.number,
         reviewers: actualReviewers,
-        team_reviewers: actualReviewers,
+        team_reviewers: teamReviewers,
     });
 
-    await updatePullRequestComment(notifiedComment, 'Notified:\n\n', notified);
-    await updatePullRequestComment(reviewersComment, 'Reviewers:\n\n', reviewers);
-    await updatePullRequestComment(
-        reqReviewersComment,
-        'Required reviewers:\n\n',
-        requiredReviewers,
-    );
+    await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
 
 const runPush = async () => {

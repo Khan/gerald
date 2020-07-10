@@ -275,7 +275,7 @@ describe('get filtered lists', () => {
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser!
-*.js                @yipstanley! @githubUser
+*.js                @yipstanley! @githubUser @Org/Slug-name
 "/test/ig"          @testperson
 # *                 @otherperson
 
@@ -294,49 +294,49 @@ describe('get filtered lists', () => {
             sampleFile,
         );
         const notified = getNotified(filesChanged, fileDiffs, 'pull_request', sampleFile);
-        const actualReviewers = getFilteredLists(reviewers, requiredReviewers, notified, [
-            'yipstanley',
-            'testperson',
-        ]);
+        const {actualReviewers, teamReviewers} = getFilteredLists(
+            reviewers,
+            requiredReviewers,
+            notified,
+            ['yipstanley', 'testperson'],
+        );
         expect(actualReviewers).toEqual(expect.arrayContaining(['githubUser']));
+        expect(teamReviewers).toEqual(expect.arrayContaining(['Slug-name']));
     });
 });
 
 describe('parse existing comments', () => {
     it('should work', () => {
-        const notify = {
+        const gerald = {
             user: {login: 'github-actions[bot]'},
-            body: 'notified:',
-        };
-        const reviewers = {user: {login: 'github-actions[bot]'}, body: 'Reviewers:\n\n:'};
-        const reqReviewers = {
-            user: {login: 'github-actions[bot]'},
-            body: 'Required Reviewers:\n\n:',
+            body: `# Gerald:
+
+            ## Notified:
+
+            ## Reviewers:
+
+            ## Required reviewers:`,
         };
         const existingComments = {
             data: [
-                notify,
+                gerald,
                 {user: {login: 'github-actions[bot]'}, body: 'irrelevant comment'},
                 {user: {login: 'github-actions[bot]'}, body: 'another irrelevant comment'},
-                reviewers,
                 {
                     user: {login: 'yipstanley'},
                     body: '#removeme',
                 },
-                reqReviewers,
+                {
+                    user: {login: 'github-actions[bot]'},
+                    body: 'Required Reviewers:\n\n:',
+                },
+                {user: {login: 'github-actions[bot]'}, body: 'Reviewers:\n\n:'},
             ],
         };
 
-        const {
-            notifiedComment,
-            reviewersComment,
-            reqReviewersComment,
-            removedJustNames,
-        } = parseExistingComments(existingComments);
+        const {megaComment, removedJustNames} = parseExistingComments(existingComments);
 
-        expect(notifiedComment).toEqual(notify);
-        expect(reviewersComment).toEqual(reviewers);
-        expect(reqReviewersComment).toEqual(reqReviewers);
+        expect(megaComment).toEqual(megaComment);
         expect(removedJustNames).toEqual(['yipstanley']);
     });
 });

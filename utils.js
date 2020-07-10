@@ -8,6 +8,7 @@ const globOptions = {
     matchBase: true,
     dot: true,
     ignore: ['node_modules/**', 'coverage/**', '.git/**'],
+    silent: true,
 };
 
 import {
@@ -73,7 +74,7 @@ const turnPatternIntoRegex = (pattern: string): RegExp => {
 const parseUsername = (
     original: string,
 ): {original: string, username: string, justName: string, isRequired: boolean} => {
-    const justName = original.match(/\w+/);
+    const justName = original.match(/[^@!]+/);
     if (justName && justName[0]) {
         const isRequired = original.endsWith('!');
         return {
@@ -171,8 +172,13 @@ const getNotified = (
     const notified: NameToFiles = {};
     if (matches) {
         for (const match of matches) {
-            const [untrimmedPattern, ...names] = match.split(/ (?=@)/).filter(Boolean);
-            const pattern = untrimmedPattern.trim();
+            const untrimmedPattern = match.match(/(.(?!  @))*/);
+            const names = match.match(/@([A-Za-z]*\/)?\S*/g);
+            if (!untrimmedPattern || !names) {
+                continue;
+            }
+
+            const pattern = untrimmedPattern[0].trim();
 
             // handle dealing with regex
             if (pattern.startsWith('"') && pattern.endsWith('"')) {
@@ -224,8 +230,13 @@ const getReviewers = (
     }
 
     for (const match of matches) {
-        const [untrimmedPattern, ...names] = match.split(/ (?=@)/).filter(Boolean);
-        const pattern = untrimmedPattern.trim();
+        const untrimmedPattern = match.match(/(.(?!  @))*/);
+        const names = match.match(/@([A-Za-z]*\/)?\S*/g);
+        if (!untrimmedPattern || !names) {
+            continue;
+        }
+
+        const pattern = untrimmedPattern[0].trim();
 
         // handle dealing with regex
         if (pattern.startsWith('"') && pattern.endsWith('"')) {
@@ -273,7 +284,7 @@ const getFilteredLists = (
     requiredReviewers: NameToFiles,
     notified: NameToFiles,
     removedJustNames: Array<string>,
-): Array<string> => {
+): {actualReviewers: Array<string>, teamReviewers: Array<string>} => {
     for (const justName of removedJustNames) {
         const username = `@${justName}`;
         if (reviewers[username]) {
@@ -287,15 +298,20 @@ const getFilteredLists = (
         }
     }
 
-    const actualReviewers: string[] = Object.keys(requiredReviewers)
+    const allReviewers: string[] = Object.keys(requiredReviewers)
         .concat(
             Object.keys(reviewers).filter(
                 (reviewer: string) => !Object.keys(requiredReviewers).includes(reviewer),
             ),
         )
         .map((username: string) => username.slice(1));
-
-    return actualReviewers;
+    const actualReviewers = allReviewers.filter(
+        (justName: string) => !justName.match(/[A-Z]\/\S*/i),
+    );
+    const teamReviewers = allReviewers
+        .filter((justName: string) => justName.match(/[A-Z]\/\S*/i))
+        .map((slugWithOrg: string) => slugWithOrg.split('/')[1]);
+    return {actualReviewers, teamReviewers};
 };
 
 /**
@@ -309,16 +325,12 @@ const parseExistingComments = <
 >(
     existingComments: Octokit$Response<T[]> | {data: T[]},
 ): {
-    notifiedComment: ?T,
-    reviewersComment: ?T,
-    reqReviewersComment: ?T,
+    megaComment: ?T,
     removedJustNames: string[],
 } => {
     const actionBotComments: T[] = [];
     const removedJustNames: string[] = [];
-    let reqReviewersComment: ?T;
-    let notifiedComment: ?T;
-    let reviewersComment: ?T;
+    let megaComment: ?T;
 
     existingComments.data.map(cmnt => {
         // only look at comments made by github-actions[bot] for <required> reviewers / notified comments
@@ -333,23 +345,13 @@ const parseExistingComments = <
     });
 
     actionBotComments.forEach(comment => {
-        const notifiedMatch = comment.body.match(/^Notified:/i);
-        if (notifiedMatch) {
-            notifiedComment = comment;
-        }
-
-        const reviewersMatch = comment.body.match(/^Reviewers:/i);
-        if (reviewersMatch) {
-            reviewersComment = comment;
-        }
-
-        const reqReviewersMatch = comment.body.match(/^Required reviewers:/i);
-        if (reqReviewersMatch) {
-            reqReviewersComment = comment;
+        const megaCommentMatch = comment.body.match(/^# Gerald/i);
+        if (megaCommentMatch) {
+            megaComment = comment;
         }
     });
 
-    return {notifiedComment, reviewersComment, reqReviewersComment, removedJustNames};
+    return {megaComment, removedJustNames};
 };
 
 /**
