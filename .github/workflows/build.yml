@@ -15,3 +15,6 @@ jobs:
         name: Transpile flow to javascript
       - run: ncc build js/pr-notify.js
         name: Build dist folder
+      - run: git add -A
+      - run: git commit -am "Run build plans"
+      - run: git push
