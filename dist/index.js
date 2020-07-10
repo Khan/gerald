@@ -41,7 +41,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(493);
+/******/ 		return __webpack_require__(29);
 /******/ 	};
 /******/ 	// initialize runtime
 /******/ 	runtime(__webpack_require__);
@@ -1154,46 +1154,9 @@ getBindingIdentifiers.keys = {
 
 /***/ }),
 /* 29 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
-var Symbol = __webpack_require__(14),
-    arrayMap = __webpack_require__(807),
-    isArray = __webpack_require__(853),
-    isSymbol = __webpack_require__(131);
-
-/** Used as references for various `Number` constants. */
-var INFINITY = 1 / 0;
-
-/** Used to convert symbols to primitives and strings. */
-var symbolProto = Symbol ? Symbol.prototype : undefined,
-    symbolToString = symbolProto ? symbolProto.toString : undefined;
-
-/**
- * The base implementation of `_.toString` which doesn't convert nullish
- * values to empty strings.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {string} Returns the string.
- */
-function baseToString(value) {
-  // Exit early for strings to avoid a performance hit in some environments.
-  if (typeof value == 'string') {
-    return value;
-  }
-  if (isArray(value)) {
-    // Recursively convert values (susceptible to call stack limits).
-    return arrayMap(value, baseToString) + '';
-  }
-  if (isSymbol(value)) {
-    return symbolToString ? symbolToString.call(value) : '';
-  }
-  var result = (value + '');
-  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
-}
-
-module.exports = baseToString;
-
+__webpack_require__(315);var core=__webpack_require__(310);var _require=__webpack_require__(322),runPullRequest=_require.runPullRequest;try{console.log(process.env.GITHUB_EVENT);runPullRequest();}catch(error){core.setFailed(error.message);}
 
 /***/ }),
 /* 30 */
@@ -7014,7 +6977,12 @@ function requireModule(type, name) {
 }
 
 /***/ }),
-/* 109 */,
+/* 109 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+var _interopRequireDefault=__webpack_require__(464);var _regenerator=_interopRequireDefault(__webpack_require__(340));var _slicedToArray2=_interopRequireDefault(__webpack_require__(630));function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var fs=__webpack_require__(747);var glob=__webpack_require__(380);var _require=__webpack_require__(994),execCmd=_require.execCmd;var globOptions={matchBase:true,dot:true,ignore:['node_modules/**','coverage/**','.git/**'],silent:true};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,fileDiffs,nameToFilesObj){for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(pattern.test(diff)){if(nameToFilesObj[name]){if(!nameToFilesObj[name].includes(file)){nameToFilesObj[name].push(file);}}else{nameToFilesObj[name]=[file];}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=/^"\/(.*?)\/([a-z]*)"$/.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{original:original,username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,files){if(bin[username]){for(var _iterator=_createForOfIteratorHelperLoose(files),_step;!(_step=_iterator()).done;){var file=_step.value;if(!bin[username].includes(file)){bin[username].push(file);}}}else{bin[username]=files;}};var getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(/\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file==='NOTIFIED'&&!rawFile.match(/\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section==='pull_request'){sectionRegexp=file==='NOTIFIED'?/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm:/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else if(file==='NOTIFIED'){sectionRegexp=/(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return sectionRegexp.exec(rawFile);};var getNotified=function getNotified(filesChanged,fileDiffs,on){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=__testContent||fs.readFileSync('.github/NOTIFIED','utf-8');var section=getCorrectSection(buf,'NOTIFIED',on);if(!section){return{};}var matches=section[0].match(/^[^\#\n].*/gm);var notified={};if(matches){for(var _iterator2=_createForOfIteratorHelperLoose(matches),_step2;!(_step2=_iterator2()).done;){var match=_step2.value;var untrimmedPattern=match.match(/(.(?!  @))*/);var names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator3=_createForOfIteratorHelperLoose(names),_step3;!(_step3=_iterator3()).done;){var _name=_step3.value;maybeAddIfMatch(regex,_name,fileDiffs,notified);}}else{var matchedFiles=glob.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});for(var _iterator4=_createForOfIteratorHelperLoose(names),_step4;!(_step4=_iterator4()).done;){var _name2=_step4.value;pushOrSetToBin(notified,_name2,intersection);}}}}return notified;};var getReviewers=function getReviewers(filesChanged,fileDiffs,issuer){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=__testContent||fs.readFileSync('.github/REVIEWERS','utf-8');var section=getCorrectSection(buf,'REVIEWERS','pull_request');if(!section){return{reviewers:{},requiredReviewers:{}};}var matches=section[0].match(/^[^\#\n].*/gm);var reviewers={};var requiredReviewers={};if(!matches){return{reviewers:reviewers,requiredReviewers:requiredReviewers};}for(var _iterator5=_createForOfIteratorHelperLoose(matches),_step5;!(_step5=_iterator5()).done;){var match=_step5.value;var untrimmedPattern=match.match(/(.(?!  @))*/);var names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator6=_createForOfIteratorHelperLoose(names),_step6;!(_step6=_iterator6()).done;){var _name3=_step6.value;var _parseUsername=parseUsername(_name3),original=_parseUsername.original,username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(justName===issuer){continue;}var correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,fileDiffs,correctBin);}}else{var matchedFiles=glob.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});for(var _iterator7=_createForOfIteratorHelperLoose(names),_step7;!(_step7=_iterator7()).done;){var _name4=_step7.value;var _parseUsername2=parseUsername(_name4),_original=_parseUsername2.original,_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(_justName===issuer){continue;}var _correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,intersection);}}}return{reviewers:reviewers,requiredReviewers:requiredReviewers};};var getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator8=_createForOfIteratorHelperLoose(removedJustNames),_step8;!(_step8=_iterator8()).done;){var justName=_step8.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};var parseExistingComments=function parseExistingComments(existingComments){var actionBotComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.user.login==='github-actions[bot]'){actionBotComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(/\#removeme/i);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});actionBotComments.forEach(function(comment){var megaCommentMatch=comment.body.match(/^# Gerald/i);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};var getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator9,_step9,diff,fileName;return _regenerator.default.async(function getFileDiffs$(_context){while(1){switch(_context.prev=_context.next){case 0:_context.next=2;return _regenerator.default.awrap(execCmd('git',['diff',diffString]));case 2:rawDiffs=_context.sent.split(/^diff --git /m);fileToDiff={};for(_iterator9=_createForOfIteratorHelperLoose(rawDiffs);!(_step9=_iterator9()).done;){diff=_step9.value;fileName=diff.match(/(?<=^a\/)\S*/);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context.abrupt("return",fileToDiff);case 6:case"end":return _context.stop();}}},null,null,null,Promise);};var __maybeAddIfMatch=maybeAddIfMatch;var __turnPatternIntoRegex=turnPatternIntoRegex;var __parseUsername=parseUsername;var __pushOrSetToBin=pushOrSetToBin;module.exports={__maybeAddIfMatch:__maybeAddIfMatch,__turnPatternIntoRegex:__turnPatternIntoRegex,__parseUsername:__parseUsername,__pushOrSetToBin:__pushOrSetToBin,getNotified:getNotified,getReviewers:getReviewers,parseExistingComments:parseExistingComments,getFileDiffs:getFileDiffs,getFilteredLists:getFilteredLists,getCorrectSection:getCorrectSection};
+
+/***/ }),
 /* 110 */
 /***/ (function(module) {
 
@@ -9170,7 +9138,7 @@ module.exports = getRawTag;
 module.exports = parseOptions;
 
 const { Deprecation } = __webpack_require__(914);
-const { getUserAgent } = __webpack_require__(322);
+const { getUserAgent } = __webpack_require__(559);
 const once = __webpack_require__(924);
 
 const pkg = __webpack_require__(628);
@@ -12435,12 +12403,7 @@ var _plugins = __webpack_require__(108);
 ({});
 
 /***/ }),
-/* 191 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-var _interopRequireDefault=__webpack_require__(464);var _regenerator=_interopRequireDefault(__webpack_require__(340));var exec=__webpack_require__(751);var execCmd=function execCmd(cmd,args){var output,error,options;return _regenerator.default.async(function execCmd$(_context){while(1){switch(_context.prev=_context.next){case 0:output='';error='';options={};options.listeners={stdout:function stdout(data){output+=data.toString();},stderr:function stderr(data){error+=data.toString();}};_context.next=6;return _regenerator.default.awrap(exec.exec(cmd,args,options));case 6:if(!error){_context.next=8;break;}throw error;case 8:return _context.abrupt("return",output);case 9:case"end":return _context.stop();}}},null,null,null,Promise);};module.exports={execCmd:execCmd};
-
-/***/ }),
+/* 191 */,
 /* 192 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -15137,7 +15100,7 @@ const Core = __webpack_require__(693);
 
 const CORE_PLUGINS = [
   __webpack_require__(309),
-  __webpack_require__(971), // deprecated: remove in v17
+  __webpack_require__(477), // deprecated: remove in v17
   requestLog,
   __webpack_require__(978),
   restEndpointMethods,
@@ -17778,12 +17741,7 @@ module.exports = Map;
 
 
 /***/ }),
-/* 290 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-var _interopRequireDefault=__webpack_require__(464);var _regenerator=_interopRequireDefault(__webpack_require__(340));var _slicedToArray2=_interopRequireDefault(__webpack_require__(630));function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var fs=__webpack_require__(747);var glob=__webpack_require__(380);var _require=__webpack_require__(191),execCmd=_require.execCmd;var globOptions={matchBase:true,dot:true,ignore:['node_modules/**','coverage/**','.git/**'],silent:true};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,fileDiffs,nameToFilesObj){for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(pattern.test(diff)){if(nameToFilesObj[name]){if(!nameToFilesObj[name].includes(file)){nameToFilesObj[name].push(file);}}else{nameToFilesObj[name]=[file];}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=/^"\/(.*?)\/([a-z]*)"$/.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^\@\!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{original:original,username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,files){if(bin[username]){for(var _iterator=_createForOfIteratorHelperLoose(files),_step;!(_step=_iterator()).done;){var file=_step.value;if(!bin[username].includes(file)){bin[username].push(file);}}}else{bin[username]=files;}};var getNotified=function getNotified(filesChanged,fileDiffs,on){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=__testContent||fs.readFileSync('.github/NOTIFIED','utf-8');var section=buf.match(on==='pull_request'?/(.|\n)*(?=^## ON PUSH WITHOUT PULL REQUEST$)/gim:/(?<=^## ON PUSH WITHOUT PULL REQUEST)(.|\n)*/gim);if(!section){throw new Error("Invalid NOTIFIED file. Could not find a line with the text: '## ON PUSH WITHOUT PULL REQUEST'. Please add the line back. This line separates the list of rules that are employed on pull-requests and on pushes to master and develop.");}var matches=section[0].match(/^[^\#\n].*/gm);var notified={};if(matches){for(var _iterator2=_createForOfIteratorHelperLoose(matches),_step2;!(_step2=_iterator2()).done;){var match=_step2.value;var untrimmedPattern=match.match(/(.(?!  @))*/);var names=match.match(/@(Khan\/)?\S*/g);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator3=_createForOfIteratorHelperLoose(names),_step3;!(_step3=_iterator3()).done;){var _name=_step3.value;maybeAddIfMatch(regex,_name,fileDiffs,notified);}}else{var matchedFiles=glob.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});for(var _iterator4=_createForOfIteratorHelperLoose(names),_step4;!(_step4=_iterator4()).done;){var _name2=_step4.value;pushOrSetToBin(notified,_name2,intersection);}}}}return notified;};var getReviewers=function getReviewers(filesChanged,fileDiffs,issuer){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=__testContent||fs.readFileSync('.github/REVIEWERS','utf-8');var matches=buf.match(/^[^\#\n].*/gm);var reviewers={};var requiredReviewers={};if(!matches){return{reviewers:reviewers,requiredReviewers:requiredReviewers};}for(var _iterator5=_createForOfIteratorHelperLoose(matches),_step5;!(_step5=_iterator5()).done;){var match=_step5.value;var untrimmedPattern=match.match(/(.(?!  @))*/);var names=match.match(/@(Khan\/)?\S*/g);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator6=_createForOfIteratorHelperLoose(names),_step6;!(_step6=_iterator6()).done;){var _name3=_step6.value;var _parseUsername=parseUsername(_name3),original=_parseUsername.original,username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(justName===issuer){continue;}var correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,fileDiffs,correctBin);}}else{var matchedFiles=glob.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});for(var _iterator7=_createForOfIteratorHelperLoose(names),_step7;!(_step7=_iterator7()).done;){var _name4=_step7.value;var _parseUsername2=parseUsername(_name4),_original=_parseUsername2.original,_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(_justName===issuer){continue;}var _correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,intersection);}}}return{reviewers:reviewers,requiredReviewers:requiredReviewers};};var getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator8=_createForOfIteratorHelperLoose(removedJustNames),_step8;!(_step8=_iterator8()).done;){var justName=_step8.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.startsWith('Khan/');});var teamReviewers=allReviewers.filter(function(justName){return justName.startsWith('Khan/');}).map(function(slugWithKhan){return slugWithKhan.slice('Khan/'.length);});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};var parseExistingComments=function parseExistingComments(existingComments){var actionBotComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.user.login==='github-actions[bot]'){actionBotComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(/\#removeme/i);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});actionBotComments.forEach(function(comment){var megaCommentMatch=comment.body.match(/^# Gerald/i);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};var getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator9,_step9,diff,fileName;return _regenerator.default.async(function getFileDiffs$(_context){while(1){switch(_context.prev=_context.next){case 0:_context.next=2;return _regenerator.default.awrap(execCmd('git',['diff',diffString]));case 2:rawDiffs=_context.sent.split(/^diff --git /m);fileToDiff={};for(_iterator9=_createForOfIteratorHelperLoose(rawDiffs);!(_step9=_iterator9()).done;){diff=_step9.value;fileName=diff.match(/(?<=^a\/)\S*/);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context.abrupt("return",fileToDiff);case 6:case"end":return _context.stop();}}},null,null,null,Promise);};var __maybeAddIfMatch=maybeAddIfMatch;var __turnPatternIntoRegex=turnPatternIntoRegex;var __parseUsername=parseUsername;var __pushOrSetToBin=pushOrSetToBin;module.exports={__maybeAddIfMatch:__maybeAddIfMatch,__turnPatternIntoRegex:__turnPatternIntoRegex,__parseUsername:__parseUsername,__pushOrSetToBin:__pushOrSetToBin,getNotified:getNotified,getReviewers:getReviewers,parseExistingComments:parseExistingComments,getFileDiffs:getFileDiffs,getFilteredLists:getFilteredLists};
-
-/***/ }),
+/* 290 */,
 /* 291 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -20397,32 +20355,9 @@ module.exports = baseSortBy;
 
 /***/ }),
 /* 322 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
-"use strict";
-
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var osName = _interopDefault(__webpack_require__(732));
-
-function getUserAgent() {
-  try {
-    return `Node.js/${process.version.substr(1)} (${osName()}; ${process.arch})`;
-  } catch (error) {
-    if (/wmic os get Caption/.test(error.message)) {
-      return "Windows <version undetectable>";
-    }
-
-    throw error;
-  }
-}
-
-exports.getUserAgent = getUserAgent;
-//# sourceMappingURL=index.js.map
-
+var _interopRequireDefault=__webpack_require__(464);var _regenerator=_interopRequireDefault(__webpack_require__(340));var _extends2=_interopRequireDefault(__webpack_require__(540));function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var path=__webpack_require__(622);var octokit=__webpack_require__(459);var _require=__webpack_require__(109),getReviewers=_require.getReviewers,getNotified=_require.getNotified,getFileDiffs=_require.getFileDiffs,parseExistingComments=_require.parseExistingComments,getFilteredLists=_require.getFilteredLists;var _require2=__webpack_require__(994),execCmd=_require2.execCmd;var extraPermGithub=new octokit.GitHub(process.env['KHAN_ACTIONS_BOT_TOKEN']);var github=new octokit.GitHub(process.env['GITHUB_TOKEN']);var context=octokit.context;var ownerAndRepo={owner:context.issue.owner,repo:context.issue.repo};var separator='__________________________________________________________________________________________________________________________________';var makeCommentBody=function makeCommentBody(peopleToFiles,sectionHeader){var names=Object.keys(peopleToFiles);if(names.length){var body="### "+sectionHeader;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n\n";});return body;}return'';};var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function updatePullRequestComment$(_context){while(1){switch(_context.prev=_context.next){case 0:body='# Gerald:\n\n';body+=makeCommentBody(notifyees,'Notified:\n');body+=makeCommentBody(reviewers,'Reviewers:\n');body+=makeCommentBody(requiredReviewers,'Required reviewers:\n');if(!body.match(/^### (Reviewers:|Required Reviewers:|Notified:)$/m)){_context.next=15;break;}body+="\n"+separator+"\n_Don't want to be involved in this pull request? Comment `#removeme` and we won't notify you of further changes._";if(!comment){_context.next=11;break;}_context.next=9;return _regenerator.default.awrap(github.issues.updateComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id,body:body})));case 9:_context.next=13;break;case 11:_context.next=13;return _regenerator.default.awrap(github.issues.createComment((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number,body:body})));case 13:_context.next=18;break;case 15:if(!comment){_context.next=18;break;}_context.next=18;return _regenerator.default.awrap(github.issues.deleteComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id})));case 18:case"end":return _context.stop();}}},null,null,null,Promise);};var makeCommitComments=function makeCommitComments(peopleToFiles){var names,body,_iterator,_step,commit;return _regenerator.default.async(function makeCommitComments$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:names=Object.keys(peopleToFiles);if(!(peopleToFiles&&names.length)){_context2.next=11;break;}body='Notify of Push Without Pull Request\n\n';names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n";});_iterator=_createForOfIteratorHelperLoose(context.payload.commits);case 5:if((_step=_iterator()).done){_context2.next=11;break;}commit=_step.value;_context2.next=9;return _regenerator.default.awrap(extraPermGithub.repos.createCommitComment((0,_extends2.default)({},ownerAndRepo,{commit_sha:commit.id,body:body})));case 9:_context2.next=5;break;case 11:case"end":return _context2.stop();}}},null,null,null,Promise);};var runPullRequest=function runPullRequest(){var filesChanged,fileDiffs,notified,_getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function runPullRequest$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _regenerator.default.awrap(execCmd('git',['diff','origin/'+context.payload.pull_request.base.ref,'--name-only']));case 2:filesChanged=_context3.sent.split('\n');_context3.next=5;return _regenerator.default.awrap(getFileDiffs('origin/'+context.payload.pull_request.base.ref));case 5:fileDiffs=_context3.sent;notified=getNotified(filesChanged,fileDiffs,'pull_request');_getReviewers=getReviewers(filesChanged,fileDiffs,context.payload.pull_request.user.login),reviewers=_getReviewers.reviewers,requiredReviewers=_getReviewers.requiredReviewers;_context3.next=10;return _regenerator.default.awrap(github.issues.listComments((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number})));case 10:existingComments=_context3.sent;_parseExistingComment=parseExistingComments(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=15;return _regenerator.default.awrap(extraPermGithub.pulls.createReviewRequest((0,_extends2.default)({},ownerAndRepo,{pull_number:context.issue.number,reviewers:actualReviewers,team_reviewers:teamReviewers})));case 15:_context3.next=17;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 17:case"end":return _context3.stop();}}},null,null,null,Promise);};var runPush=function runPush(){var filesChanged,fileDiffs,notified;return _regenerator.default.async(function runPush$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:_context4.next=2;return _regenerator.default.awrap(execCmd('git',['diff',context.payload.before+"..."+context.payload.after,'--name-only']));case 2:filesChanged=_context4.sent.split('\n');_context4.next=5;return _regenerator.default.awrap(getFileDiffs(context.payload.before+"..."+context.payload.after));case 5:fileDiffs=_context4.sent;notified=getNotified(filesChanged,fileDiffs,'push');_context4.next=9;return _regenerator.default.awrap(makeCommitComments(notified));case 9:case"end":return _context4.stop();}}},null,null,null,Promise);};module.exports={runPullRequest:runPullRequest,runPush:runPush};
 
 /***/ }),
 /* 323 */
@@ -32285,7 +32220,43 @@ function getConditionalAnnotation(binding, path, name) {
 }
 
 /***/ }),
-/* 477 */,
+/* 477 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+module.exports = authenticationPlugin;
+
+const { Deprecation } = __webpack_require__(914);
+const once = __webpack_require__(924);
+
+const deprecateAuthenticate = once((log, deprecation) => log.warn(deprecation));
+
+const authenticate = __webpack_require__(685);
+const beforeRequest = __webpack_require__(571);
+const requestError = __webpack_require__(82);
+
+function authenticationPlugin(octokit, options) {
+  if (options.auth) {
+    octokit.authenticate = () => {
+      deprecateAuthenticate(
+        octokit.log,
+        new Deprecation(
+          '[@octokit/rest] octokit.authenticate() is deprecated and has no effect when "auth" option is set on Octokit constructor'
+        )
+      );
+    };
+    return;
+  }
+  const state = {
+    octokit,
+    auth: false
+  };
+  octokit.authenticate = authenticate.bind(null, state);
+  octokit.hook.before("request", beforeRequest.bind(null, state));
+  octokit.hook.error("request", requestError.bind(null, state));
+}
+
+
+/***/ }),
 /* 478 */
 /***/ (function(module) {
 
@@ -33174,12 +33145,7 @@ module.exports = cloneDeep;
 
 
 /***/ }),
-/* 493 */
-/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
-
-__webpack_require__(315);var core=__webpack_require__(310);var _require=__webpack_require__(703),runPullRequest=_require.runPullRequest;try{runPullRequest();}catch(error){core.setFailed(error.message);}
-
-/***/ }),
+/* 493 */,
 /* 494 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -34824,7 +34790,7 @@ module.exports = {
 /* 518 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var baseToString = __webpack_require__(29);
+var baseToString = __webpack_require__(971);
 
 /**
  * Converts `value` to a string. An empty string is returned for `null`
@@ -39208,7 +39174,35 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 });
 
 /***/ }),
-/* 559 */,
+/* 559 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var osName = _interopDefault(__webpack_require__(732));
+
+function getUserAgent() {
+  try {
+    return `Node.js/${process.version.substr(1)} (${osName()}; ${process.arch})`;
+  } catch (error) {
+    if (/wmic os get Caption/.test(error.message)) {
+      return "Windows <version undetectable>";
+    }
+
+    throw error;
+  }
+}
+
+exports.getUserAgent = getUserAgent;
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
 /* 560 */,
 /* 561 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
@@ -54266,12 +54260,7 @@ module.exports = baseIsNaN;
 
 
 /***/ }),
-/* 703 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-var _interopRequireDefault=__webpack_require__(464);var _regenerator=_interopRequireDefault(__webpack_require__(340));var _extends2=_interopRequireDefault(__webpack_require__(540));function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var path=__webpack_require__(622);var octokit=__webpack_require__(459);var _require=__webpack_require__(290),getReviewers=_require.getReviewers,getNotified=_require.getNotified,getFileDiffs=_require.getFileDiffs,parseExistingComments=_require.parseExistingComments,getFilteredLists=_require.getFilteredLists;var _require2=__webpack_require__(191),execCmd=_require2.execCmd;var khanActionsBot=new octokit.GitHub(process.env['KHAN_ACTIONS_BOT_TOKEN']);var github=new octokit.GitHub(process.env['GITHUB_TOKEN']);var context=octokit.context;var ownerAndRepo={owner:context.issue.owner,repo:context.issue.repo};var separator='__________________________________________________________________________________________________________________________________';var makeCommentBody=function makeCommentBody(peopleToFiles,sectionHeader){var names=Object.keys(peopleToFiles);if(names.length){var body="### "+sectionHeader;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n\n";});return body;}return'';};var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function updatePullRequestComment$(_context){while(1){switch(_context.prev=_context.next){case 0:body='# Gerald:\n\n';body+=makeCommentBody(notifyees,'Notified:\n');body+=makeCommentBody(reviewers,'Reviewers:\n');body+=makeCommentBody(requiredReviewers,'Required reviewers:\n');if(!body.match(/^### (Reviewers:|Required Reviewers:|Notified:)$/m)){_context.next=16;break;}body+="\n"+separator+"\n_Don't want to be involved in this pull request? Comment `#removeme` and we won't notify you of further changes._";console.log(body);if(!comment){_context.next=12;break;}_context.next=10;return _regenerator.default.awrap(github.issues.updateComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id,body:body})));case 10:_context.next=14;break;case 12:_context.next=14;return _regenerator.default.awrap(github.issues.createComment((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number,body:body})));case 14:_context.next=19;break;case 16:if(!comment){_context.next=19;break;}_context.next=19;return _regenerator.default.awrap(github.issues.deleteComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id})));case 19:case"end":return _context.stop();}}},null,null,null,Promise);};var makeCommitComments=function makeCommitComments(peopleToFiles){var names,body,_iterator,_step,commit;return _regenerator.default.async(function makeCommitComments$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:names=Object.keys(peopleToFiles);if(!(peopleToFiles&&names.length)){_context2.next=11;break;}body='Notify of Push Without Pull Request\n\n';names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n";});_iterator=_createForOfIteratorHelperLoose(context.payload.commits);case 5:if((_step=_iterator()).done){_context2.next=11;break;}commit=_step.value;_context2.next=9;return _regenerator.default.awrap(khanActionsBot.repos.createCommitComment((0,_extends2.default)({},ownerAndRepo,{commit_sha:commit.id,body:body})));case 9:_context2.next=5;break;case 11:case"end":return _context2.stop();}}},null,null,null,Promise);};var runPullRequest=function runPullRequest(){var filesChanged,fileDiffs,notified,_getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function runPullRequest$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _regenerator.default.awrap(execCmd('git',['diff','origin/'+context.payload.pull_request.base.ref,'--name-only']));case 2:filesChanged=_context3.sent.split('\n');_context3.next=5;return _regenerator.default.awrap(getFileDiffs('origin/'+context.payload.pull_request.base.ref));case 5:fileDiffs=_context3.sent;notified=getNotified(filesChanged,fileDiffs,'pull_request');_getReviewers=getReviewers(filesChanged,fileDiffs,context.payload.pull_request.user.login),reviewers=_getReviewers.reviewers,requiredReviewers=_getReviewers.requiredReviewers;_context3.next=10;return _regenerator.default.awrap(github.issues.listComments((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number})));case 10:existingComments=_context3.sent;_parseExistingComment=parseExistingComments(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=15;return _regenerator.default.awrap(khanActionsBot.pulls.createReviewRequest((0,_extends2.default)({},ownerAndRepo,{pull_number:context.issue.number,reviewers:actualReviewers,team_reviewers:teamReviewers})));case 15:_context3.next=17;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 17:case"end":return _context3.stop();}}},null,null,null,Promise);};var runPush=function runPush(){var filesChanged,fileDiffs,notified;return _regenerator.default.async(function runPush$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:_context4.next=2;return _regenerator.default.awrap(execCmd('git',['diff',context.payload.before+"..."+context.payload.after,'--name-only']));case 2:filesChanged=_context4.sent.split('\n');_context4.next=5;return _regenerator.default.awrap(getFileDiffs(context.payload.before+"..."+context.payload.after));case 5:fileDiffs=_context4.sent;notified=getNotified(filesChanged,fileDiffs,'push');_context4.next=9;return _regenerator.default.awrap(makeCommitComments(notified));case 9:case"end":return _context4.stop();}}},null,null,null,Promise);};module.exports={runPullRequest:runPullRequest,runPush:runPush};
-
-/***/ }),
+/* 703 */,
 /* 704 */
 /***/ (function(module) {
 
@@ -101283,37 +101272,43 @@ function hasTypes(node, param) {
 /* 971 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-module.exports = authenticationPlugin;
+var Symbol = __webpack_require__(14),
+    arrayMap = __webpack_require__(807),
+    isArray = __webpack_require__(853),
+    isSymbol = __webpack_require__(131);
 
-const { Deprecation } = __webpack_require__(914);
-const once = __webpack_require__(924);
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0;
 
-const deprecateAuthenticate = once((log, deprecation) => log.warn(deprecation));
+/** Used to convert symbols to primitives and strings. */
+var symbolProto = Symbol ? Symbol.prototype : undefined,
+    symbolToString = symbolProto ? symbolProto.toString : undefined;
 
-const authenticate = __webpack_require__(685);
-const beforeRequest = __webpack_require__(571);
-const requestError = __webpack_require__(82);
-
-function authenticationPlugin(octokit, options) {
-  if (options.auth) {
-    octokit.authenticate = () => {
-      deprecateAuthenticate(
-        octokit.log,
-        new Deprecation(
-          '[@octokit/rest] octokit.authenticate() is deprecated and has no effect when "auth" option is set on Octokit constructor'
-        )
-      );
-    };
-    return;
+/**
+ * The base implementation of `_.toString` which doesn't convert nullish
+ * values to empty strings.
+ *
+ * @private
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ */
+function baseToString(value) {
+  // Exit early for strings to avoid a performance hit in some environments.
+  if (typeof value == 'string') {
+    return value;
   }
-  const state = {
-    octokit,
-    auth: false
-  };
-  octokit.authenticate = authenticate.bind(null, state);
-  octokit.hook.before("request", beforeRequest.bind(null, state));
-  octokit.hook.error("request", requestError.bind(null, state));
+  if (isArray(value)) {
+    // Recursively convert values (susceptible to call stack limits).
+    return arrayMap(value, baseToString) + '';
+  }
+  if (isSymbol(value)) {
+    return symbolToString ? symbolToString.call(value) : '';
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
 }
+
+module.exports = baseToString;
 
 
 /***/ }),
@@ -103288,7 +103283,12 @@ module.exports = nativeCreate;
 
 /***/ }),
 /* 993 */,
-/* 994 */,
+/* 994 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+var _interopRequireDefault=__webpack_require__(464);var _regenerator=_interopRequireDefault(__webpack_require__(340));var exec=__webpack_require__(751);var execCmd=function execCmd(cmd,args){var output,error,options;return _regenerator.default.async(function execCmd$(_context){while(1){switch(_context.prev=_context.next){case 0:output='';error='';options={};options.listeners={stdout:function stdout(data){output+=data.toString();},stderr:function stderr(data){error+=data.toString();}};_context.next=6;return _regenerator.default.awrap(exec.exec(cmd,args,options));case 6:if(!error){_context.next=8;break;}throw error;case 8:return _context.abrupt("return",output);case 9:case"end":return _context.stop();}}},null,null,null,Promise);};module.exports={execCmd:execCmd};
+
+/***/ }),
 /* 995 */
 /***/ (function(__unusedmodule, exports) {
 
