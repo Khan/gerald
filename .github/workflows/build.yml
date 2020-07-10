@@ -15,6 +15,15 @@ jobs:
         name: Transpile flow to javascript
       - run: ncc build js/pr-notify.js
         name: Build dist folder
-      - run: git add -A
-      - run: git commit -am "Run build plans"
-      - run: git push
+      - name: Commit files
+        run: |
+          echo ${{ github.ref }}
+          git add .
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "ci: Automated build push" -a | exit 0
+      - name: Push changes
+        if: github.ref == 'refs/heads/master'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
