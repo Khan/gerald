@@ -1,0 +1,14 @@
+name: Build index.js
+'on':
+  - push
+jobs:
+  build_index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: yarn
+        name: "Setting up Yarn"
+      - run: npx babel src --out-dir lib
+        name: Transpile flow to javascript
+      - run: ncc build lib/pr-notify.js
+        name: Build dist folder
