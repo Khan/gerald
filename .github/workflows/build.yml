@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2-beta
-      - run: npm i -g @zeit/ncc
+      - run: sudo npm i -g @zeit/ncc
       - run: yarn
         name: "Setting up Yarn"
       - run: yarn global add
