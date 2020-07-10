@@ -6,8 +6,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+      - run: npm i -g @zeit/ncc
       - run: yarn
         name: "Setting up Yarn"
+      - run: yarn global add
       - run: npx babel lib --out-dir js
         name: Transpile flow to javascript
       - run: ncc build js/pr-notify.js
