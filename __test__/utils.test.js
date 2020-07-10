@@ -16,6 +16,7 @@ const {
     parseExistingComments,
     getFileDiffs,
     getFilteredLists,
+    getCorrectSection,
 } = require('../utils');
 
 const mockTestFileDiff = `a/testFile b/testFile
@@ -157,12 +158,16 @@ describe('push or set to bin', () => {
 describe('get notified', () => {
     it('should work', () => {
         const notifiedFile = `# comment
+*                   @userName
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
 .github/**          @githubUser
 *.js                @yipstanley @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson
 
-## ON PUSH WITHOUT PULL REQUEST
+[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 *.js                @owner`;
 
@@ -192,6 +197,10 @@ describe('get notified', () => {
 describe('get reviewers', () => {
     it('should work', () => {
         const reviewersFile = `# comment
+*                   @userName
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
 .github/**          @githubUser!
 *.js                @yipstanley! @githubUser
 "/test/ig"          @testperson
@@ -223,15 +232,54 @@ describe('get reviewers', () => {
     });
 });
 
+describe('get correct section', () => {
+    it('should work', () => {
+        const rawFile = `this should not show up
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+this should show up!
+
+[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+this should show up 2!`;
+
+        let result = getCorrectSection(rawFile, 'NOTIFIED', 'pull_request');
+        if (!result) {
+            expect(true).toBe(false);
+            return;
+        }
+
+        expect(result[0]).toBe('\n\nthis should show up!\n\n');
+
+        result = getCorrectSection(rawFile, 'NOTIFIED', 'push');
+        if (!result) {
+            expect(true).toBe(false);
+            return;
+        }
+        expect(result[0]).toBe('\n\nthis should show up 2!');
+
+        try {
+            getCorrectSection(rawFile, 'REVIEWERS', 'push');
+            /* flow-uncovered-block */
+        } catch (e) {
+            expect(e).toEqual(new Error(`The REVIEWERS file does not have a 'push' section.`));
+            /* end flow-uncovered-block */
+        }
+    });
+});
+
 describe('get filtered lists', () => {
     it('should work', () => {
         const sampleFile = `# comment
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
 .github/**          @githubUser!
 *.js                @yipstanley! @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson
 
-## ON PUSH WITHOUT PULL REQUEST`;
+[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)`;
         const filesChanged = [
             '.github/workflows/pr-notify.js',
             '.github/workflows/pr-notify.yml',

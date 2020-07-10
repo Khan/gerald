@@ -105,6 +105,49 @@ const pushOrSetToBin = (bin: NameToFiles, username: string, files: Array<string>
 };
 
 /**
+ * @desc Helper function that parses the raw string of either the NOTIFIED or
+ * REVIEWERS file and returns the correct section to be looking at.
+ * @param rawFile - The unparsed string of the NOTIFIED or REVIEWERS file.
+ * @param file - Which file are we actually looking at?
+ * @param section - What section of the file do you want? Only the NOTIFIED file has a 'push' section.
+ * @throws if the file is missing a section header or if there was a request to look at the 'push' section of the REVIEWERS file.
+ */
+const getCorrectSection = (
+    rawFile: string,
+    file: 'NOTIFIED' | 'REVIEWERS',
+    section: 'pull_request' | 'push',
+) => {
+    if (!rawFile.match(/\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)) {
+        throw new Error(
+            `Invalid ${file} file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.`,
+        );
+    }
+
+    if (
+        file === 'NOTIFIED' &&
+        !rawFile.match(/\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)
+    ) {
+        throw new Error(
+            `Invalid ${file} file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.`,
+        );
+    }
+    let sectionRegexp;
+    if (section === 'pull_request') {
+        sectionRegexp =
+            file === 'NOTIFIED'
+                ? /(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm
+                : /(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;
+    }
+    // if we're requesting the push section, make sure it's on the NOTIFIED file.
+    else if (file === 'NOTIFIED') {
+        sectionRegexp = /(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;
+    } else {
+        throw new Error("The REVIEWERS file does not have a 'push' section.");
+    }
+    return sectionRegexp.exec(rawFile);
+};
+
+/**
  * @desc Parse .github/NOTIFIED and return an object where each entry is a
  * unique person to notify and the files that they are being notified for.
  * @param filesChanged - List of changed files.
@@ -119,16 +162,11 @@ const getNotified = (
     __testContent: ?string = undefined,
 ): NameToFiles => {
     const buf = __testContent || fs.readFileSync('.github/NOTIFIED', 'utf-8');
-    const section = buf.match(
-        on === 'pull_request'
-            ? /(.|\n)*(?=^## ON PUSH WITHOUT PULL REQUEST$)/gim
-            : /(?<=^## ON PUSH WITHOUT PULL REQUEST)(.|\n)*/gim,
-    );
+    const section = getCorrectSection(buf, 'NOTIFIED', on);
     if (!section) {
-        throw new Error(
-            "Invalid NOTIFIED file. Could not find a line with the text: '## ON PUSH WITHOUT PULL REQUEST'. Please add the line back. This line separates the list of rules that are employed on pull-requests and on pushes to master and develop.",
-        );
+        return {};
     }
+
     const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
     const notified: NameToFiles = {};
     if (matches) {
@@ -172,8 +210,13 @@ const getReviewers = (
     __testContent: ?string = undefined,
 ): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
     const buf = __testContent || fs.readFileSync('.github/REVIEWERS', 'utf-8');
+    const section = getCorrectSection(buf, 'REVIEWERS', 'pull_request');
 
-    const matches = buf.match(/^[^\#\n].*/gm); // ignore comments
+    if (!section) {
+        return {reviewers: {}, requiredReviewers: {}};
+    }
+
+    const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
     const reviewers: {[string]: Array<string>, ...} = {};
     const requiredReviewers: {[string]: Array<string>, ...} = {};
     if (!matches) {
@@ -344,4 +387,5 @@ module.exports = {
     parseExistingComments,
     getFileDiffs,
     getFilteredLists,
+    getCorrectSection,
 };
