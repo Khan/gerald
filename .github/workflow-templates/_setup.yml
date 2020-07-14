@@ -1,0 +1,9 @@
+
+setup:
+  checkout:
+  - uses: actions/checkout@v1
+    name: get the repo
+  yarn:
+    setup: checkout
+    steps:
+      - run: yarn
