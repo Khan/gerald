@@ -1,0 +1,29 @@
+name: Build index.js
+'on':
+  - push
+jobs:
+  build_index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+      - run: sudo npm i -g @zeit/ncc
+      - run: yarn
+        name: "Setting up Yarn"
+      - run: yarn global add
+      - run: npx babel lib --out-dir js
+        name: Transpile flow to javascript
+      - run: ncc build js/pr-notify.js
+        name: Build dist folder
+      - name: Commit files
+        run: |
+          echo ${{ github.ref }}
+          git add .
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "ci: Automated build push" -a | exit 0
+      - name: Push changes
+        if: github.ref == 'refs/heads/master'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
