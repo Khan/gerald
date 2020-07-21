@@ -11,7 +11,8 @@
     "actions-utils": "Khan/actions-utils",
     "flow-bin": "0.124.0",
     "glob": "^7.1.6",
-    "jest": "^26.1.0"
+    "jest": "^26.1.0",
+    "prettier": "^2.0.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.4",
