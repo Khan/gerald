@@ -8,12 +8,15 @@
     "@actions/github": "2.1.1",
     "@babel/core": "^7.10.4",
     "@babel/register": "^7.10.4",
+    "actions-utils": "Khan/actions-utils",
     "flow-bin": "0.124.0",
     "glob": "^7.1.6",
-    "jest": "^26.1.0"
+    "jest": "^26.1.0",
+    "prettier": "^2.0.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.4",
+    "actions-workflow-tools": "Khan/actions-workflow-tools",
     "babel-jest": "^26.1.0",
     "eslint": "^7.5.0",
     "eslint-config-prettier": "^6.11.0",
