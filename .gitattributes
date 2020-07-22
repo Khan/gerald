@@ -1,0 +1,3 @@
+yarn.lock binary linguist-generated=true
+dist/*.js binary linguist-generated=true
+.github/workflows/*.yml binary linguist-generated=true
