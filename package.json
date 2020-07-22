@@ -1,6 +1,12 @@
 {
   "scripts": {
-    "dist": "ncc build lib/pr-notify.js"
+    "dist": "ncc build lib/pr-notify.js",
+    "format": "prettier-eslint --write --config .prettierrc '**/*.js'",
+    "format-files": "prettier-eslint --write --config .prettierrc",
+    "lint": "eslint .",
+    "test": "jest",
+    "test:all": "env JIRA_TESTS=1 jest",
+    "flow": "flow"
   },
   "dependencies": {
     "@actions/core": "^1.2.4",
