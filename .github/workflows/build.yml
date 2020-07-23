@@ -3,9 +3,6 @@ name: Build index.js
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 jobs:
   build_index:
     runs-on: ubuntu-latest
