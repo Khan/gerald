@@ -1,6 +1,6 @@
 // @flow
 
-const exec = require('@actions/exec'); //flow-uncovered-line
+import exec from '@actions/exec'; //flow-uncovered-line
 
 /**
  * @desc Asynchronously calls @actions/exec to execute a command.
@@ -8,7 +8,7 @@ const exec = require('@actions/exec'); //flow-uncovered-line
  * @param args - List of arguments to call with the command.
  * @throws if the command errors.
  */
-const execCmd = async (cmd: string, args: string[]): Promise<string> => {
+export const execCmd = async (cmd: string, args: string[]): Promise<string> => {
     let output = '';
     let error = '';
     const options = {};
@@ -28,5 +28,3 @@ const execCmd = async (cmd: string, args: string[]): Promise<string> => {
     /* end flow-uncovered-block */
     return output;
 };
-
-module.exports = {execCmd};
