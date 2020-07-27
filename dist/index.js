@@ -70080,9 +70080,9 @@ exports.transformFromAstAsync = transformFromAstAsync;
 /***/ }),
 /* 528 */,
 /* 529 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-var _interopRequireDefault=__webpack_require__(5);var _regenerator=_interopRequireDefault(__webpack_require__(292));var exec=__webpack_require__(120);var execCmd=function execCmd(cmd,args){var output,error,options;return _regenerator.default.async(function execCmd$(_context){while(1){switch(_context.prev=_context.next){case 0:output='';error='';options={};options.listeners={stdout:function stdout(data){output+=data.toString();},stderr:function stderr(data){error+=data.toString();}};_context.next=6;return _regenerator.default.awrap(exec.exec(cmd,args,options));case 6:if(!error){_context.next=8;break;}throw error;case 8:return _context.abrupt("return",output);case 9:case"end":return _context.stop();}}},null,null,null,Promise);};module.exports={execCmd:execCmd};
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.execCmd=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _exec=_interopRequireDefault(__webpack_require__(120));var execCmd=function execCmd(cmd,args){var output,error,options;return _regenerator.default.async(function execCmd$(_context){while(1){switch(_context.prev=_context.next){case 0:output='';error='';options={};options.listeners={stdout:function stdout(data){output+=data.toString();},stderr:function stderr(data){error+=data.toString();}};_context.next=6;return _regenerator.default.awrap(_exec.default.exec(cmd,args,options));case 6:if(!error){_context.next=8;break;}throw error;case 8:return _context.abrupt("return",output);case 9:case"end":return _context.stop();}}},null,null,null,Promise);};exports.execCmd=execCmd;
 
 /***/ }),
 /* 530 */
