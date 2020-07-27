@@ -1,16 +1,16 @@
 // @flow
 
 import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from '@octokit/rest';
-import {type Options} from 'glob';
+import {type Options} from 'fast-glob';
 import fs from 'fs';
+import fg from 'fast-glob';
 import glob from 'glob';
 
 import {execCmd} from './execCmd';
 const globOptions: Options = {
-    matchBase: true,
+    baseNameMatch: true,
     dot: true,
     ignore: ['node_modules/**', 'coverage/**', '.git/**', 'flow-typed/**'],
-    silent: true,
 };
 
 type NameToFiles = {[name: string]: string[], ...};
@@ -210,10 +210,7 @@ export const getNotified = async (
             }
             // handle dealing with glob matches
             else {
-                const {matchedFiles, newCache} = await globAsync(pattern, {
-                    cache: cache,
-                    ...globOptions,
-                });
+                const {matchedFiles, newCache} = fg.sync(pattern, globOptions);
                 cache = {...newCache, ...cache};
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
@@ -279,10 +276,7 @@ export const getReviewers = async (
                 maybeAddIfMatch(regex, username, fileDiffs, correctBin);
             }
         } else {
-            const {matchedFiles, newCache} = await globAsync(pattern, {
-                cache: cache,
-                ...globOptions,
-            });
+            const {matchedFiles, newCache} = fg.sync(pattern, globOptions);
             cache = {...cache, ...newCache};
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
             for (const name of names) {

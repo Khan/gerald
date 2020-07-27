@@ -1,6 +1,7 @@
 // @flow
 
 import glob from 'glob';
+import fg from 'fast-glob';
 
 import {
     __maybeAddIfMatch,
@@ -16,7 +17,7 @@ import {
     getCorrectSection,
 } from '../utils';
 
-const globOptions = {matchBase: true, dot: true};
+const globOptions = {dot: true, matchBase: true};
 
 const mockTestFileDiff = `a/testFile b/testFile
 new file mode 123456
@@ -369,5 +370,20 @@ describe('test caching glob calls', () => {
         // on average the uncached glob search takes about 1.2X the speed of the cached glob search
         expect(asyncEndTime - asyncStartTime < syncEndTime - syncStartTime);
         expect(syncResults).toEqual(asyncResults);
+
+        // do the same for fast-glob
+        const fgResults: Array<string> = [];
+        const fgStartTime = new Date().getTime();
+
+        for (const pattern of globPatterns) {
+            const matchedFiles = await fg(pattern, {baseNameMatch: true, dot: true});
+            fgResults.push(...matchedFiles);
+        }
+
+        const fgEndTime = new Date().getTime();
+
+        console.log(fgEndTime - fgStartTime);
+        console.log(asyncEndTime - asyncStartTime);
+        console.log(syncEndTime - syncStartTime);
     });
 });
