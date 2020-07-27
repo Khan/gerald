@@ -367,10 +367,6 @@ describe('test caching glob calls', () => {
 
         const asyncEndTime = new Date().getTime();
 
-        // on average the uncached glob search takes about 1.2X the speed of the cached glob search
-        expect(asyncEndTime - asyncStartTime < syncEndTime - syncStartTime);
-        expect(syncResults).toEqual(asyncResults);
-
         // do the same for fast-glob
         const fgResults: Array<string> = [];
         const fgStartTime = new Date().getTime();
@@ -382,8 +378,8 @@ describe('test caching glob calls', () => {
 
         const fgEndTime = new Date().getTime();
 
-        console.log(fgEndTime - fgStartTime);
-        console.log(asyncEndTime - asyncStartTime);
-        console.log(syncEndTime - syncStartTime);
+        // on average the uncached glob search takes about 1.2X the speed of the cached glob search
+        expect(asyncEndTime - asyncStartTime < syncEndTime - syncStartTime);
+        expect(syncResults).toEqual(asyncResults);
     });
 });
