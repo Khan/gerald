@@ -4,7 +4,6 @@ import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from
 import {type Options} from 'fast-glob';
 import fs from 'fs';
 import fg from 'fast-glob';
-import glob from 'glob';
 
 import {execCmd} from './execCmd';
 const globOptions: Options = {
@@ -140,35 +139,6 @@ export const getCorrectSection = (
 };
 
 /**
- * @desc Runs glob.Glob asynchronously, and returns the matches and the cache
- * object so that it can be passed into the next Glob call. We don't use glob.sync
- * (which is a synchronous version of glob.Glob) because it doesn't allow us
- * to get the cache object and pass it into the next call.
- * @param pattern - Glob pattern to match files for
- * @param options - GlobOptions to pass into the glob call
- */
-const globAsync = async (
-    pattern: string,
-    options: Options,
-): Promise<{
-    matchedFiles: Array<string>,
-    newCache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...},
-}> => {
-    return new Promise<{
-        matchedFiles: Array<string>,
-        newCache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...},
-    }>((res, rej) => {
-        const g = new glob.Glob(pattern, options, (err: ?Error, matches: Array<string>) => {
-            if (err) {
-                rej(err);
-            } else {
-                res({matchedFiles: matches, newCache: g.cache});
-            }
-        });
-    });
-};
-
-/**
  * @desc Parse .github/NOTIFIED and return an object where each entry is a
  * unique person to notify and the files that they are being notified for.
  * @param filesChanged - List of changed files.
@@ -190,7 +160,6 @@ export const getNotified = async (
 
     const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
     const notified: NameToFiles = {};
-    let cache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...} = {};
     if (matches) {
         for (const match of matches) {
             const untrimmedPattern = match.match(/(.(?!  @))*/);
@@ -210,8 +179,7 @@ export const getNotified = async (
             }
             // handle dealing with glob matches
             else {
-                const {matchedFiles, newCache} = fg.sync(pattern, globOptions);
-                cache = {...newCache, ...cache};
+                const matchedFiles = fg.sync(pattern, globOptions);
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
                 for (const name of names) {
@@ -251,7 +219,6 @@ export const getReviewers = async (
         return {reviewers, requiredReviewers};
     }
 
-    let cache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...} = {};
     for (const match of matches) {
         const untrimmedPattern = match.match(/(.(?!  @))*/);
         const names = match.match(/@([A-Za-z]*\/)?\S*/g);
@@ -276,8 +243,7 @@ export const getReviewers = async (
                 maybeAddIfMatch(regex, username, fileDiffs, correctBin);
             }
         } else {
-            const {matchedFiles, newCache} = fg.sync(pattern, globOptions);
-            cache = {...cache, ...newCache};
+            const matchedFiles = fg.sync(pattern, globOptions);
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
             for (const name of names) {
                 // don't add yourself as a reviewer
