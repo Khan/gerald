@@ -127,7 +127,7 @@ export const runPullRequest = async () => {
     const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
 
     // figure out who to notify and request reviews from
-    const notified = getNotified(filesChanged, fileDiffs, 'pull_request');
+    const notified = await getNotified(filesChanged, fileDiffs, 'pull_request');
     const {reviewers, requiredReviewers} = await getReviewers(
         filesChanged,
         fileDiffs,
