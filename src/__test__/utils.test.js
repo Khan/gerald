@@ -168,17 +168,17 @@ describe('get notified', () => {
 
 *.js                @owner`;
 
-        const filesChanged = ['.github/workflows/build.yml', 'lib/execCmd.js', 'lib/main.js'];
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
         expect(await getNotified(filesChanged, fileDiffs, 'pull_request', notifiedFile)).toEqual({
-            '@yipstanley': ['lib/execCmd.js', 'lib/main.js'],
-            '@githubUser': ['.github/workflows/build.yml', 'lib/execCmd.js', 'lib/main.js'],
+            '@yipstanley': ['src/execCmd.js', 'src/main.js'],
+            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'],
             '@testperson': ['yaml.yml'],
         });
 
         expect(await getNotified(filesChanged, fileDiffs, 'push', notifiedFile)).toEqual({
-            '@owner': ['lib/execCmd.js', 'lib/main.js'],
+            '@owner': ['src/execCmd.js', 'src/main.js'],
         });
     });
 });
@@ -194,7 +194,7 @@ describe('get reviewers', () => {
 *.js                @yipstanley! @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson`;
-        const filesChanged = ['.github/workflows/build.yml', 'lib/execCmd.js', 'lib/main.js'];
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
         const {requiredReviewers, reviewers} = await getReviewers(
@@ -204,7 +204,7 @@ describe('get reviewers', () => {
             reviewersFile,
         );
         expect(reviewers).toEqual({
-            '@githubUser': ['lib/execCmd.js', 'lib/main.js'],
+            '@githubUser': ['src/execCmd.js', 'src/main.js'],
             '@testperson': ['yaml.yml'],
         });
         expect(requiredReviewers).toEqual({
@@ -289,7 +289,7 @@ describe('get filtered lists', () => {
 describe('parse existing comments', () => {
     it('should work', () => {
         const gerald = {
-            user: {login: 'github-actions[bot]'},
+            user: {login: 'khan-actions-bot'},
             body: `# Gerald:
 
             ## Notified:
@@ -301,17 +301,17 @@ describe('parse existing comments', () => {
         const existingComments = {
             data: [
                 gerald,
-                {user: {login: 'github-actions[bot]'}, body: 'irrelevant comment'},
-                {user: {login: 'github-actions[bot]'}, body: 'another irrelevant comment'},
+                {user: {login: 'khan-actions-bot'}, body: 'irrelevant comment'},
+                {user: {login: 'khan-actions-bot'}, body: 'another irrelevant comment'},
                 {
                     user: {login: 'yipstanley'},
                     body: '#removeme',
                 },
                 {
-                    user: {login: 'github-actions[bot]'},
+                    user: {login: 'khan-actions-bot'},
                     body: 'Required Reviewers:\n\n:',
                 },
-                {user: {login: 'github-actions[bot]'}, body: 'Reviewers:\n\n:'},
+                {user: {login: 'khan-actions-bot'}, body: 'Reviewers:\n\n:'},
             ],
         };
 

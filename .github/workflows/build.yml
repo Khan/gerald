@@ -16,7 +16,7 @@ jobs:
       - run: yarn
         name: "Setting up Yarn"
       - run: yarn global add
-      - run: npx babel lib --out-dir js
+      - run: npx babel src --out-dir js
         name: Transpile flow to javascript
       - run: ncc build js/pr-notify.js
         name: Build dist folder

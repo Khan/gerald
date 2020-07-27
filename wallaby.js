@@ -4,8 +4,8 @@
  * See https://wallabyjs.com/ for details.
  */
 module.exports = wallaby => {
-    const tests = ['cli/**/*.test.js', 'lib/**/*.test.js'];
-    const files = ['cli/**/*.js', 'lib/**/*.js', ...tests.map(glob => `!${glob}`)];
+    const tests = ['src/**/*.test.js'];
+    const files = ['src/**/*.js', ...tests.map(glob => `!${glob}`)];
 
     return {
         files,
