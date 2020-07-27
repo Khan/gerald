@@ -101,7 +101,7 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['set-up/*.js', 'bin/*', 'lib/__test__/prog.js'],
+            files: ['src/pr-notify.js, src/main.js'],
             rules: {
                 'import/no-commonjs': 'off',
             },

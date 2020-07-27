@@ -6,7 +6,6 @@ import {
     type Octokit$PullsListResponseItem,
     type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
-const octokit = require('@actions/github'); //flow-uncovered-line
 
 type Context = {|
     issue: {|owner: string, repo: string, number: number|},
@@ -27,6 +26,8 @@ import {
     getFilteredLists,
 } from './utils';
 import {execCmd} from './execCmd';
+
+const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
 const extraPermGithub: Octokit = new octokit.GitHub(process.env['KHAN_ACTIONS_BOT_TOKEN']);
