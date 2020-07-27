@@ -32994,60 +32994,19 @@ module.exports = setToString;
 
 /***/ }),
 /* 144 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(module) {
 
-"use strict";
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
 
-const pump = __webpack_require__(631);
-const bufferStream = __webpack_require__(128);
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
 
-class MaxBufferError extends Error {
-	constructor() {
-		super('maxBuffer exceeded');
-		this.name = 'MaxBufferError';
-	}
+  return arr2;
 }
 
-function getStream(inputStream, options) {
-	if (!inputStream) {
-		return Promise.reject(new Error('Expected a stream'));
-	}
-
-	options = Object.assign({maxBuffer: Infinity}, options);
-
-	const {maxBuffer} = options;
-
-	let stream;
-	return new Promise((resolve, reject) => {
-		const rejectPromise = error => {
-			if (error) { // A null check
-				error.bufferedData = stream.getBufferedValue();
-			}
-			reject(error);
-		};
-
-		stream = pump(inputStream, bufferStream(options), error => {
-			if (error) {
-				rejectPromise(error);
-				return;
-			}
-
-			resolve();
-		});
-
-		stream.on('data', () => {
-			if (stream.getBufferedLength() > maxBuffer) {
-				rejectPromise(new MaxBufferError());
-			}
-		});
-	}).then(() => stream.getBufferedValue());
-}
-
-module.exports = getStream;
-module.exports.buffer = (stream, options) => getStream(stream, Object.assign({}, options, {encoding: 'buffer'}));
-module.exports.array = (stream, options) => getStream(stream, Object.assign({}, options, {array: true}));
-module.exports.MaxBufferError = MaxBufferError;
-
+module.exports = _arrayLikeToArray;
 
 /***/ }),
 /* 145 */
@@ -35377,7 +35336,12 @@ exports.paginateRest = paginateRest;
 
 
 /***/ }),
-/* 167 */,
+/* 167 */
+/***/ (function(module) {
+
+module.exports = require("tls");
+
+/***/ }),
 /* 168 */,
 /* 169 */,
 /* 170 */
@@ -35457,16 +35421,7 @@ function register (state, name, method, options) {
 
 
 /***/ }),
-/* 172 */
-/***/ (function(module) {
-
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
-
-module.exports = _arrayWithHoles;
-
-/***/ }),
+/* 172 */,
 /* 173 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -38097,23 +38052,11 @@ module.exports = mapCacheDelete;
 /* 219 */
 /***/ (function(module) {
 
-"use strict";
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
 
-module.exports = (promise, onFinally) => {
-	onFinally = onFinally || (() => {});
-
-	return promise.then(
-		val => new Promise(resolve => {
-			resolve(onFinally());
-		}).then(() => val),
-		err => new Promise(resolve => {
-			resolve(onFinally());
-		}).then(() => {
-			throw err;
-		})
-	);
-};
-
+module.exports = _arrayWithHoles;
 
 /***/ }),
 /* 220 */,
@@ -38799,161 +38742,13 @@ module.exports = require("child_process");
 
 /***/ }),
 /* 229 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(module) {
 
-"use strict";
-
-
-module.exports = validate;
-
-const { RequestError } = __webpack_require__(711);
-const get = __webpack_require__(638);
-const set = __webpack_require__(698);
-
-function validate(octokit, options) {
-  if (!options.request.validate) {
-    return;
-  }
-  const { validate: params } = options.request;
-
-  Object.keys(params).forEach(parameterName => {
-    const parameter = get(params, parameterName);
-
-    const expectedType = parameter.type;
-    let parentParameterName;
-    let parentValue;
-    let parentParamIsPresent = true;
-    let parentParameterIsArray = false;
-
-    if (/\./.test(parameterName)) {
-      parentParameterName = parameterName.replace(/\.[^.]+$/, "");
-      parentParameterIsArray = parentParameterName.slice(-2) === "[]";
-      if (parentParameterIsArray) {
-        parentParameterName = parentParameterName.slice(0, -2);
-      }
-      parentValue = get(options, parentParameterName);
-      parentParamIsPresent =
-        parentParameterName === "headers" ||
-        (typeof parentValue === "object" && parentValue !== null);
-    }
-
-    const values = parentParameterIsArray
-      ? (get(options, parentParameterName) || []).map(
-          value => value[parameterName.split(/\./).pop()]
-        )
-      : [get(options, parameterName)];
-
-    values.forEach((value, i) => {
-      const valueIsPresent = typeof value !== "undefined";
-      const valueIsNull = value === null;
-      const currentParameterName = parentParameterIsArray
-        ? parameterName.replace(/\[\]/, `[${i}]`)
-        : parameterName;
-
-      if (!parameter.required && !valueIsPresent) {
-        return;
-      }
-
-      // if the parent parameter is of type object but allows null
-      // then the child parameters can be ignored
-      if (!parentParamIsPresent) {
-        return;
-      }
-
-      if (parameter.allowNull && valueIsNull) {
-        return;
-      }
-
-      if (!parameter.allowNull && valueIsNull) {
-        throw new RequestError(
-          `'${currentParameterName}' cannot be null`,
-          400,
-          {
-            request: options
-          }
-        );
-      }
-
-      if (parameter.required && !valueIsPresent) {
-        throw new RequestError(
-          `Empty value for parameter '${currentParameterName}': ${JSON.stringify(
-            value
-          )}`,
-          400,
-          {
-            request: options
-          }
-        );
-      }
-
-      // parse to integer before checking for enum
-      // so that string "1" will match enum with number 1
-      if (expectedType === "integer") {
-        const unparsedValue = value;
-        value = parseInt(value, 10);
-        if (isNaN(value)) {
-          throw new RequestError(
-            `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
-              unparsedValue
-            )} is NaN`,
-            400,
-            {
-              request: options
-            }
-          );
-        }
-      }
-
-      if (parameter.enum && parameter.enum.indexOf(String(value)) === -1) {
-        throw new RequestError(
-          `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
-            value
-          )}`,
-          400,
-          {
-            request: options
-          }
-        );
-      }
-
-      if (parameter.validation) {
-        const regex = new RegExp(parameter.validation);
-        if (!regex.test(value)) {
-          throw new RequestError(
-            `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
-              value
-            )}`,
-            400,
-            {
-              request: options
-            }
-          );
-        }
-      }
-
-      if (expectedType === "object" && typeof value === "string") {
-        try {
-          value = JSON.parse(value);
-        } catch (exception) {
-          throw new RequestError(
-            `JSON parse error of value for parameter '${currentParameterName}': ${JSON.stringify(
-              value
-            )}`,
-            400,
-            {
-              request: options
-            }
-          );
-        }
-      }
-
-      set(options, parameter.mapTo || currentParameterName, value);
-    });
-  });
-
-  return options;
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
+module.exports = _nonIterableRest;
 
 /***/ }),
 /* 230 */,
@@ -41699,7 +41494,28 @@ exports.endpoint = endpoint;
 
 
 /***/ }),
-/* 291 */,
+/* 291 */
+/***/ (function(module) {
+
+"use strict";
+
+module.exports = (promise, onFinally) => {
+	onFinally = onFinally || (() => {});
+
+	return promise.then(
+		val => new Promise(resolve => {
+			resolve(onFinally());
+		}).then(() => val),
+		err => new Promise(resolve => {
+			resolve(onFinally());
+		}).then(() => {
+			throw err;
+		})
+	);
+};
+
+
+/***/ }),
 /* 292 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -55299,7 +55115,7 @@ module.exports = baseForOwn;
 
 module.exports = octokitValidate;
 
-const validate = __webpack_require__(229);
+const validate = __webpack_require__(887);
 
 function octokitValidate(octokit) {
   octokit.hook.before("request", validate.bind(null, octokit));
@@ -60663,7 +60479,7 @@ function isThenable(val) {
 
 module.exports = factory;
 
-const Octokit = __webpack_require__(587);
+const Octokit = __webpack_require__(933);
 const registerPlugin = __webpack_require__(194);
 
 function factory(plugins) {
@@ -63544,22 +63360,7 @@ function isCompatTag(tagName) {
 }
 
 /***/ }),
-/* 409 */
-/***/ (function(module) {
-
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-
-  for (var i = 0, arr2 = new Array(len); i < len; i++) {
-    arr2[i] = arr[i];
-  }
-
-  return arr2;
-}
-
-module.exports = _arrayLikeToArray;
-
-/***/ }),
+/* 409 */,
 /* 410 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -63886,7 +63687,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var concatMap = __webpack_require__(812);
-var balanced = __webpack_require__(900);
+var balanced = __webpack_require__(605);
 
 module.exports = expandTop;
 
@@ -66926,13 +66727,13 @@ module.exports = class HttpError extends Error {
 /* 479 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var arrayWithHoles = __webpack_require__(172);
+var arrayWithHoles = __webpack_require__(219);
 
 var iterableToArrayLimit = __webpack_require__(475);
 
 var unsupportedIterableToArray = __webpack_require__(555);
 
-var nonIterableRest = __webpack_require__(789);
+var nonIterableRest = __webpack_require__(229);
 
 function _slicedToArray(arr, i) {
   return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
@@ -70363,7 +70164,63 @@ function _assertUnremoved() {
 /* 531 */,
 /* 532 */,
 /* 533 */,
-/* 534 */,
+/* 534 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+"use strict";
+
+const pump = __webpack_require__(631);
+const bufferStream = __webpack_require__(128);
+
+class MaxBufferError extends Error {
+	constructor() {
+		super('maxBuffer exceeded');
+		this.name = 'MaxBufferError';
+	}
+}
+
+function getStream(inputStream, options) {
+	if (!inputStream) {
+		return Promise.reject(new Error('Expected a stream'));
+	}
+
+	options = Object.assign({maxBuffer: Infinity}, options);
+
+	const {maxBuffer} = options;
+
+	let stream;
+	return new Promise((resolve, reject) => {
+		const rejectPromise = error => {
+			if (error) { // A null check
+				error.bufferedData = stream.getBufferedValue();
+			}
+			reject(error);
+		};
+
+		stream = pump(inputStream, bufferStream(options), error => {
+			if (error) {
+				rejectPromise(error);
+				return;
+			}
+
+			resolve();
+		});
+
+		stream.on('data', () => {
+			if (stream.getBufferedLength() > maxBuffer) {
+				rejectPromise(new MaxBufferError());
+			}
+		});
+	}).then(() => stream.getBufferedValue());
+}
+
+module.exports = getStream;
+module.exports.buffer = (stream, options) => getStream(stream, Object.assign({}, options, {encoding: 'buffer'}));
+module.exports.array = (stream, options) => getStream(stream, Object.assign({}, options, {array: true}));
+module.exports.MaxBufferError = MaxBufferError;
+
+
+/***/ }),
 /* 535 */,
 /* 536 */
 /***/ (function(module) {
@@ -71209,7 +71066,7 @@ module.exports = baseMatches;
 /* 547 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.runPush=exports.runPullRequest=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _extends2=_interopRequireDefault(__webpack_require__(306));var _github=_interopRequireDefault(__webpack_require__(973));var _utils=__webpack_require__(624);var _execCmd=__webpack_require__(529);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var extraPermGithub=new _github.default.GitHub(process.env['KHAN_ACTIONS_BOT_TOKEN']);var github=new _github.default.GitHub(process.env['GITHUB_TOKEN']);var context=_github.default.context;var ownerAndRepo={owner:context.issue.owner,repo:context.issue.repo};var separator='__________________________________________________________________________________________________________________________________';var makeCommentBody=function makeCommentBody(peopleToFiles,sectionHeader){var names=Object.keys(peopleToFiles);if(names.length){var body="### "+sectionHeader;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n\n";});return body;}return'';};var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function updatePullRequestComment$(_context){while(1){switch(_context.prev=_context.next){case 0:body='# Gerald:\n\n';body+=makeCommentBody(notifyees,'Notified:\n');body+=makeCommentBody(reviewers,'Reviewers:\n');body+=makeCommentBody(requiredReviewers,'Required reviewers:\n');if(!body.match(/^### (Reviewers:|Required reviewers:|Notified:)$/m)){_context.next=15;break;}body+="\n"+separator+"\n_Don't want to be involved in this pull request? Comment `#removeme` and we won't notify you of further changes._";if(!comment){_context.next=11;break;}_context.next=9;return _regenerator.default.awrap(extraPermGithub.issues.updateComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id,body:body})));case 9:_context.next=13;break;case 11:_context.next=13;return _regenerator.default.awrap(extraPermGithub.issues.createComment((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number,body:body})));case 13:_context.next=18;break;case 15:if(!comment){_context.next=18;break;}_context.next=18;return _regenerator.default.awrap(extraPermGithub.issues.deleteComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id})));case 18:case"end":return _context.stop();}}},null,null,null,Promise);};var makeCommitComments=function makeCommitComments(peopleToFiles){var names,body,_iterator,_step,commit;return _regenerator.default.async(function makeCommitComments$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:names=Object.keys(peopleToFiles);if(!(peopleToFiles&&names.length)){_context2.next=11;break;}body='Notify of Push Without Pull Request\n\n';names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n";});_iterator=_createForOfIteratorHelperLoose(context.payload.commits);case 5:if((_step=_iterator()).done){_context2.next=11;break;}commit=_step.value;_context2.next=9;return _regenerator.default.awrap(extraPermGithub.repos.createCommitComment((0,_extends2.default)({},ownerAndRepo,{commit_sha:commit.id,body:body})));case 9:_context2.next=5;break;case 11:case"end":return _context2.stop();}}},null,null,null,Promise);};var runPullRequest=function runPullRequest(){var filesChanged,fileDiffs,notified,_await$getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function runPullRequest$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff','origin/'+context.payload.pull_request.base.ref,'--name-only']));case 2:filesChanged=_context3.sent.split('\n');_context3.next=5;return _regenerator.default.awrap((0,_utils.getFileDiffs)('origin/'+context.payload.pull_request.base.ref));case 5:fileDiffs=_context3.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,'pull_request');_context3.next=9;return _regenerator.default.awrap((0,_utils.getReviewers)(filesChanged,fileDiffs,context.payload.pull_request.user.login));case 9:_await$getReviewers=_context3.sent;reviewers=_await$getReviewers.reviewers;requiredReviewers=_await$getReviewers.requiredReviewers;_context3.next=14;return _regenerator.default.awrap(github.issues.listComments((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number})));case 14:existingComments=_context3.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=(0,_utils.getFilteredLists)(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=19;return _regenerator.default.awrap(extraPermGithub.pulls.createReviewRequest((0,_extends2.default)({},ownerAndRepo,{pull_number:context.issue.number,reviewers:actualReviewers,team_reviewers:teamReviewers})));case 19:_context3.next=21;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 21:case"end":return _context3.stop();}}},null,null,null,Promise);};exports.runPullRequest=runPullRequest;var runPush=function runPush(){var filesChanged,fileDiffs,notified;return _regenerator.default.async(function runPush$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:_context4.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',context.payload.before+"..."+context.payload.after,'--name-only']));case 2:filesChanged=_context4.sent.split('\n');_context4.next=5;return _regenerator.default.awrap((0,_utils.getFileDiffs)(context.payload.before+"..."+context.payload.after));case 5:fileDiffs=_context4.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,'push');_context4.next=9;return _regenerator.default.awrap(makeCommitComments(notified));case 9:case"end":return _context4.stop();}}},null,null,null,Promise);};exports.runPush=runPush;
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.runPush=exports.runPullRequest=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _extends2=_interopRequireDefault(__webpack_require__(306));var _utils=__webpack_require__(587);var _execCmd=__webpack_require__(529);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var octokit=__webpack_require__(973);var extraPermGithub=new octokit.GitHub(process.env['KHAN_ACTIONS_BOT_TOKEN']);var github=new octokit.GitHub(process.env['GITHUB_TOKEN']);var context=octokit.context;var ownerAndRepo={owner:context.issue.owner,repo:context.issue.repo};var separator='__________________________________________________________________________________________________________________________________';var makeCommentBody=function makeCommentBody(peopleToFiles,sectionHeader){var names=Object.keys(peopleToFiles);if(names.length){var body="### "+sectionHeader;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n\n";});return body;}return'';};var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function updatePullRequestComment$(_context){while(1){switch(_context.prev=_context.next){case 0:body='# Gerald:\n\n';body+=makeCommentBody(notifyees,'Notified:\n');body+=makeCommentBody(reviewers,'Reviewers:\n');body+=makeCommentBody(requiredReviewers,'Required reviewers:\n');if(!body.match(/^### (Reviewers:|Required reviewers:|Notified:)$/m)){_context.next=15;break;}body+="\n"+separator+"\n_Don't want to be involved in this pull request? Comment `#removeme` and we won't notify you of further changes._";if(!comment){_context.next=11;break;}_context.next=9;return _regenerator.default.awrap(extraPermGithub.issues.updateComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id,body:body})));case 9:_context.next=13;break;case 11:_context.next=13;return _regenerator.default.awrap(extraPermGithub.issues.createComment((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number,body:body})));case 13:_context.next=18;break;case 15:if(!comment){_context.next=18;break;}_context.next=18;return _regenerator.default.awrap(extraPermGithub.issues.deleteComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id})));case 18:case"end":return _context.stop();}}},null,null,null,Promise);};var makeCommitComments=function makeCommitComments(peopleToFiles){var names,body,_iterator,_step,commit;return _regenerator.default.async(function makeCommitComments$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:names=Object.keys(peopleToFiles);if(!(peopleToFiles&&names.length)){_context2.next=11;break;}body='Notify of Push Without Pull Request\n\n';names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n";});_iterator=_createForOfIteratorHelperLoose(context.payload.commits);case 5:if((_step=_iterator()).done){_context2.next=11;break;}commit=_step.value;_context2.next=9;return _regenerator.default.awrap(extraPermGithub.repos.createCommitComment((0,_extends2.default)({},ownerAndRepo,{commit_sha:commit.id,body:body})));case 9:_context2.next=5;break;case 11:case"end":return _context2.stop();}}},null,null,null,Promise);};var runPullRequest=function runPullRequest(){var filesChanged,fileDiffs,notified,_await$getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function runPullRequest$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff','origin/'+context.payload.pull_request.base.ref,'--name-only']));case 2:filesChanged=_context3.sent.split('\n');_context3.next=5;return _regenerator.default.awrap((0,_utils.getFileDiffs)('origin/'+context.payload.pull_request.base.ref));case 5:fileDiffs=_context3.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,'pull_request');_context3.next=9;return _regenerator.default.awrap((0,_utils.getReviewers)(filesChanged,fileDiffs,context.payload.pull_request.user.login));case 9:_await$getReviewers=_context3.sent;reviewers=_await$getReviewers.reviewers;requiredReviewers=_await$getReviewers.requiredReviewers;_context3.next=14;return _regenerator.default.awrap(github.issues.listComments((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number})));case 14:existingComments=_context3.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=(0,_utils.getFilteredLists)(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=19;return _regenerator.default.awrap(extraPermGithub.pulls.createReviewRequest((0,_extends2.default)({},ownerAndRepo,{pull_number:context.issue.number,reviewers:actualReviewers,team_reviewers:teamReviewers})));case 19:_context3.next=21;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 21:case"end":return _context3.stop();}}},null,null,null,Promise);};exports.runPullRequest=runPullRequest;var runPush=function runPush(){var filesChanged,fileDiffs,notified;return _regenerator.default.async(function runPush$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:_context4.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',context.payload.before+"..."+context.payload.after,'--name-only']));case 2:filesChanged=_context4.sent.split('\n');_context4.next=5;return _regenerator.default.awrap((0,_utils.getFileDiffs)(context.payload.before+"..."+context.payload.after));case 5:fileDiffs=_context4.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,'push');_context4.next=9;return _regenerator.default.awrap(makeCommitComments(notified));case 9:case"end":return _context4.stop();}}},null,null,null,Promise);};exports.runPush=runPush;
 
 /***/ }),
 /* 548 */
@@ -71388,7 +71245,7 @@ module.exports = overRest;
 /* 555 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var arrayLikeToArray = __webpack_require__(409);
+var arrayLikeToArray = __webpack_require__(144);
 
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
@@ -74205,38 +74062,9 @@ function VoidTypeAnnotation() {
 
 /***/ }),
 /* 587 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-module.exports = Octokit;
-
-const { request } = __webpack_require__(277);
-const Hook = __webpack_require__(344);
-
-const parseClientOptions = __webpack_require__(330);
-
-function Octokit(plugins, options) {
-  options = options || {};
-  const hook = new Hook.Collection();
-  const log = Object.assign(
-    {
-      debug: () => {},
-      info: () => {},
-      warn: console.warn,
-      error: console.error
-    },
-    options && options.log
-  );
-  const api = {
-    hook,
-    log,
-    request: request.defaults(parseClientOptions(options, log, hook))
-  };
-
-  plugins.forEach(pluginFunction => pluginFunction(api, options));
-
-  return api;
-}
-
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__globAsync=exports.__pushOrSetToBin=exports.__parseUsername=exports.__turnPatternIntoRegex=exports.__maybeAddIfMatch=exports.getFileDiffs=exports.parseExistingComments=exports.getFilteredLists=exports.getReviewers=exports.getNotified=exports.getCorrectSection=void 0;var _extends2=_interopRequireDefault(__webpack_require__(306));var _regenerator=_interopRequireDefault(__webpack_require__(292));var _slicedToArray2=_interopRequireDefault(__webpack_require__(479));var _fs=_interopRequireDefault(__webpack_require__(747));var _glob=_interopRequireDefault(__webpack_require__(696));var _execCmd=__webpack_require__(529);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var globOptions={matchBase:true,dot:true,ignore:['node_modules/**','coverage/**','.git/**','flow-typed/**'],silent:true};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,fileDiffs,nameToFilesObj){for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(pattern.test(diff)){if(nameToFilesObj[name]){if(!nameToFilesObj[name].includes(file)){nameToFilesObj[name].push(file);}}else{nameToFilesObj[name]=[file];}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=/^"\/(.*?)\/([a-z]*)"$/.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,files){if(bin[username]){for(var _iterator=_createForOfIteratorHelperLoose(files),_step;!(_step=_iterator()).done;){var file=_step.value;if(!bin[username].includes(file)){bin[username].push(file);}}}else{bin[username]=files;}};var getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(/\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file==='NOTIFIED'&&!rawFile.match(/\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section==='pull_request'){sectionRegexp=file==='NOTIFIED'?/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm:/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else if(file==='NOTIFIED'){sectionRegexp=/(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return sectionRegexp.exec(rawFile);};exports.getCorrectSection=getCorrectSection;var globAsync=function globAsync(pattern,options){return _regenerator.default.async(function globAsync$(_context){while(1){switch(_context.prev=_context.next){case 0:return _context.abrupt("return",new Promise(function(res,rej){var g=new _glob.default.Glob(pattern,options,function(err,matches){if(err){rej(err);}else{res({matchedFiles:matches,newCache:g.cache});}});}));case 1:case"end":return _context.stop();}}},null,null,null,Promise);};var getNotified=function getNotified(filesChanged,fileDiffs,on){var __testContent,buf,section,matches,notified,cache,_iterator2,_step2,match,untrimmedPattern,names,pattern,regex,_iterator3,_step3,_name,_await$globAsync,matchedFiles,newCache,intersection,_iterator4,_step4,_name2,_args2=arguments;return _regenerator.default.async(function getNotified$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:__testContent=_args2.length>3&&_args2[3]!==undefined?_args2[3]:undefined;buf=__testContent||_fs.default.readFileSync('.github/NOTIFIED','utf-8');section=getCorrectSection(buf,'NOTIFIED',on);if(section){_context2.next=5;break;}return _context2.abrupt("return",{});case 5:matches=section[0].match(/^[^\#\n].*/gm);notified={};cache={};if(!matches){_context2.next=32;break;}_iterator2=_createForOfIteratorHelperLoose(matches);case 10:if((_step2=_iterator2()).done){_context2.next=32;break;}match=_step2.value;untrimmedPattern=match.match(/(.(?!  @))*/);names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!(!untrimmedPattern||!names)){_context2.next=16;break;}return _context2.abrupt("continue",30);case 16:pattern=untrimmedPattern[0].trim();if(!(pattern.startsWith('"')&&pattern.endsWith('"'))){_context2.next=22;break;}regex=turnPatternIntoRegex(pattern);for(_iterator3=_createForOfIteratorHelperLoose(names);!(_step3=_iterator3()).done;){_name=_step3.value;maybeAddIfMatch(regex,_name,fileDiffs,notified);}_context2.next=30;break;case 22:_context2.next=24;return _regenerator.default.awrap(globAsync(pattern,(0,_extends2.default)({cache:cache},globOptions)));case 24:_await$globAsync=_context2.sent;matchedFiles=_await$globAsync.matchedFiles;newCache=_await$globAsync.newCache;cache=(0,_extends2.default)({},newCache,cache);intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});for(_iterator4=_createForOfIteratorHelperLoose(names);!(_step4=_iterator4()).done;){_name2=_step4.value;pushOrSetToBin(notified,_name2,intersection);}case 30:_context2.next=10;break;case 32:return _context2.abrupt("return",notified);case 33:case"end":return _context2.stop();}}},null,null,null,Promise);};exports.getNotified=getNotified;var getReviewers=function getReviewers(filesChanged,fileDiffs,issuer){var __testContent,buf,section,matches,reviewers,requiredReviewers,cache,_iterator5,_step5,match,untrimmedPattern,names,pattern,regex,_iterator6,_step6,_name3,_parseUsername,username,justName,isRequired,correctBin,_await$globAsync2,matchedFiles,newCache,intersection,_iterator7,_step7,_name4,_parseUsername2,_username,_justName,_isRequired,_correctBin,_args3=arguments;return _regenerator.default.async(function getReviewers$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:__testContent=_args3.length>3&&_args3[3]!==undefined?_args3[3]:undefined;buf=__testContent||_fs.default.readFileSync('.github/REVIEWERS','utf-8');section=getCorrectSection(buf,'REVIEWERS','pull_request');if(section){_context3.next=5;break;}return _context3.abrupt("return",{reviewers:{},requiredReviewers:{}});case 5:matches=section[0].match(/^[^\#\n].*/gm);reviewers={};requiredReviewers={};if(matches){_context3.next=10;break;}return _context3.abrupt("return",{reviewers:reviewers,requiredReviewers:requiredReviewers});case 10:cache={};_iterator5=_createForOfIteratorHelperLoose(matches);case 12:if((_step5=_iterator5()).done){_context3.next=52;break;}match=_step5.value;untrimmedPattern=match.match(/(.(?!  @))*/);names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!(!untrimmedPattern||!names)){_context3.next=18;break;}return _context3.abrupt("continue",50);case 18:pattern=untrimmedPattern[0].trim();if(!(pattern.startsWith('"')&&pattern.endsWith('"'))){_context3.next=33;break;}regex=turnPatternIntoRegex(pattern);_iterator6=_createForOfIteratorHelperLoose(names);case 22:if((_step6=_iterator6()).done){_context3.next=31;break;}_name3=_step6.value;_parseUsername=parseUsername(_name3),username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(!(justName===issuer)){_context3.next=27;break;}return _context3.abrupt("continue",29);case 27:correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,fileDiffs,correctBin);case 29:_context3.next=22;break;case 31:_context3.next=50;break;case 33:_context3.next=35;return _regenerator.default.awrap(globAsync(pattern,(0,_extends2.default)({cache:cache},globOptions)));case 35:_await$globAsync2=_context3.sent;matchedFiles=_await$globAsync2.matchedFiles;newCache=_await$globAsync2.newCache;cache=(0,_extends2.default)({},cache,newCache);intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});_iterator7=_createForOfIteratorHelperLoose(names);case 41:if((_step7=_iterator7()).done){_context3.next=50;break;}_name4=_step7.value;_parseUsername2=parseUsername(_name4),_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(!(_justName===issuer)){_context3.next=46;break;}return _context3.abrupt("continue",48);case 46:_correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,intersection);case 48:_context3.next=41;break;case 50:_context3.next=12;break;case 52:return _context3.abrupt("return",{reviewers:reviewers,requiredReviewers:requiredReviewers});case 53:case"end":return _context3.stop();}}},null,null,null,Promise);};exports.getReviewers=getReviewers;var getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator8=_createForOfIteratorHelperLoose(removedJustNames),_step8;!(_step8=_iterator8()).done;){var justName=_step8.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};exports.getFilteredLists=getFilteredLists;var parseExistingComments=function parseExistingComments(existingComments){var actionBotComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.user.login==='khan-actions-bot'){actionBotComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(/\#removeme/i);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});actionBotComments.forEach(function(comment){var megaCommentMatch=comment.body.match(/^# Gerald/i);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};exports.parseExistingComments=parseExistingComments;var getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator9,_step9,diff,fileName;return _regenerator.default.async(function getFileDiffs$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:_context4.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString]));case 2:rawDiffs=_context4.sent.split(/^diff --git /m);fileToDiff={};for(_iterator9=_createForOfIteratorHelperLoose(rawDiffs);!(_step9=_iterator9()).done;){diff=_step9.value;fileName=diff.match(/(?<=^a\/)\S*/);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context4.abrupt("return",fileToDiff);case 6:case"end":return _context4.stop();}}},null,null,null,Promise);};exports.getFileDiffs=getFileDiffs;var __maybeAddIfMatch=maybeAddIfMatch;exports.__maybeAddIfMatch=__maybeAddIfMatch;var __turnPatternIntoRegex=turnPatternIntoRegex;exports.__turnPatternIntoRegex=__turnPatternIntoRegex;var __parseUsername=parseUsername;exports.__parseUsername=__parseUsername;var __pushOrSetToBin=pushOrSetToBin;exports.__pushOrSetToBin=__pushOrSetToBin;var __globAsync=globAsync;exports.__globAsync=__globAsync;
 
 /***/ }),
 /* 588 */
@@ -74681,7 +74509,67 @@ module.exports = eos;
 /* 605 */
 /***/ (function(module) {
 
-module.exports = require("http");
+"use strict";
+
+module.exports = balanced;
+function balanced(a, b, str) {
+  if (a instanceof RegExp) a = maybeMatch(a, str);
+  if (b instanceof RegExp) b = maybeMatch(b, str);
+
+  var r = range(a, b, str);
+
+  return r && {
+    start: r[0],
+    end: r[1],
+    pre: str.slice(0, r[0]),
+    body: str.slice(r[0] + a.length, r[1]),
+    post: str.slice(r[1] + b.length)
+  };
+}
+
+function maybeMatch(reg, str) {
+  var m = str.match(reg);
+  return m ? m[0] : null;
+}
+
+balanced.range = range;
+function range(a, b, str) {
+  var begs, beg, left, right, result;
+  var ai = str.indexOf(a);
+  var bi = str.indexOf(b, ai + 1);
+  var i = ai;
+
+  if (ai >= 0 && bi > 0) {
+    begs = [];
+    left = str.length;
+
+    while (i >= 0 && !result) {
+      if (i == ai) {
+        begs.push(i);
+        ai = str.indexOf(a, i + 1);
+      } else if (begs.length == 1) {
+        result = [ begs.pop(), bi ];
+      } else {
+        beg = begs.pop();
+        if (beg < left) {
+          left = beg;
+          right = bi;
+        }
+
+        bi = str.indexOf(b, i + 1);
+      }
+
+      i = ai < bi && ai >= 0 ? ai : bi;
+    }
+
+    if (begs.length) {
+      result = [ left, right ];
+    }
+  }
+
+  return result;
+}
+
 
 /***/ }),
 /* 606 */
@@ -76959,12 +76847,7 @@ function SpreadProperty(...args) {
 }
 
 /***/ }),
-/* 624 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__globAsync=exports.__pushOrSetToBin=exports.__parseUsername=exports.__turnPatternIntoRegex=exports.__maybeAddIfMatch=exports.getFileDiffs=exports.parseExistingComments=exports.getFilteredLists=exports.getReviewers=exports.getNotified=exports.getCorrectSection=void 0;var _extends2=_interopRequireDefault(__webpack_require__(306));var _regenerator=_interopRequireDefault(__webpack_require__(292));var _slicedToArray2=_interopRequireDefault(__webpack_require__(479));var _fs=_interopRequireDefault(__webpack_require__(747));var _glob=_interopRequireDefault(__webpack_require__(696));var _execCmd=__webpack_require__(529);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var globOptions={matchBase:true,dot:true,ignore:['node_modules/**','coverage/**','.git/**','flow-typed/**'],silent:true};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,fileDiffs,nameToFilesObj){for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(pattern.test(diff)){if(nameToFilesObj[name]){if(!nameToFilesObj[name].includes(file)){nameToFilesObj[name].push(file);}}else{nameToFilesObj[name]=[file];}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=/^"\/(.*?)\/([a-z]*)"$/.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,files){if(bin[username]){for(var _iterator=_createForOfIteratorHelperLoose(files),_step;!(_step=_iterator()).done;){var file=_step.value;if(!bin[username].includes(file)){bin[username].push(file);}}}else{bin[username]=files;}};var getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(/\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file==='NOTIFIED'&&!rawFile.match(/\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section==='pull_request'){sectionRegexp=file==='NOTIFIED'?/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm:/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else if(file==='NOTIFIED'){sectionRegexp=/(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return sectionRegexp.exec(rawFile);};exports.getCorrectSection=getCorrectSection;var globAsync=function globAsync(pattern,options){return _regenerator.default.async(function globAsync$(_context){while(1){switch(_context.prev=_context.next){case 0:return _context.abrupt("return",new Promise(function(res,rej){var g=new _glob.default.Glob(pattern,options,function(err,matches){if(err){rej(err);}else{res({matchedFiles:matches,newCache:g.cache});}});}));case 1:case"end":return _context.stop();}}},null,null,null,Promise);};var getNotified=function getNotified(filesChanged,fileDiffs,on){var __testContent,buf,section,matches,notified,cache,_iterator2,_step2,match,untrimmedPattern,names,pattern,regex,_iterator3,_step3,_name,_await$globAsync,matchedFiles,newCache,intersection,_iterator4,_step4,_name2,_args2=arguments;return _regenerator.default.async(function getNotified$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:__testContent=_args2.length>3&&_args2[3]!==undefined?_args2[3]:undefined;buf=__testContent||_fs.default.readFileSync('.github/NOTIFIED','utf-8');section=getCorrectSection(buf,'NOTIFIED',on);if(section){_context2.next=5;break;}return _context2.abrupt("return",{});case 5:matches=section[0].match(/^[^\#\n].*/gm);notified={};cache={};if(!matches){_context2.next=32;break;}_iterator2=_createForOfIteratorHelperLoose(matches);case 10:if((_step2=_iterator2()).done){_context2.next=32;break;}match=_step2.value;untrimmedPattern=match.match(/(.(?!  @))*/);names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!(!untrimmedPattern||!names)){_context2.next=16;break;}return _context2.abrupt("continue",30);case 16:pattern=untrimmedPattern[0].trim();if(!(pattern.startsWith('"')&&pattern.endsWith('"'))){_context2.next=22;break;}regex=turnPatternIntoRegex(pattern);for(_iterator3=_createForOfIteratorHelperLoose(names);!(_step3=_iterator3()).done;){_name=_step3.value;maybeAddIfMatch(regex,_name,fileDiffs,notified);}_context2.next=30;break;case 22:_context2.next=24;return _regenerator.default.awrap(globAsync(pattern,(0,_extends2.default)({cache:cache},globOptions)));case 24:_await$globAsync=_context2.sent;matchedFiles=_await$globAsync.matchedFiles;newCache=_await$globAsync.newCache;cache=(0,_extends2.default)({},newCache,cache);intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});for(_iterator4=_createForOfIteratorHelperLoose(names);!(_step4=_iterator4()).done;){_name2=_step4.value;pushOrSetToBin(notified,_name2,intersection);}case 30:_context2.next=10;break;case 32:return _context2.abrupt("return",notified);case 33:case"end":return _context2.stop();}}},null,null,null,Promise);};exports.getNotified=getNotified;var getReviewers=function getReviewers(filesChanged,fileDiffs,issuer){var __testContent,buf,section,matches,reviewers,requiredReviewers,cache,_iterator5,_step5,match,untrimmedPattern,names,pattern,regex,_iterator6,_step6,_name3,_parseUsername,username,justName,isRequired,correctBin,_await$globAsync2,matchedFiles,newCache,intersection,_iterator7,_step7,_name4,_parseUsername2,_username,_justName,_isRequired,_correctBin,_args3=arguments;return _regenerator.default.async(function getReviewers$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:__testContent=_args3.length>3&&_args3[3]!==undefined?_args3[3]:undefined;buf=__testContent||_fs.default.readFileSync('.github/REVIEWERS','utf-8');section=getCorrectSection(buf,'REVIEWERS','pull_request');if(section){_context3.next=5;break;}return _context3.abrupt("return",{reviewers:{},requiredReviewers:{}});case 5:matches=section[0].match(/^[^\#\n].*/gm);reviewers={};requiredReviewers={};if(matches){_context3.next=10;break;}return _context3.abrupt("return",{reviewers:reviewers,requiredReviewers:requiredReviewers});case 10:cache={};_iterator5=_createForOfIteratorHelperLoose(matches);case 12:if((_step5=_iterator5()).done){_context3.next=52;break;}match=_step5.value;untrimmedPattern=match.match(/(.(?!  @))*/);names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!(!untrimmedPattern||!names)){_context3.next=18;break;}return _context3.abrupt("continue",50);case 18:pattern=untrimmedPattern[0].trim();if(!(pattern.startsWith('"')&&pattern.endsWith('"'))){_context3.next=33;break;}regex=turnPatternIntoRegex(pattern);_iterator6=_createForOfIteratorHelperLoose(names);case 22:if((_step6=_iterator6()).done){_context3.next=31;break;}_name3=_step6.value;_parseUsername=parseUsername(_name3),username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(!(justName===issuer)){_context3.next=27;break;}return _context3.abrupt("continue",29);case 27:correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,fileDiffs,correctBin);case 29:_context3.next=22;break;case 31:_context3.next=50;break;case 33:_context3.next=35;return _regenerator.default.awrap(globAsync(pattern,(0,_extends2.default)({cache:cache},globOptions)));case 35:_await$globAsync2=_context3.sent;matchedFiles=_await$globAsync2.matchedFiles;newCache=_await$globAsync2.newCache;cache=(0,_extends2.default)({},cache,newCache);intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});_iterator7=_createForOfIteratorHelperLoose(names);case 41:if((_step7=_iterator7()).done){_context3.next=50;break;}_name4=_step7.value;_parseUsername2=parseUsername(_name4),_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(!(_justName===issuer)){_context3.next=46;break;}return _context3.abrupt("continue",48);case 46:_correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,intersection);case 48:_context3.next=41;break;case 50:_context3.next=12;break;case 52:return _context3.abrupt("return",{reviewers:reviewers,requiredReviewers:requiredReviewers});case 53:case"end":return _context3.stop();}}},null,null,null,Promise);};exports.getReviewers=getReviewers;var getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator8=_createForOfIteratorHelperLoose(removedJustNames),_step8;!(_step8=_iterator8()).done;){var justName=_step8.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};exports.getFilteredLists=getFilteredLists;var parseExistingComments=function parseExistingComments(existingComments){var actionBotComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.user.login==='khan-actions-bot'){actionBotComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(/\#removeme/i);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});actionBotComments.forEach(function(comment){var megaCommentMatch=comment.body.match(/^# Gerald/i);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};exports.parseExistingComments=parseExistingComments;var getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator9,_step9,diff,fileName;return _regenerator.default.async(function getFileDiffs$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:_context4.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString]));case 2:rawDiffs=_context4.sent.split(/^diff --git /m);fileToDiff={};for(_iterator9=_createForOfIteratorHelperLoose(rawDiffs);!(_step9=_iterator9()).done;){diff=_step9.value;fileName=diff.match(/(?<=^a\/)\S*/);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context4.abrupt("return",fileToDiff);case 6:case"end":return _context4.stop();}}},null,null,null,Promise);};exports.getFileDiffs=getFileDiffs;var __maybeAddIfMatch=maybeAddIfMatch;exports.__maybeAddIfMatch=__maybeAddIfMatch;var __turnPatternIntoRegex=turnPatternIntoRegex;exports.__turnPatternIntoRegex=__turnPatternIntoRegex;var __parseUsername=parseUsername;exports.__parseUsername=__parseUsername;var __pushOrSetToBin=pushOrSetToBin;exports.__pushOrSetToBin=__pushOrSetToBin;var __globAsync=globAsync;exports.__globAsync=__globAsync;
-
-/***/ }),
+/* 624 */,
 /* 625 */,
 /* 626 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
@@ -79711,7 +79594,28 @@ module.exports = toInteger;
 /* 655 */,
 /* 656 */,
 /* 657 */,
-/* 658 */,
+/* 658 */
+/***/ (function(module) {
+
+"use strict";
+
+module.exports = function (x) {
+	var lf = typeof x === 'string' ? '\n' : '\n'.charCodeAt();
+	var cr = typeof x === 'string' ? '\r' : '\r'.charCodeAt();
+
+	if (x[x.length - 1] === lf) {
+		x = x.slice(0, x.length - 1);
+	}
+
+	if (x[x.length - 1] === cr) {
+		x = x.slice(0, x.length - 1);
+	}
+
+	return x;
+};
+
+
+/***/ }),
 /* 659 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -84629,11 +84533,11 @@ function isPlaceholderType(placeholderType, targetType) {
 const path = __webpack_require__(622);
 const childProcess = __webpack_require__(228);
 const crossSpawn = __webpack_require__(701);
-const stripEof = __webpack_require__(933);
+const stripEof = __webpack_require__(658);
 const npmRunPath = __webpack_require__(923);
 const isStream = __webpack_require__(25);
-const _getStream = __webpack_require__(144);
-const pFinally = __webpack_require__(219);
+const _getStream = __webpack_require__(534);
+const pFinally = __webpack_require__(291);
 const onExit = __webpack_require__(841);
 const errname = __webpack_require__(147);
 const stdio = __webpack_require__(256);
@@ -87265,7 +87169,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var Stream = _interopDefault(__webpack_require__(413));
-var http = _interopDefault(__webpack_require__(605));
+var http = _interopDefault(__webpack_require__(876));
 var Url = _interopDefault(__webpack_require__(835));
 var https = _interopDefault(__webpack_require__(583));
 var zlib = _interopDefault(__webpack_require__(903));
@@ -90293,16 +90197,7 @@ module.exports = (options = {}) => {
 
 
 /***/ }),
-/* 789 */
-/***/ (function(module) {
-
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-
-module.exports = _nonIterableRest;
-
-/***/ }),
+/* 789 */,
 /* 790 */
 /***/ (function(module) {
 
@@ -95805,7 +95700,12 @@ exports.decode = function base64VLQ_decode(aStr, aIndex, aOutParam) {
 
 
 /***/ }),
-/* 876 */,
+/* 876 */
+/***/ (function(module) {
+
+module.exports = require("http");
+
+/***/ }),
 /* 877 */,
 /* 878 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
@@ -96077,9 +95977,161 @@ module.exports = {
 /***/ }),
 /* 886 */,
 /* 887 */
-/***/ (function(module) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
-module.exports = require("tls");
+"use strict";
+
+
+module.exports = validate;
+
+const { RequestError } = __webpack_require__(711);
+const get = __webpack_require__(638);
+const set = __webpack_require__(698);
+
+function validate(octokit, options) {
+  if (!options.request.validate) {
+    return;
+  }
+  const { validate: params } = options.request;
+
+  Object.keys(params).forEach(parameterName => {
+    const parameter = get(params, parameterName);
+
+    const expectedType = parameter.type;
+    let parentParameterName;
+    let parentValue;
+    let parentParamIsPresent = true;
+    let parentParameterIsArray = false;
+
+    if (/\./.test(parameterName)) {
+      parentParameterName = parameterName.replace(/\.[^.]+$/, "");
+      parentParameterIsArray = parentParameterName.slice(-2) === "[]";
+      if (parentParameterIsArray) {
+        parentParameterName = parentParameterName.slice(0, -2);
+      }
+      parentValue = get(options, parentParameterName);
+      parentParamIsPresent =
+        parentParameterName === "headers" ||
+        (typeof parentValue === "object" && parentValue !== null);
+    }
+
+    const values = parentParameterIsArray
+      ? (get(options, parentParameterName) || []).map(
+          value => value[parameterName.split(/\./).pop()]
+        )
+      : [get(options, parameterName)];
+
+    values.forEach((value, i) => {
+      const valueIsPresent = typeof value !== "undefined";
+      const valueIsNull = value === null;
+      const currentParameterName = parentParameterIsArray
+        ? parameterName.replace(/\[\]/, `[${i}]`)
+        : parameterName;
+
+      if (!parameter.required && !valueIsPresent) {
+        return;
+      }
+
+      // if the parent parameter is of type object but allows null
+      // then the child parameters can be ignored
+      if (!parentParamIsPresent) {
+        return;
+      }
+
+      if (parameter.allowNull && valueIsNull) {
+        return;
+      }
+
+      if (!parameter.allowNull && valueIsNull) {
+        throw new RequestError(
+          `'${currentParameterName}' cannot be null`,
+          400,
+          {
+            request: options
+          }
+        );
+      }
+
+      if (parameter.required && !valueIsPresent) {
+        throw new RequestError(
+          `Empty value for parameter '${currentParameterName}': ${JSON.stringify(
+            value
+          )}`,
+          400,
+          {
+            request: options
+          }
+        );
+      }
+
+      // parse to integer before checking for enum
+      // so that string "1" will match enum with number 1
+      if (expectedType === "integer") {
+        const unparsedValue = value;
+        value = parseInt(value, 10);
+        if (isNaN(value)) {
+          throw new RequestError(
+            `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
+              unparsedValue
+            )} is NaN`,
+            400,
+            {
+              request: options
+            }
+          );
+        }
+      }
+
+      if (parameter.enum && parameter.enum.indexOf(String(value)) === -1) {
+        throw new RequestError(
+          `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
+            value
+          )}`,
+          400,
+          {
+            request: options
+          }
+        );
+      }
+
+      if (parameter.validation) {
+        const regex = new RegExp(parameter.validation);
+        if (!regex.test(value)) {
+          throw new RequestError(
+            `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
+              value
+            )}`,
+            400,
+            {
+              request: options
+            }
+          );
+        }
+      }
+
+      if (expectedType === "object" && typeof value === "string") {
+        try {
+          value = JSON.parse(value);
+        } catch (exception) {
+          throw new RequestError(
+            `JSON parse error of value for parameter '${currentParameterName}': ${JSON.stringify(
+              value
+            )}`,
+            400,
+            {
+              request: options
+            }
+          );
+        }
+      }
+
+      set(options, parameter.mapTo || currentParameterName, value);
+    });
+  });
+
+  return options;
+}
+
 
 /***/ }),
 /* 888 */,
@@ -96130,7 +96182,7 @@ module.exports = property;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const url = __webpack_require__(835);
-const http = __webpack_require__(605);
+const http = __webpack_require__(876);
 const https = __webpack_require__(583);
 const pm = __webpack_require__(497);
 let tunnel;
@@ -96839,72 +96891,7 @@ function paginationMethodsPlugin (octokit) {
 
 
 /***/ }),
-/* 900 */
-/***/ (function(module) {
-
-"use strict";
-
-module.exports = balanced;
-function balanced(a, b, str) {
-  if (a instanceof RegExp) a = maybeMatch(a, str);
-  if (b instanceof RegExp) b = maybeMatch(b, str);
-
-  var r = range(a, b, str);
-
-  return r && {
-    start: r[0],
-    end: r[1],
-    pre: str.slice(0, r[0]),
-    body: str.slice(r[0] + a.length, r[1]),
-    post: str.slice(r[1] + b.length)
-  };
-}
-
-function maybeMatch(reg, str) {
-  var m = str.match(reg);
-  return m ? m[0] : null;
-}
-
-balanced.range = range;
-function range(a, b, str) {
-  var begs, beg, left, right, result;
-  var ai = str.indexOf(a);
-  var bi = str.indexOf(b, ai + 1);
-  var i = ai;
-
-  if (ai >= 0 && bi > 0) {
-    begs = [];
-    left = str.length;
-
-    while (i >= 0 && !result) {
-      if (i == ai) {
-        begs.push(i);
-        ai = str.indexOf(a, i + 1);
-      } else if (begs.length == 1) {
-        result = [ begs.pop(), bi ];
-      } else {
-        beg = begs.pop();
-        if (beg < left) {
-          left = beg;
-          right = bi;
-        }
-
-        bi = str.indexOf(b, i + 1);
-      }
-
-      i = ai < bi && ai >= 0 ? ai : bi;
-    }
-
-    if (begs.length) {
-      result = [ left, right ];
-    }
-  }
-
-  return result;
-}
-
-
-/***/ }),
+/* 900 */,
 /* 901 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -98943,24 +98930,37 @@ function syntaxError (message) {
 
 /***/ }),
 /* 933 */
-/***/ (function(module) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
-"use strict";
+module.exports = Octokit;
 
-module.exports = function (x) {
-	var lf = typeof x === 'string' ? '\n' : '\n'.charCodeAt();
-	var cr = typeof x === 'string' ? '\r' : '\r'.charCodeAt();
+const { request } = __webpack_require__(277);
+const Hook = __webpack_require__(344);
 
-	if (x[x.length - 1] === lf) {
-		x = x.slice(0, x.length - 1);
-	}
+const parseClientOptions = __webpack_require__(330);
 
-	if (x[x.length - 1] === cr) {
-		x = x.slice(0, x.length - 1);
-	}
+function Octokit(plugins, options) {
+  options = options || {};
+  const hook = new Hook.Collection();
+  const log = Object.assign(
+    {
+      debug: () => {},
+      info: () => {},
+      warn: console.warn,
+      error: console.error
+    },
+    options && options.log
+  );
+  const api = {
+    hook,
+    log,
+    request: request.defaults(parseClientOptions(options, log, hook))
+  };
 
-	return x;
-};
+  plugins.forEach(pluginFunction => pluginFunction(api, options));
+
+  return api;
+}
 
 
 /***/ }),
@@ -102244,8 +102244,8 @@ module.exports = cloneSymbol;
 
 
 var net = __webpack_require__(60);
-var tls = __webpack_require__(887);
-var http = __webpack_require__(605);
+var tls = __webpack_require__(167);
+var http = __webpack_require__(876);
 var https = __webpack_require__(583);
 var events = __webpack_require__(614);
 var assert = __webpack_require__(161);
