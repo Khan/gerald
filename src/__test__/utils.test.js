@@ -1,14 +1,10 @@
 // @flow
 
-import glob from 'glob';
-import fg from 'fast-glob';
-
 import {
     __maybeAddIfMatch,
     __turnPatternIntoRegex,
     __parseUsername,
     __pushOrSetToBin,
-    __globAsync,
     getNotified,
     getReviewers,
     parseExistingComments,
@@ -16,8 +12,6 @@ import {
     getFilteredLists,
     getCorrectSection,
 } from '../utils';
-
-const globOptions = {dot: true, matchBase: true};
 
 const mockTestFileDiff = `a/testFile b/testFile
 new file mode 123456
@@ -161,13 +155,13 @@ describe('get notified', () => {
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser
-*.js                @yipstanley @githubUser
+**/*.js             @yipstanley @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
-*.js                @owner`;
+**/*.js             @owner`;
 
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
@@ -185,20 +179,20 @@ describe('get notified', () => {
 });
 
 describe('get reviewers', () => {
-    it('should work', async () => {
+    it('should work', () => {
         const reviewersFile = `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser!
-*.js                @yipstanley! @githubUser
+**/*.js             @yipstanley! @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson`;
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = await getReviewers(
+        const {requiredReviewers, reviewers} = getReviewers(
             filesChanged,
             fileDiffs,
             'yipstanley',

@@ -1,13 +1,11 @@
 // @flow
 
 import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from '@octokit/rest';
-import {type Options} from 'fast-glob';
 import fs from 'fs';
-import fg from 'fast-glob';
+import fg from 'fast-glob'; // flow-uncovered-line
 
 import {execCmd} from './execCmd';
-const globOptions: Options = {
-    baseNameMatch: true,
+const globOptions = {
     dot: true,
     ignore: ['node_modules/**', 'coverage/**', '.git/**', 'flow-typed/**'],
 };
@@ -146,12 +144,12 @@ export const getCorrectSection = (
  * @param on - Which section of the NOTIFIED file are we looking at, the 'pull_request' section or the 'push' section?
  * @param __testContent - For testing, mimicks .github/NOTIFIED content.
  */
-export const getNotified = async (
+export const getNotified = (
     filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
     on: 'pull_request' | 'push',
     __testContent: ?string = undefined,
-): Promise<NameToFiles> => {
+): NameToFiles => {
     const buf = __testContent || fs.readFileSync('.github/NOTIFIED', 'utf-8');
     const section = getCorrectSection(buf, 'NOTIFIED', on);
     if (!section) {
@@ -179,7 +177,7 @@ export const getNotified = async (
             }
             // handle dealing with glob matches
             else {
-                const matchedFiles = fg.sync(pattern, globOptions);
+                const matchedFiles: Array<string> = fg.sync(pattern, globOptions); // flow-uncovered-line
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
                 for (const name of names) {
@@ -199,12 +197,12 @@ export const getNotified = async (
  * @param issuer - The person making the pull request should not be a reviewer.
  * @param __testContent - For testing, mimicks .github/REVIEWERS content.
  */
-export const getReviewers = async (
+export const getReviewers = (
     filesChanged: string[],
     fileDiffs: {[string]: string, ...},
     issuer: string,
     __testContent: ?string = undefined,
-): Promise<{reviewers: NameToFiles, requiredReviewers: NameToFiles}> => {
+): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
     const buf = __testContent || fs.readFileSync('.github/REVIEWERS', 'utf-8');
     const section = getCorrectSection(buf, 'REVIEWERS', 'pull_request');
 
@@ -243,7 +241,7 @@ export const getReviewers = async (
                 maybeAddIfMatch(regex, username, fileDiffs, correctBin);
             }
         } else {
-            const matchedFiles = fg.sync(pattern, globOptions);
+            const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
             for (const name of names) {
                 // don't add yourself as a reviewer
@@ -368,4 +366,3 @@ export const __maybeAddIfMatch = maybeAddIfMatch;
 export const __turnPatternIntoRegex = turnPatternIntoRegex;
 export const __parseUsername = parseUsername;
 export const __pushOrSetToBin = pushOrSetToBin;
-export const __globAsync = globAsync;
