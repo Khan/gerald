@@ -30,7 +30,7 @@ import {execCmd} from './execCmd';
 const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
-const extraPermGithub: Octokit = new octokit.GitHub(process.env['KHAN_ACTIONS_BOT_TOKEN']);
+const extraPermGithub: Octokit = new octokit.GitHub(process.env['ADMIN_PERMISSION_TOKEN']);
 const github: Octokit = new octokit.GitHub(process.env['GITHUB_TOKEN']);
 const context: Context = octokit.context;
 /* end flow-uncovered-block */
@@ -127,7 +127,7 @@ export const runPullRequest = async () => {
     const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
 
     // figure out who to notify and request reviews from
-    const notified = getNotified(filesChanged, fileDiffs, 'pull_request');
+    const notified = await getNotified(filesChanged, fileDiffs, 'pull_request');
     const {reviewers, requiredReviewers} = await getReviewers(
         filesChanged,
         fileDiffs,

@@ -1,6 +1,6 @@
 // @flow
 
-import exec from '@actions/exec'; //flow-uncovered-line
+const exec = require('@actions/exec'); //flow-uncovered-line
 
 /**
  * @desc Asynchronously calls @actions/exec to execute a command.
