@@ -1,16 +1,13 @@
 // @flow
 
 import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from '@octokit/rest';
-import {type Options} from 'glob';
 import fs from 'fs';
-import glob from 'glob';
+import fg from 'fast-glob'; // flow-uncovered-line
 
 import {execCmd} from './execCmd';
-const globOptions: Options = {
-    matchBase: true,
+const globOptions = {
     dot: true,
     ignore: ['node_modules/**', 'coverage/**', '.git/**', 'flow-typed/**'],
-    silent: true,
 };
 
 type NameToFiles = {[name: string]: string[], ...};
@@ -140,35 +137,6 @@ export const getCorrectSection = (
 };
 
 /**
- * @desc Runs glob.Glob asynchronously, and returns the matches and the cache
- * object so that it can be passed into the next Glob call. We don't use glob.sync
- * (which is a synchronous version of glob.Glob) because it doesn't allow us
- * to get the cache object and pass it into the next call.
- * @param pattern - Glob pattern to match files for
- * @param options - GlobOptions to pass into the glob call
- */
-const globAsync = async (
-    pattern: string,
-    options: Options,
-): Promise<{
-    matchedFiles: Array<string>,
-    newCache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...},
-}> => {
-    return new Promise<{
-        matchedFiles: Array<string>,
-        newCache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...},
-    }>((res, rej) => {
-        const g = new glob.Glob(pattern, options, (err: ?Error, matches: Array<string>) => {
-            if (err) {
-                rej(err);
-            } else {
-                res({matchedFiles: matches, newCache: g.cache});
-            }
-        });
-    });
-};
-
-/**
  * @desc Parse .github/NOTIFIED and return an object where each entry is a
  * unique person to notify and the files that they are being notified for.
  * @param filesChanged - List of changed files.
@@ -176,12 +144,12 @@ const globAsync = async (
  * @param on - Which section of the NOTIFIED file are we looking at, the 'pull_request' section or the 'push' section?
  * @param __testContent - For testing, mimicks .github/NOTIFIED content.
  */
-export const getNotified = async (
+export const getNotified = (
     filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
     on: 'pull_request' | 'push',
     __testContent: ?string = undefined,
-): Promise<NameToFiles> => {
+): NameToFiles => {
     const buf = __testContent || fs.readFileSync('.github/NOTIFIED', 'utf-8');
     const section = getCorrectSection(buf, 'NOTIFIED', on);
     if (!section) {
@@ -190,7 +158,6 @@ export const getNotified = async (
 
     const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
     const notified: NameToFiles = {};
-    let cache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...} = {};
     if (matches) {
         for (const match of matches) {
             const untrimmedPattern = match.match(/(.(?!  @))*/);
@@ -210,11 +177,7 @@ export const getNotified = async (
             }
             // handle dealing with glob matches
             else {
-                const {matchedFiles, newCache} = await globAsync(pattern, {
-                    cache: cache,
-                    ...globOptions,
-                });
-                cache = {...newCache, ...cache};
+                const matchedFiles: Array<string> = fg.sync(pattern, globOptions); // flow-uncovered-line
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
                 for (const name of names) {
@@ -234,12 +197,12 @@ export const getNotified = async (
  * @param issuer - The person making the pull request should not be a reviewer.
  * @param __testContent - For testing, mimicks .github/REVIEWERS content.
  */
-export const getReviewers = async (
+export const getReviewers = (
     filesChanged: string[],
     fileDiffs: {[string]: string, ...},
     issuer: string,
     __testContent: ?string = undefined,
-): Promise<{reviewers: NameToFiles, requiredReviewers: NameToFiles}> => {
+): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
     const buf = __testContent || fs.readFileSync('.github/REVIEWERS', 'utf-8');
     const section = getCorrectSection(buf, 'REVIEWERS', 'pull_request');
 
@@ -254,7 +217,6 @@ export const getReviewers = async (
         return {reviewers, requiredReviewers};
     }
 
-    let cache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...} = {};
     for (const match of matches) {
         const untrimmedPattern = match.match(/(.(?!  @))*/);
         const names = match.match(/@([A-Za-z]*\/)?\S*/g);
@@ -279,11 +241,7 @@ export const getReviewers = async (
                 maybeAddIfMatch(regex, username, fileDiffs, correctBin);
             }
         } else {
-            const {matchedFiles, newCache} = await globAsync(pattern, {
-                cache: cache,
-                ...globOptions,
-            });
-            cache = {...cache, ...newCache};
+            const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
             for (const name of names) {
                 // don't add yourself as a reviewer
@@ -408,4 +366,3 @@ export const __maybeAddIfMatch = maybeAddIfMatch;
 export const __turnPatternIntoRegex = turnPatternIntoRegex;
 export const __parseUsername = parseUsername;
 export const __pushOrSetToBin = pushOrSetToBin;
-export const __globAsync = globAsync;
