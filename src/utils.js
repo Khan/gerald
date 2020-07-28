@@ -178,15 +178,16 @@ export const getNotified = (
             // handle dealing with glob matches
             else {
                 const matchedFiles: Array<string> = fg.sync(pattern, globOptions); // flow-uncovered-line
+                console.log(matchedFiles);
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
+                console.log(intersection);
                 for (const name of names) {
                     pushOrSetToBin(notified, name, intersection);
                 }
             }
         }
     }
-    console.log(notified);
     return notified;
 };
 
