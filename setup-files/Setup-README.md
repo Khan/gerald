@@ -15,4 +15,5 @@ Make a `.github/workflows/` folder if it doesn't already exist in your repositor
 1. Copy `gerald-pr.yml` and `gerald-push.yml` to the `.github/workflows` folder.
 2. Change the `<SECRET TOKEN>` in line 14 of `gerald-pr.yml` and line 20 of `gerald-push.yml` to be the name of the secret authentication token that you set up in the Prerequisite Setup section.
 3. Copy the `NOTIFIED` and `REVIEWERS` files to the `.github` folder.
-4. Add rules to Gerald!
+4. Add rules to the `NOTIFIED` and `REVIEWERS` files. Refer to the [`Gerald-README.md`](https://khanacademy.atlassian.net/wiki/spaces/FRONTEND/pages/598278672/Gerald+Documentation) document for more info on adding rules.
+5. Highly recommended: copy `Gerald-README.md` and `Setup-README.md` into your repository to have these files handy.
