@@ -178,12 +178,12 @@ export const getNotified = (
             // handle dealing with glob matches
             else {
                 const matchedFiles: Array<string> = fg.sync(pattern, globOptions); // flow-uncovered-line
-                console.log(matchedFiles);
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
-                console.log(intersection);
-                for (const name of names) {
-                    pushOrSetToBin(notified, name, intersection);
+                if (intersection.length) {
+                    for (const name of names) {
+                        pushOrSetToBin(notified, name, intersection);
+                    }
                 }
             }
         }
@@ -245,15 +245,18 @@ export const getReviewers = (
         } else {
             const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
-            for (const name of names) {
-                // don't add yourself as a reviewer
-                const {username, justName, isRequired} = parseUsername(name);
-                if (justName === issuer) {
-                    continue;
-                }
 
-                const correctBin = isRequired ? requiredReviewers : reviewers;
-                pushOrSetToBin(correctBin, username, intersection);
+            if (intersection.length) {
+                for (const name of names) {
+                    // don't add yourself as a reviewer
+                    const {username, justName, isRequired} = parseUsername(name);
+                    if (justName === issuer) {
+                        continue;
+                    }
+
+                    const correctBin = isRequired ? requiredReviewers : reviewers;
+                    pushOrSetToBin(correctBin, username, intersection);
+                }
             }
         }
     }
