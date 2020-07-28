@@ -186,6 +186,7 @@ export const getNotified = (
             }
         }
     }
+    console.log(notified);
     return notified;
 };
 
