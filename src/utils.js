@@ -1,29 +1,17 @@
 // @flow
 
-const fs = require('fs');
-const glob = require('glob'); // flow-uncovered-line
+import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from '@octokit/rest';
+import fs from 'fs';
+import fg from 'fast-glob'; // flow-uncovered-line
 
-const {execCmd} = require('./execCmd');
+import {execCmd} from './execCmd';
 const geraldIgnore =
     fs.readFileSync('.geraldignore', 'utf-8') || fs.readFileSync('.gitignore', 'utf-8');
-
 const globOptions = {
-    matchBase: true,
     dot: true,
     ignore: geraldIgnore.split('\n'),
-    silent: true,
 };
 
-import {
-    type Octokit$PullsListResponseItem,
-    type Octokit$IssuesListCommentsResponseItem,
-    type Octokit$Response,
-} from '@octokit/rest';
-
-type Context = {|
-    issue: {|owner: string, repo: string, number: number|},
-    payload: {|pull_request: Octokit$PullsListResponseItem|},
-|};
 type NameToFiles = {[name: string]: string[], ...};
 
 /**
@@ -76,12 +64,11 @@ const turnPatternIntoRegex = (pattern: string): RegExp => {
  */
 const parseUsername = (
     original: string,
-): {original: string, username: string, justName: string, isRequired: boolean} => {
+): {username: string, justName: string, isRequired: boolean} => {
     const justName = original.match(/[^@!]+/);
     if (justName && justName[0]) {
         const isRequired = original.endsWith('!');
         return {
-            original: original,
             username: `@${justName[0]}`,
             justName: justName[0],
             isRequired: isRequired,
@@ -116,7 +103,7 @@ const pushOrSetToBin = (bin: NameToFiles, username: string, files: Array<string>
  * @param section - What section of the file do you want? Only the NOTIFIED file has a 'push' section.
  * @throws if the file is missing a section header or if there was a request to look at the 'push' section of the REVIEWERS file.
  */
-const getCorrectSection = (
+export const getCorrectSection = (
     rawFile: string,
     file: 'NOTIFIED' | 'REVIEWERS',
     section: 'pull_request' | 'push',
@@ -159,7 +146,7 @@ const getCorrectSection = (
  * @param on - Which section of the NOTIFIED file are we looking at, the 'pull_request' section or the 'push' section?
  * @param __testContent - For testing, mimicks .github/NOTIFIED content.
  */
-const getNotified = (
+export const getNotified = (
     filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
     on: 'pull_request' | 'push',
@@ -192,7 +179,7 @@ const getNotified = (
             }
             // handle dealing with glob matches
             else {
-                const matchedFiles: string[] = glob.sync(pattern, globOptions); //flow-uncovered-line
+                const matchedFiles: Array<string> = fg.sync(pattern, globOptions); // flow-uncovered-line
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
                 for (const name of names) {
@@ -212,7 +199,7 @@ const getNotified = (
  * @param issuer - The person making the pull request should not be a reviewer.
  * @param __testContent - For testing, mimicks .github/REVIEWERS content.
  */
-const getReviewers = (
+export const getReviewers = (
     filesChanged: string[],
     fileDiffs: {[string]: string, ...},
     issuer: string,
@@ -246,7 +233,7 @@ const getReviewers = (
             const regex = turnPatternIntoRegex(pattern);
 
             for (const name of names) {
-                const {original, username, justName, isRequired} = parseUsername(name);
+                const {username, justName, isRequired} = parseUsername(name);
                 // don't add yourself as a reviewer
                 if (justName === issuer) {
                     continue;
@@ -256,11 +243,11 @@ const getReviewers = (
                 maybeAddIfMatch(regex, username, fileDiffs, correctBin);
             }
         } else {
-            const matchedFiles: string[] = glob.sync(pattern, globOptions); //flow-uncovered-line
+            const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
             for (const name of names) {
                 // don't add yourself as a reviewer
-                const {original, username, justName, isRequired} = parseUsername(name);
+                const {username, justName, isRequired} = parseUsername(name);
                 if (justName === issuer) {
                     continue;
                 }
@@ -282,7 +269,7 @@ const getReviewers = (
  * @param notified - List of people to notify generated from getNotified
  * @param removedJustNames - List of people who have commented #removeme
  */
-const getFilteredLists = (
+export const getFilteredLists = (
     reviewers: NameToFiles,
     requiredReviewers: NameToFiles,
     notified: NameToFiles,
@@ -323,7 +310,7 @@ const getFilteredLists = (
  * #removeme comments to figure out who shouldn't be readded on the pull request.
  * @param existingComments - List of existing Github comments.
  */
-const parseExistingComments = <
+export const parseExistingComments = <
     T: {|user: {|login: string|}, body: string|} | Octokit$IssuesListCommentsResponseItem,
 >(
     existingComments: Octokit$Response<T[]> | {data: T[]},
@@ -337,7 +324,7 @@ const parseExistingComments = <
 
     existingComments.data.map(cmnt => {
         // only look at comments made by github-actions[bot] for <required> reviewers / notified comments
-        if (cmnt.user.login === 'github-actions[bot]') {
+        if (cmnt.user.login === 'khan-actions-bot') {
             actionBotComments.push(cmnt);
         } else {
             const removeMeMatch = cmnt.body.match(/\#removeme/i);
@@ -361,7 +348,7 @@ const parseExistingComments = <
  * @desc Get the diff of each file that has been changed.
  * @param context - @actions/github context from which to find the base of the pull request.
  */
-const getFileDiffs = async (diffString: string): {[string]: string, ...} => {
+export const getFileDiffs = async (diffString: string): {[string]: string, ...} => {
     // get raw diff and split it by 'diff --git', which appears at the start of every new file.
     const rawDiffs = (await execCmd('git', ['diff', diffString])).split(/^diff --git /m);
     const fileToDiff: {[string]: string, ...} = {}; // object of {[file: string]: string}
@@ -377,20 +364,7 @@ const getFileDiffs = async (diffString: string): {[string]: string, ...} => {
     return fileToDiff;
 };
 
-const __maybeAddIfMatch = maybeAddIfMatch;
-const __turnPatternIntoRegex = turnPatternIntoRegex;
-const __parseUsername = parseUsername;
-const __pushOrSetToBin = pushOrSetToBin;
-
-module.exports = {
-    __maybeAddIfMatch,
-    __turnPatternIntoRegex,
-    __parseUsername,
-    __pushOrSetToBin,
-    getNotified,
-    getReviewers,
-    parseExistingComments,
-    getFileDiffs,
-    getFilteredLists,
-    getCorrectSection,
-};
+export const __maybeAddIfMatch = maybeAddIfMatch;
+export const __turnPatternIntoRegex = turnPatternIntoRegex;
+export const __parseUsername = parseUsername;
+export const __pushOrSetToBin = pushOrSetToBin;

@@ -7,9 +7,6 @@ import {
     type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
-const path = require('path');
-const octokit = require('@actions/github'); //flow-uncovered-line
-
 type Context = {|
     issue: {|owner: string, repo: string, number: number|},
     payload: {|
@@ -21,18 +18,19 @@ type Context = {|
     actor: string,
 |};
 
-const {
+import {
     getReviewers,
     getNotified,
     getFileDiffs,
     parseExistingComments,
     getFilteredLists,
-} = require('./utils');
-const {execCmd} = require('./execCmd');
+} from './utils';
+import {execCmd} from './execCmd';
+
+const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
-// argv looks like: ['node', '.github/workflows/pr-notify.js', authTokenWithRepoAccess, githubActionsToken]
-const extraPermGithub: Octokit = new octokit.GitHub(process.env['KHAN_ACTIONS_BOT_TOKEN']);
+const extraPermGithub: Octokit = new octokit.GitHub(process.env['ADMIN_PERMISSION_TOKEN']);
 const github: Octokit = new octokit.GitHub(process.env['GITHUB_TOKEN']);
 const context: Context = octokit.context;
 /* end flow-uncovered-block */
@@ -77,20 +75,20 @@ const updatePullRequestComment = async (
         body += `\n${separator}\n_Don't want to be involved in this pull request? Comment \`#removeme\` and we won't notify you of further changes._`;
 
         if (comment) {
-            await github.issues.updateComment({
+            await extraPermGithub.issues.updateComment({
                 ...ownerAndRepo,
                 comment_id: comment.id,
                 body: body, // flow-uncovered-line
             });
         } else {
-            await github.issues.createComment({
+            await extraPermGithub.issues.createComment({
                 ...ownerAndRepo,
                 issue_number: context.issue.number,
                 body: body, // flow-uncovered-line
             });
         }
     } else if (comment) {
-        await github.issues.deleteComment({
+        await extraPermGithub.issues.deleteComment({
             ...ownerAndRepo,
             comment_id: comment.id,
         });
@@ -116,7 +114,7 @@ const makeCommitComments = async (peopleToFiles: {[string]: Array<string>, ...})
     }
 };
 
-const runPullRequest = async () => {
+export const runPullRequest = async () => {
     // get the files changed between the head of this branch and the origin of the base branch
     const filesChanged = (
         await execCmd('git', [
@@ -136,7 +134,7 @@ const runPullRequest = async () => {
         context.payload.pull_request.user.login,
     );
 
-    // find any #removeme or existing Github-Actions[bot] comments
+    // find any #removeme or existing khan-actions-bot comments
     const existingComments = await github.issues.listComments({
         ...ownerAndRepo,
         issue_number: context.issue.number,
@@ -164,7 +162,7 @@ const runPullRequest = async () => {
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
 
-const runPush = async () => {
+export const runPush = async () => {
     const filesChanged = (
         await execCmd('git', [
             'diff',
@@ -181,5 +179,3 @@ const runPush = async () => {
 
     await makeCommitComments(notified);
 };
-
-module.exports = {runPullRequest, runPush};

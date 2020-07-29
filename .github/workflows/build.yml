@@ -3,6 +3,9 @@ name: Build index.js
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 jobs:
   build_index:
     runs-on: ubuntu-latest
@@ -13,7 +16,7 @@ jobs:
       - run: yarn
         name: "Setting up Yarn"
       - run: yarn global add
-      - run: npx babel lib --out-dir js
+      - run: npx babel src --out-dir js
         name: Transpile flow to javascript
       - run: ncc build js/pr-notify.js
         name: Build dist folder
@@ -23,8 +26,9 @@ jobs:
           git add .
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "ci: Automated build push" -a | exit 0
+          git commit -m "Automated build push" -a | exit 0
       - name: Push changes
+        if: github.ref == 'refs/heads/main'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

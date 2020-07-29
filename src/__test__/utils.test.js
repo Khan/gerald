@@ -1,12 +1,6 @@
 // @flow
 
 import {
-    type Octokit$PullsListResponseItem,
-    type Octokit$IssuesListCommentsResponseItem,
-    type Octokit$Response,
-} from '@octokit/rest';
-
-const {
     __maybeAddIfMatch,
     __turnPatternIntoRegex,
     __parseUsername,
@@ -17,7 +11,7 @@ const {
     getFileDiffs,
     getFilteredLists,
     getCorrectSection,
-} = require('../utils');
+} from '../utils';
 
 const mockTestFileDiff = `a/testFile b/testFile
 new file mode 123456
@@ -120,7 +114,6 @@ describe('parse usernames', () => {
         const result = __parseUsername(original);
 
         expect(result).toEqual({
-            original: original,
             username: '@yipstanley',
             justName: 'yipstanley',
             isRequired: true,
@@ -133,7 +126,6 @@ describe('parse usernames', () => {
         const result = __parseUsername(original);
 
         expect(result).toEqual({
-            original: original,
             username: '@yipstanley',
             justName: 'yipstanley',
             isRequired: false,
@@ -156,40 +148,32 @@ describe('push or set to bin', () => {
 });
 
 describe('get notified', () => {
-    it('should work', () => {
+    it('should work', async () => {
         const notifiedFile = `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser
-*.js                @yipstanley @githubUser
+**/*.js             @yipstanley @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
-*.js                @owner`;
+**/*.js             @owner`;
 
-        const filesChanged = [
-            '.github/workflows/pr-notify.js',
-            '.github/workflows/pr-notify.yml',
-            '.github/NOTIFIED',
-        ];
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        expect(getNotified(filesChanged, fileDiffs, 'pull_request', notifiedFile)).toEqual({
-            '@yipstanley': ['.github/workflows/pr-notify.js'],
-            '@githubUser': [
-                '.github/NOTIFIED',
-                '.github/workflows/pr-notify.js',
-                '.github/workflows/pr-notify.yml',
-            ],
+        expect(await getNotified(filesChanged, fileDiffs, 'pull_request', notifiedFile)).toEqual({
+            '@yipstanley': ['src/execCmd.js', 'src/main.js'],
+            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'],
             '@testperson': ['yaml.yml'],
         });
 
-        expect(getNotified(filesChanged, fileDiffs, 'push', notifiedFile)).toEqual({
-            '@owner': ['.github/workflows/pr-notify.js'],
+        expect(await getNotified(filesChanged, fileDiffs, 'push', notifiedFile)).toEqual({
+            '@owner': ['src/execCmd.js', 'src/main.js'],
         });
     });
 });
@@ -202,14 +186,10 @@ describe('get reviewers', () => {
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser!
-*.js                @yipstanley! @githubUser
+**/*.js             @yipstanley! @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson`;
-        const filesChanged = [
-            '.github/workflows/pr-notify.js',
-            '.github/workflows/pr-notify.yml',
-            '.github/NOTIFIED',
-        ];
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
         const {requiredReviewers, reviewers} = getReviewers(
@@ -219,15 +199,11 @@ describe('get reviewers', () => {
             reviewersFile,
         );
         expect(reviewers).toEqual({
-            '@githubUser': ['.github/workflows/pr-notify.js'],
+            '@githubUser': ['src/execCmd.js', 'src/main.js'],
             '@testperson': ['yaml.yml'],
         });
         expect(requiredReviewers).toEqual({
-            '@githubUser': [
-                '.github/NOTIFIED',
-                '.github/workflows/pr-notify.js',
-                '.github/workflows/pr-notify.yml',
-            ],
+            '@githubUser': ['.github/workflows/build.yml'],
         });
     });
 });
@@ -270,7 +246,7 @@ this should show up 2!`;
 });
 
 describe('get filtered lists', () => {
-    it('should work', () => {
+    it('should work', async () => {
         const sampleFile = `# comment
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
@@ -287,7 +263,7 @@ describe('get filtered lists', () => {
         ];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = getReviewers(
+        const {requiredReviewers, reviewers} = await getReviewers(
             filesChanged,
             fileDiffs,
             'yipstanley',
@@ -308,7 +284,7 @@ describe('get filtered lists', () => {
 describe('parse existing comments', () => {
     it('should work', () => {
         const gerald = {
-            user: {login: 'github-actions[bot]'},
+            user: {login: 'khan-actions-bot'},
             body: `# Gerald:
 
             ## Notified:
@@ -320,17 +296,17 @@ describe('parse existing comments', () => {
         const existingComments = {
             data: [
                 gerald,
-                {user: {login: 'github-actions[bot]'}, body: 'irrelevant comment'},
-                {user: {login: 'github-actions[bot]'}, body: 'another irrelevant comment'},
+                {user: {login: 'khan-actions-bot'}, body: 'irrelevant comment'},
+                {user: {login: 'khan-actions-bot'}, body: 'another irrelevant comment'},
                 {
                     user: {login: 'yipstanley'},
                     body: '#removeme',
                 },
                 {
-                    user: {login: 'github-actions[bot]'},
+                    user: {login: 'khan-actions-bot'},
                     body: 'Required Reviewers:\n\n:',
                 },
-                {user: {login: 'github-actions[bot]'}, body: 'Reviewers:\n\n:'},
+                {user: {login: 'khan-actions-bot'}, body: 'Reviewers:\n\n:'},
             ],
         };
 
