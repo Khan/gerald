@@ -5,12 +5,28 @@ import fs from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
 import {execCmd} from './execCmd';
-const globOptions = {
-    dot: true,
-    ignore: ['node_modules/**', 'coverage/**', '.git/**', 'flow-typed/**'],
-};
 
 type NameToFiles = {[name: string]: string[], ...};
+
+/**
+ * @desc Read ./.geraldignore if it exists. Otherwise, read ./.gitignore.
+ * Split the file by newlines to serve as the list of files/directories to
+ * ignore for Gerald.
+ */
+const getGeraldIgnore = (): Array<string> => {
+    if (fs.existsSync('.geraldignore')) {
+        return fs.readFileSync('.geraldignore', 'utf-8').split('\n');
+    } else if (fs.existsSync('.gitignore')) {
+        return fs.readFileSync('.gitignore', 'utf-8').split('\n');
+    }
+    return [];
+};
+
+const geraldIgnore = getGeraldIgnore();
+const globOptions = {
+    dot: true,
+    ignore: geraldIgnore,
+};
 
 /**
  * @desc Add the username/files pair to the nameToFilesObj if the
