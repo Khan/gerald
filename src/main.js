@@ -150,7 +150,7 @@ export const runPullRequest = async () => {
     );
 
     // find any #removeme or existing khan-actions-bot comments
-    const existingComments = await extraPermGithub.issues
+    const existingComments = await github.issues
         .listComments({
             ...ownerAndRepo,
             issue_number: context.issue.number,
