@@ -3,7 +3,6 @@ name: Build index.js
   push:
     branches:
       - main
-      - debug
   pull_request:
     branches:
       - main
@@ -29,8 +28,8 @@ jobs:
           git config --local user.name "GitHub Action"
           git commit -m "Automated build push" -a | exit 0
       - name: Push changes
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/debug'
+        if: github.ref == 'refs/heads/main'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          branch: main
