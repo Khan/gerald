@@ -17,5 +17,5 @@ jobs:
         uses: Khan/gerald@debug
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          KHAN_ACTIONS_BOT_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
+          ADMIN_PERMISSION_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
           EVENT: 'push'
