@@ -11,5 +11,5 @@ jobs:
         uses: Khan/gerald@debug
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          ADMIN_PERMISSIONS_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
+          ADMIN_PERMISSION_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
           EVENT: 'pull_request'
