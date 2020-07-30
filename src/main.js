@@ -170,6 +170,11 @@ export const runPush = async () => {
             '--name-only',
         ])
     ).split('\n');
+
+    for (const commit of context.payload.commits) {
+        console.log(commit);
+    }
+
     const fileDiffs = await getFileDiffs(`${context.payload.before}...${context.payload.after}`);
     const notified = getNotified(filesChanged, fileDiffs, 'push');
 
