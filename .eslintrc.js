@@ -101,7 +101,7 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['src/pr-notify.js, src/main.js'],
+            files: ['src/pr-notify.js', 'src/main.js', 'src/execCmd.js'],
             rules: {
                 'import/no-commonjs': 'off',
             },

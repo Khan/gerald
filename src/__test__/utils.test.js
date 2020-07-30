@@ -1,13 +1,10 @@
 // @flow
 
-import glob from 'glob';
-
 import {
     __maybeAddIfMatch,
     __turnPatternIntoRegex,
     __parseUsername,
     __pushOrSetToBin,
-    __globAsync,
     getNotified,
     getReviewers,
     parseExistingComments,
@@ -15,8 +12,6 @@ import {
     getFilteredLists,
     getCorrectSection,
 } from '../utils';
-
-const globOptions = {matchBase: true, dot: true};
 
 const mockTestFileDiff = `a/testFile b/testFile
 new file mode 123456
@@ -160,13 +155,13 @@ describe('get notified', () => {
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser
-*.js                @yipstanley @githubUser
+**/*.js             @yipstanley @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
-*.js                @owner`;
+**/*.js             @owner`;
 
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
@@ -184,20 +179,20 @@ describe('get notified', () => {
 });
 
 describe('get reviewers', () => {
-    it('should work', async () => {
+    it('should work', () => {
         const reviewersFile = `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser!
-*.js                @yipstanley! @githubUser
+**/*.js             @yipstanley! @githubUser
 "/test/ig"          @testperson
 # *                 @otherperson`;
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = await getReviewers(
+        const {requiredReviewers, reviewers} = getReviewers(
             filesChanged,
             fileDiffs,
             'yipstanley',
@@ -251,24 +246,24 @@ this should show up 2!`;
 });
 
 describe('get filtered lists', () => {
-    it('should work', async () => {
+    it('should work', () => {
         const sampleFile = `# comment
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser!
-*.js                @yipstanley! @githubUser @Org/Slug-name
+**/*.js             @yipstanley! @githubUser @Org/Slug-name
 "/test/ig"          @testperson
 # *                 @otherperson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)`;
         const filesChanged = [
-            '.github/workflows/pr-notify.js',
-            '.github/workflows/pr-notify.yml',
+            'src/pr-notify.js',
+            '.github/workflows/pr-actions.yml',
             '.github/NOTIFIED',
         ];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = await getReviewers(
+        const {requiredReviewers, reviewers} = getReviewers(
             filesChanged,
             fileDiffs,
             'yipstanley',
@@ -329,45 +324,5 @@ describe('test get file diffs', () => {
         expect(result['testFile']).toEqual(mockTestFileDiff);
 
         expect(result['otherFile.js']).toEqual(mockOtherFileDiff);
-    });
-});
-
-describe('test caching glob calls', () => {
-    beforeAll(() => {
-        // this test takes about 15 seconds.
-        jest.setTimeout(30000);
-    });
-
-    it('should work', async () => {
-        // run and track the time it takes to run a synchronous, uncached glob search
-        const globPatterns = ['**', '*.js', 'main', 'utils', '**src/**'];
-        const syncResults: Array<string> = [];
-        const syncStartTime = new Date().getTime();
-
-        for (const pattern of globPatterns) {
-            syncResults.push(...glob.sync(pattern, globOptions));
-        }
-
-        const syncEndTime = new Date().getTime();
-
-        // do the same for an asynchronous, cached glob search
-        const asyncResults: Array<string> = [];
-        const asyncStartTime = new Date().getTime();
-        let cache: {[path: string]: boolean | 'DIR' | 'FILE' | $ReadOnlyArray<string>, ...} = {};
-
-        for (const pattern of globPatterns) {
-            const {matchedFiles, newCache} = await __globAsync(pattern, {
-                cache: cache,
-                ...globOptions,
-            });
-            asyncResults.push(...matchedFiles);
-            cache = {...cache, ...newCache};
-        }
-
-        const asyncEndTime = new Date().getTime();
-
-        // on average the uncached glob search takes about 1.2X the speed of the cached glob search
-        expect(asyncEndTime - asyncStartTime < syncEndTime - syncStartTime);
-        expect(syncResults).toEqual(asyncResults);
     });
 });
