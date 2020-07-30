@@ -1,4 +1,4 @@
-# Gerald Documentation
+# Gerald Usage Documentation
 
 Gerald is the project described under [ADR 356](https://docs.google.com/document/d/1TDE_nmrV3vuGi54HtC8X7irSMwTTcc9p83cuhH4kB6Y/edit#heading=h.zcx77itbdtis). The goal was to port over as much of the used Phabricator Herald functionality into Github Actions as possible.
 
