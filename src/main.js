@@ -95,7 +95,10 @@ const updatePullRequestComment = async (
     }
 };
 
-const makeCommitComments = async (peopleToFiles: {[string]: Array<string>, ...}) => {
+const makeCommitComment = async (
+    peopleToFiles: {[string]: Array<string>, ...},
+    commit_sha: string,
+) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (peopleToFiles && names.length) {
         let body: string = 'Notify of Push Without Pull Request\n\n';
@@ -104,13 +107,11 @@ const makeCommitComments = async (peopleToFiles: {[string]: Array<string>, ...})
             body += `${person} for changes to \`${files.join('`, `')}\`\n`;
         });
 
-        for (const commit of context.payload.commits) {
-            await extraPermGithub.repos.createCommitComment({
-                ...ownerAndRepo,
-                commit_sha: commit.id,
-                body: body,
-            });
-        }
+        await extraPermGithub.repos.createCommitComment({
+            ...ownerAndRepo,
+            commit_sha: commit_sha,
+            body: body,
+        });
     }
 };
 
@@ -163,24 +164,27 @@ export const runPullRequest = async () => {
 };
 
 export const runPush = async () => {
-    const filesChanged = (
-        await execCmd('git', [
-            'diff',
-            `${context.payload.before}...${context.payload.after}`,
-            '--name-only',
-        ])
-    ).split('\n');
-
+    const nonMergeCommits = [];
+    let prevCommit = context.payload.before;
     for (const commit of context.payload.commits) {
-        console.log(commit);
+        const commitData = await extraPermGithub.git.getCommit({
+            ...ownerAndRepo,
+            commit_sha: commit.id,
+        });
+        if (commitData.data.parents.length === 1) {
+            const filesChanged = (
+                await execCmd('git', [
+                    'diff',
+                    `${prevCommit}...${commitData.data.sha}`,
+                    '--name-only',
+                ])
+            ).split('\n');
+            const fileDiffs = await getFileDiffs(`${prevCommit}...${commitData.data.sha}`);
+            const notified = getNotified(filesChanged, fileDiffs, 'push');
+
+            await makeCommitComment(notified, commitData.data.sha);
+        }
+
+        prevCommit = commitData.data.sha;
     }
-
-    const fileDiffs = await getFileDiffs(`${context.payload.before}...${context.payload.after}`);
-    const notified = getNotified(filesChanged, fileDiffs, 'push');
-
-    // no such thing as reviewers on a push
-    // no need to look thru existing comments, a new push can't have existing comments
-    // no need to filter out, since we're not requesting reviewers
-
-    await makeCommitComments(notified);
 };
