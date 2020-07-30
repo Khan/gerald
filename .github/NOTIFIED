@@ -16,4 +16,8 @@ Be sure to read through .github/Gerald-README.md before adding any rules!
 # Adding yourself below this line will notify you of any changes to this branch that don't go through a pull-request.
 # This is analogous to Herald's "Differential Revision is False" condition.
 
+<<<<<<< HEAD
 **/*            @yipstanley
+=======
+*
+>>>>>>> Merge branch 'debug' of github.com:Khan/gerald into debug
