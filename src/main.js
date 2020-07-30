@@ -75,23 +75,38 @@ const updatePullRequestComment = async (
         body += `\n${separator}\n_Don't want to be involved in this pull request? Comment \`#removeme\` and we won't notify you of further changes._`;
 
         if (comment) {
-            await extraPermGithub.issues.updateComment({
-                ...ownerAndRepo,
-                comment_id: comment.id,
-                body: body, // flow-uncovered-line
-            });
+            await extraPermGithub.issues
+                .updateComment({
+                    ...ownerAndRepo,
+                    comment_id: comment.id,
+                    body: body, // flow-uncovered-line
+                })
+                .catch(err => {
+                    console.error("Error with updating Gerald's comment");
+                    throw err;
+                });
         } else {
-            await extraPermGithub.issues.createComment({
-                ...ownerAndRepo,
-                issue_number: context.issue.number,
-                body: body, // flow-uncovered-line
-            });
+            await extraPermGithub.issues
+                .createComment({
+                    ...ownerAndRepo,
+                    issue_number: context.issue.number,
+                    body: body, // flow-uncovered-line
+                })
+                .catch(err => {
+                    console.error("Error with creating Gerald's comment");
+                    throw err;
+                });
         }
     } else if (comment) {
-        await extraPermGithub.issues.deleteComment({
-            ...ownerAndRepo,
-            comment_id: comment.id,
-        });
+        await extraPermGithub.issues
+            .deleteComment({
+                ...ownerAndRepo,
+                comment_id: comment.id,
+            })
+            .catch(err => {
+                console.error("Error with deleting Gerald's comment");
+                throw err;
+            });
     }
 };
 
@@ -136,10 +151,15 @@ export const runPullRequest = async () => {
     );
 
     // find any #removeme or existing khan-actions-bot comments
-    const existingComments = await github.issues.listComments({
-        ...ownerAndRepo,
-        issue_number: context.issue.number,
-    });
+    const existingComments = await extraPermGithub.issues
+        .listComments({
+            ...ownerAndRepo,
+            issue_number: context.issue.number,
+        })
+        .catch(err => {
+            console.error('Error with listing comments:');
+            throw err;
+        });
     const {
         megaComment,
         removedJustNames,
@@ -153,12 +173,17 @@ export const runPullRequest = async () => {
         removedJustNames,
     );
 
-    await extraPermGithub.pulls.createReviewRequest({
-        ...ownerAndRepo,
-        pull_number: context.issue.number,
-        reviewers: actualReviewers,
-        team_reviewers: teamReviewers,
-    });
+    await extraPermGithub.pulls
+        .createReviewRequest({
+            ...ownerAndRepo,
+            pull_number: context.issue.number,
+            reviewers: actualReviewers,
+            team_reviewers: teamReviewers,
+        })
+        .catch(err => {
+            console.error('Error with creating a review request:');
+            throw err;
+        });
 
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };

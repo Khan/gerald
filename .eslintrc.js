@@ -101,7 +101,11 @@ module.exports = {
     },
     overrides: [
         {
+<<<<<<< HEAD
             files: ['src/core.js', 'src/main.js', 'src/execCmd.js'],
+=======
+            files: ['src/pr-notify.js', 'src/main.js', 'src/execCmd.js'],
+>>>>>>> Automated build push
             rules: {
                 'import/no-commonjs': 'off',
             },
