@@ -13,11 +13,8 @@ import {
     getFilteredLists,
     getCorrectSection,
 } from '../utils';
-
 const mockTestFileDiff = `a/testFile b/testFile
 new file mode 123456
-index 0000000..1234567
---- /dev/null
 +++ b/testFile
 @@ -0,0 +1,220 @@
 +this is a new line that was added
