@@ -66797,7 +66797,18 @@ exports.classMethodOrDeclareMethodCommon = classMethodOrDeclareMethodCommon;
 });
 
 /***/ }),
-/* 455 */,
+/* 455 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+var arrayLikeToArray = __webpack_require__(144);
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) return arrayLikeToArray(arr);
+}
+
+module.exports = _arrayWithoutHoles;
+
+/***/ }),
 /* 456 */,
 /* 457 */
 /***/ (function(module) {
@@ -67277,7 +67288,65 @@ module.exports = pump
 
 
 /***/ }),
-/* 465 */,
+/* 465 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+"use strict";
+
+const os = __webpack_require__(87);
+const execa = __webpack_require__(703);
+
+// Reference: https://www.gaijin.at/en/lstwinver.php
+const names = new Map([
+	['10.0', '10'],
+	['6.3', '8.1'],
+	['6.2', '8'],
+	['6.1', '7'],
+	['6.0', 'Vista'],
+	['5.2', 'Server 2003'],
+	['5.1', 'XP'],
+	['5.0', '2000'],
+	['4.9', 'ME'],
+	['4.1', '98'],
+	['4.0', '95']
+]);
+
+const windowsRelease = release => {
+	const version = /\d+\.\d/.exec(release || os.release());
+
+	if (release && !version) {
+		throw new Error('`release` argument doesn\'t match `n.n`');
+	}
+
+	const ver = (version || [])[0];
+
+	// Server 2008, 2012, 2016, and 2019 versions are ambiguous with desktop versions and must be detected at runtime.
+	// If `release` is omitted or we're on a Windows system, and the version number is an ambiguous version
+	// then use `wmic` to get the OS caption: https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
+	// If `wmic` is obsoloete (later versions of Windows 10), use PowerShell instead.
+	// If the resulting caption contains the year 2008, 2012, 2016 or 2019, it is a server version, so return a server OS name.
+	if ((!release || release === os.release()) && ['6.1', '6.2', '6.3', '10.0'].includes(ver)) {
+		let stdout;
+		try {
+			stdout = execa.sync('wmic', ['os', 'get', 'Caption']).stdout || '';
+		} catch (_) {
+			stdout = execa.sync('powershell', ['(Get-CimInstance -ClassName Win32_OperatingSystem).caption']).stdout || '';
+		}
+
+		const year = (stdout.match(/2008|2012|2016|2019/) || [])[0];
+
+		if (year) {
+			return `Server ${year}`;
+		}
+	}
+
+	return names.get(ver);
+};
+
+module.exports = windowsRelease;
+
+
+/***/ }),
 /* 466 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -67342,62 +67411,13 @@ function sync (path, options) {
 
 /***/ }),
 /* 467 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(module) {
 
-"use strict";
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+}
 
-const os = __webpack_require__(87);
-const execa = __webpack_require__(703);
-
-// Reference: https://www.gaijin.at/en/lstwinver.php
-const names = new Map([
-	['10.0', '10'],
-	['6.3', '8.1'],
-	['6.2', '8'],
-	['6.1', '7'],
-	['6.0', 'Vista'],
-	['5.2', 'Server 2003'],
-	['5.1', 'XP'],
-	['5.0', '2000'],
-	['4.9', 'ME'],
-	['4.1', '98'],
-	['4.0', '95']
-]);
-
-const windowsRelease = release => {
-	const version = /\d+\.\d/.exec(release || os.release());
-
-	if (release && !version) {
-		throw new Error('`release` argument doesn\'t match `n.n`');
-	}
-
-	const ver = (version || [])[0];
-
-	// Server 2008, 2012, 2016, and 2019 versions are ambiguous with desktop versions and must be detected at runtime.
-	// If `release` is omitted or we're on a Windows system, and the version number is an ambiguous version
-	// then use `wmic` to get the OS caption: https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
-	// If `wmic` is obsoloete (later versions of Windows 10), use PowerShell instead.
-	// If the resulting caption contains the year 2008, 2012, 2016 or 2019, it is a server version, so return a server OS name.
-	if ((!release || release === os.release()) && ['6.1', '6.2', '6.3', '10.0'].includes(ver)) {
-		let stdout;
-		try {
-			stdout = execa.sync('wmic', ['os', 'get', 'Caption']).stdout || '';
-		} catch (_) {
-			stdout = execa.sync('powershell', ['(Get-CimInstance -ClassName Win32_OperatingSystem).caption']).stdout || '';
-		}
-
-		const year = (stdout.match(/2008|2012|2016|2019/) || [])[0];
-
-		if (year) {
-			return `Server ${year}`;
-		}
-	}
-
-	return names.get(ver);
-};
-
-module.exports = windowsRelease;
-
+module.exports = _iterableToArray;
 
 /***/ }),
 /* 468 */,
@@ -76478,7 +76498,7 @@ function VoidTypeAnnotation() {
 /* 587 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__pushOrSetToBin=exports.__parseUsername=exports.__turnPatternIntoRegex=exports.__maybeAddIfMatch=exports.getFileDiffs=exports.parseExistingComments=exports.getFilteredLists=exports.getReviewers=exports.getNotified=exports.getCorrectSection=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _slicedToArray2=_interopRequireDefault(__webpack_require__(479));var _fs=_interopRequireDefault(__webpack_require__(747));var _fastGlob=_interopRequireDefault(__webpack_require__(98));var _execCmd=__webpack_require__(529);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var getGeraldIgnore=function getGeraldIgnore(){if(_fs.default.existsSync('.geraldignore')){return _fs.default.readFileSync('.geraldignore','utf-8').split('\n');}else if(_fs.default.existsSync('.gitignore')){return _fs.default.readFileSync('.gitignore','utf-8').split('\n');}return[];};var geraldIgnore=getGeraldIgnore();var globOptions={dot:true,ignore:geraldIgnore};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,fileDiffs,nameToFilesObj){for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(pattern.test(diff)){if(nameToFilesObj[name]){if(!nameToFilesObj[name].includes(file)){nameToFilesObj[name].push(file);}}else{nameToFilesObj[name]=[file];}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=/^"\/(.*?)\/([a-z]*)"$/.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,files){if(bin[username]){for(var _iterator=_createForOfIteratorHelperLoose(files),_step;!(_step=_iterator()).done;){var file=_step.value;if(!bin[username].includes(file)){bin[username].push(file);}}}else{bin[username]=files;}};var getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(/\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file==='NOTIFIED'&&!rawFile.match(/\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section==='pull_request'){sectionRegexp=file==='NOTIFIED'?/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm:/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else if(file==='NOTIFIED'){sectionRegexp=/(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return sectionRegexp.exec(rawFile);};exports.getCorrectSection=getCorrectSection;var getNotified=function getNotified(filesChanged,fileDiffs,on){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=__testContent||_fs.default.readFileSync('.github/NOTIFIED','utf-8');var section=getCorrectSection(buf,'NOTIFIED',on);if(!section){return{};}var matches=section[0].match(/^[^\#\n].*/gm);var notified={};if(matches){for(var _iterator2=_createForOfIteratorHelperLoose(matches),_step2;!(_step2=_iterator2()).done;){var match=_step2.value;var untrimmedPattern=match.match(/(.(?!  @))*/);var names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator3=_createForOfIteratorHelperLoose(names),_step3;!(_step3=_iterator3()).done;){var _name=_step3.value;maybeAddIfMatch(regex,_name,fileDiffs,notified);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});for(var _iterator4=_createForOfIteratorHelperLoose(names),_step4;!(_step4=_iterator4()).done;){var _name2=_step4.value;pushOrSetToBin(notified,_name2,intersection);}}}}return notified;};exports.getNotified=getNotified;var getReviewers=function getReviewers(filesChanged,fileDiffs,issuer){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=__testContent||_fs.default.readFileSync('.github/REVIEWERS','utf-8');var section=getCorrectSection(buf,'REVIEWERS','pull_request');if(!section){return{reviewers:{},requiredReviewers:{}};}var matches=section[0].match(/^[^\#\n].*/gm);var reviewers={};var requiredReviewers={};if(!matches){return{reviewers:reviewers,requiredReviewers:requiredReviewers};}for(var _iterator5=_createForOfIteratorHelperLoose(matches),_step5;!(_step5=_iterator5()).done;){var match=_step5.value;var untrimmedPattern=match.match(/(.(?!  @))*/);var names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator6=_createForOfIteratorHelperLoose(names),_step6;!(_step6=_iterator6()).done;){var _name3=_step6.value;var _parseUsername=parseUsername(_name3),username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(justName===issuer){continue;}var correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,fileDiffs,correctBin);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});for(var _iterator7=_createForOfIteratorHelperLoose(names),_step7;!(_step7=_iterator7()).done;){var _name4=_step7.value;var _parseUsername2=parseUsername(_name4),_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(_justName===issuer){continue;}var _correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,intersection);}}}return{reviewers:reviewers,requiredReviewers:requiredReviewers};};exports.getReviewers=getReviewers;var getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator8=_createForOfIteratorHelperLoose(removedJustNames),_step8;!(_step8=_iterator8()).done;){var justName=_step8.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};exports.getFilteredLists=getFilteredLists;var parseExistingComments=function parseExistingComments(existingComments){var actionBotComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.user.login==='khan-actions-bot'){actionBotComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(/\#removeme/i);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});actionBotComments.forEach(function(comment){var megaCommentMatch=comment.body.match(/^# Gerald/i);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};exports.parseExistingComments=parseExistingComments;var getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator9,_step9,diff,fileName;return _regenerator.default.async(function getFileDiffs$(_context){while(1){switch(_context.prev=_context.next){case 0:_context.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString]));case 2:rawDiffs=_context.sent.split(/^diff --git /m);fileToDiff={};for(_iterator9=_createForOfIteratorHelperLoose(rawDiffs);!(_step9=_iterator9()).done;){diff=_step9.value;fileName=diff.match(/(?<=^a\/)\S*/);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context.abrupt("return",fileToDiff);case 6:case"end":return _context.stop();}}},null,null,null,Promise);};exports.getFileDiffs=getFileDiffs;var __maybeAddIfMatch=maybeAddIfMatch;exports.__maybeAddIfMatch=__maybeAddIfMatch;var __turnPatternIntoRegex=turnPatternIntoRegex;exports.__turnPatternIntoRegex=__turnPatternIntoRegex;var __parseUsername=parseUsername;exports.__parseUsername=__parseUsername;var __pushOrSetToBin=pushOrSetToBin;exports.__pushOrSetToBin=__pushOrSetToBin;
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__pushOrSetToBin=exports.__parseUsername=exports.__turnPatternIntoRegex=exports.__maybeAddIfMatch=exports.getFileDiffs=exports.parseExistingComments=exports.getFilteredLists=exports.getReviewers=exports.getNotified=exports.getCorrectSection=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _slicedToArray2=_interopRequireDefault(__webpack_require__(479));var _toConsumableArray2=_interopRequireDefault(__webpack_require__(775));var _fs=_interopRequireDefault(__webpack_require__(747));var _fastGlob=_interopRequireDefault(__webpack_require__(98));var _execCmd=__webpack_require__(529);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var getGeraldIgnore=function getGeraldIgnore(){var ignore=[];if(_fs.default.existsSync('.geraldignore')){ignore.push.apply(ignore,(0,_toConsumableArray2.default)(_fs.default.readFileSync('.geraldignore','utf-8').split('\n')));}if(_fs.default.existsSync('.gitignore')){ignore.push.apply(ignore,(0,_toConsumableArray2.default)(_fs.default.readFileSync('.gitignore','utf-8').split('\n').filter(function(line){return!ignore.includes(line);})));}return ignore;};var geraldIgnore=getGeraldIgnore();var globOptions={dot:true,ignore:geraldIgnore};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,fileDiffs,nameToFilesObj){for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(pattern.test(diff)){if(nameToFilesObj[name]){if(!nameToFilesObj[name].includes(file)){nameToFilesObj[name].push(file);}}else{nameToFilesObj[name]=[file];}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=/^"\/(.*?)\/([a-z]*)"$/.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,files){if(bin[username]){for(var _iterator=_createForOfIteratorHelperLoose(files),_step;!(_step=_iterator()).done;){var file=_step.value;if(!bin[username].includes(file)){bin[username].push(file);}}}else{bin[username]=files;}};var getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(/\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file==='NOTIFIED'&&!rawFile.match(/\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section==='pull_request'){sectionRegexp=file==='NOTIFIED'?/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm:/(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else if(file==='NOTIFIED'){sectionRegexp=/(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return sectionRegexp.exec(rawFile);};exports.getCorrectSection=getCorrectSection;var getNotified=function getNotified(filesChanged,fileDiffs,on){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=__testContent||_fs.default.readFileSync('.github/NOTIFIED','utf-8');var section=getCorrectSection(buf,'NOTIFIED',on);if(!section){return{};}var matches=section[0].match(/^[^\#\n].*/gm);var notified={};if(matches){for(var _iterator2=_createForOfIteratorHelperLoose(matches),_step2;!(_step2=_iterator2()).done;){var match=_step2.value;var untrimmedPattern=match.match(/(.(?!  @))*/);var names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator3=_createForOfIteratorHelperLoose(names),_step3;!(_step3=_iterator3()).done;){var _name=_step3.value;maybeAddIfMatch(regex,_name,fileDiffs,notified);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator4=_createForOfIteratorHelperLoose(names),_step4;!(_step4=_iterator4()).done;){var _name2=_step4.value;pushOrSetToBin(notified,_name2,intersection);}}}}}return notified;};exports.getNotified=getNotified;var getReviewers=function getReviewers(filesChanged,fileDiffs,issuer){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=__testContent||_fs.default.readFileSync('.github/REVIEWERS','utf-8');var section=getCorrectSection(buf,'REVIEWERS','pull_request');if(!section){return{reviewers:{},requiredReviewers:{}};}var matches=section[0].match(/^[^\#\n].*/gm);var reviewers={};var requiredReviewers={};if(!matches){return{reviewers:reviewers,requiredReviewers:requiredReviewers};}for(var _iterator5=_createForOfIteratorHelperLoose(matches),_step5;!(_step5=_iterator5()).done;){var match=_step5.value;var untrimmedPattern=match.match(/(.(?!  @))*/);var names=match.match(/@([A-Za-z]*\/)?\S*/g);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator6=_createForOfIteratorHelperLoose(names),_step6;!(_step6=_iterator6()).done;){var _name3=_step6.value;var _parseUsername=parseUsername(_name3),username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(justName===issuer){continue;}var correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,fileDiffs,correctBin);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator7=_createForOfIteratorHelperLoose(names),_step7;!(_step7=_iterator7()).done;){var _name4=_step7.value;var _parseUsername2=parseUsername(_name4),_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(_justName===issuer){continue;}var _correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,intersection);}}}}return{reviewers:reviewers,requiredReviewers:requiredReviewers};};exports.getReviewers=getReviewers;var getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator8=_createForOfIteratorHelperLoose(removedJustNames),_step8;!(_step8=_iterator8()).done;){var justName=_step8.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};exports.getFilteredLists=getFilteredLists;var parseExistingComments=function parseExistingComments(existingComments){var actionBotComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.user.login==='khan-actions-bot'){actionBotComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(/\#removeme/i);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});actionBotComments.forEach(function(comment){var megaCommentMatch=comment.body.match(/^# Gerald/i);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};exports.parseExistingComments=parseExistingComments;var getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator9,_step9,diff,fileName;return _regenerator.default.async(function getFileDiffs$(_context){while(1){switch(_context.prev=_context.next){case 0:_context.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString]));case 2:rawDiffs=_context.sent.split(/^diff --git /m);fileToDiff={};for(_iterator9=_createForOfIteratorHelperLoose(rawDiffs);!(_step9=_iterator9()).done;){diff=_step9.value;fileName=diff.match(/(?<=^a\/)\S*/);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context.abrupt("return",fileToDiff);case 6:case"end":return _context.stop();}}},null,null,null,Promise);};exports.getFileDiffs=getFileDiffs;var __maybeAddIfMatch=maybeAddIfMatch;exports.__maybeAddIfMatch=__maybeAddIfMatch;var __turnPatternIntoRegex=turnPatternIntoRegex;exports.__turnPatternIntoRegex=__turnPatternIntoRegex;var __parseUsername=parseUsername;exports.__parseUsername=__parseUsername;var __pushOrSetToBin=pushOrSetToBin;exports.__pushOrSetToBin=__pushOrSetToBin;
 
 /***/ }),
 /* 588 */
@@ -77052,7 +77072,16 @@ module.exports = eos;
 
 
 /***/ }),
-/* 603 */,
+/* 603 */
+/***/ (function(module) {
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+module.exports = _nonIterableSpread;
+
+/***/ }),
 /* 604 */,
 /* 605 */
 /***/ (function(module) {
@@ -86429,7 +86458,7 @@ function wrappy (fn, cb) {
 
 const os = __webpack_require__(87);
 const macosRelease = __webpack_require__(866);
-const winRelease = __webpack_require__(467);
+const winRelease = __webpack_require__(465);
 
 const osName = (platform, release) => {
 	if (!platform && release) {
@@ -90664,7 +90693,24 @@ module.exports = eq;
 
 /***/ }),
 /* 774 */,
-/* 775 */,
+/* 775 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+var arrayWithoutHoles = __webpack_require__(455);
+
+var iterableToArray = __webpack_require__(467);
+
+var unsupportedIterableToArray = __webpack_require__(555);
+
+var nonIterableSpread = __webpack_require__(603);
+
+function _toConsumableArray(arr) {
+  return arrayWithoutHoles(arr) || iterableToArray(arr) || unsupportedIterableToArray(arr) || nonIterableSpread();
+}
+
+module.exports = _toConsumableArray;
+
+/***/ }),
 /* 776 */
 /***/ (function(module) {
 
