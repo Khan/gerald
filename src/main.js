@@ -164,7 +164,6 @@ export const runPullRequest = async () => {
 };
 
 export const runPush = async () => {
-    const nonMergeCommits = [];
     let prevCommit = context.payload.before;
     for (const commit of context.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
