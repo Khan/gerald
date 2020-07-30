@@ -97,7 +97,7 @@ const updatePullRequestComment = async (
 
 const makeCommitComment = async (
     peopleToFiles: {[string]: Array<string>, ...},
-    commit_sha: string,
+    commitSHA: string,
 ) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (peopleToFiles && names.length) {
@@ -109,7 +109,7 @@ const makeCommitComment = async (
 
         await extraPermGithub.repos.createCommitComment({
             ...ownerAndRepo,
-            commit_sha: commit_sha,
+            commit_sha: commitSHA,
             body: body,
         });
     }
