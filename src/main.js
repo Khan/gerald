@@ -164,12 +164,15 @@ export const runPullRequest = async () => {
 };
 
 export const runPush = async () => {
+    // loop through each commit in the push
     let prevCommit = context.payload.before;
     for (const commit of context.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
             ...ownerAndRepo,
             commit_sha: commit.id,
         });
+
+        // commits with >1 parent are merge commits. we want to ignore those
         if (commitData.data.parents.length === 1) {
             const filesChanged = (
                 await execCmd('git', [
@@ -184,6 +187,7 @@ export const runPush = async () => {
             await makeCommitComment(notified, commitData.data.sha);
         }
 
+        // we also want to ignore the diff of a merge commit
         prevCommit = commitData.data.sha;
     }
 };
