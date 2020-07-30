@@ -246,24 +246,24 @@ this should show up 2!`;
 });
 
 describe('get filtered lists', () => {
-    it('should work', async () => {
+    it('should work', () => {
         const sampleFile = `# comment
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser!
-*.js                @yipstanley! @githubUser @Org/Slug-name
+**/*.js             @yipstanley! @githubUser @Org/Slug-name
 "/test/ig"          @testperson
 # *                 @otherperson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)`;
         const filesChanged = [
-            '.github/workflows/pr-notify.js',
-            '.github/workflows/pr-notify.yml',
+            'src/pr-notify.js',
+            '.github/workflows/pr-actions.yml',
             '.github/NOTIFIED',
         ];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = await getReviewers(
+        const {requiredReviewers, reviewers} = getReviewers(
             filesChanged,
             fileDiffs,
             'yipstanley',
