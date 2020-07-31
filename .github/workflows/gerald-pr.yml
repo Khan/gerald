@@ -5,12 +5,14 @@ jobs:
   gerald:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out base branch
+        uses: actions/checkout@v2
         with:
-          ref: 'debug'
-      - uses: actions/checkout@v2
+          ref: '${{ github.base_ref }}'
+      - name: Check out head branch
+        uses: actions/checkout@v2
         with:
-          ref: '${{ github.ref }}'
+          ref: '${{ github.head_ref }}'
       - name: Run Gerald
         uses: Khan/gerald@debug
         env:

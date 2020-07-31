@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: '${{ github.ref }}'
-          fetch-depth: '$(node ./getFetchDepth/index.js ${{ secrets.KHAN_ACTIONS_BOT_TOKEN }})'
+          fetch-depth: '$(node -e "console.log(${{ github.event.commits.length }}.length + 1")'
       - name: Run Gerald
         uses: Khan/gerald@debug
         env:
