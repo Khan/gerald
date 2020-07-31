@@ -16,7 +16,7 @@ Every time the pull request is updated, Gerald will rerun and update the pull re
 
 ## Adding a Rule
 
-The two relevant files for Gerald are `.github/NOTIFIED` and `.github/REVIEWERS`. These files follow the [Github CODEOWNERS syntax](https://docs.github.com/en/enterprise/2.15/user/articles/about-code-owners#:~:text=CODEOWNERS%20syntax,org%2Fteam%2Dname%20format.). The only difference is that the order of a rule does not matter; no rules take precedence over others.
+The two relevant files for Gerald are `.github/NOTIFIED` and `.github/REVIEWERS`. These files follow the [Github CODEOWNERS syntax](https://docs.github.com/en/enterprise/2.15/user/articles/about-code-owners#:~:text=CODEOWNERS%20syntax,org%2Fteam%2Dname%20format.). There are two main differences. First, the order of a rule does not matter; no rules take precedence over others. Additionally, Gerald supports Regular Expressions as well as Glob patterns. See below for more information.
 
 Rules are made in the format of:
 `<pattern> @<username or Organization/team-slug>`
