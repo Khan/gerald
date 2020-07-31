@@ -1,0 +1,9 @@
+[<REQUIRED> REVIEWER RULES]
+
+Be sure to read through https://khanacademy.atlassian.net/wiki/spaces/FRONTEND/pages/598278672/Gerald+Documentation before adding any rules!
+
+----Everything above this line will be ignored!----
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+# Make these people reviewers for any changes made to any file
+**/*
