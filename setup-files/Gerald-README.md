@@ -10,13 +10,13 @@ The code for the project exists in the [Gerald repository](https://github.com/Kh
 
 Gerald is the name given to the custom Github Actions and code that reads in and handles **Notification Rules** and **Reviewer Rules** from the `.github/NOTIFIED` and `.github/REVIEWERS files`, respectively.
 
-Every rule has a condition and a list of Github usernames or team slugs. Every time a pull request is made, Gerald will test the files changed and the squashed diff of the pull request against all of the rules in the NOTIFIED and REVIEWERS files. Rules that test positive against the pull request are pulled into a list of notifyees and reviewers, depending on the file that the rule exists in. People in this list will be mentioned on the pull request, and reviews will be requested from the list of reviewers.
+Every rule has a condition and a list of Github usernames or team slugs. Every time a pull request is made, Gerald will test the files changed, and the squashed diff of the pull request, against all of the rules in the NOTIFIED and REVIEWERS files. Rules that test positive against the pull request are pulled into a list of notifyees and reviewers, depending on the file that the rule exists in. People in this list will be mentioned on the pull request, and reviews will be requested from the list of reviewers.
 
 Every time the pull request is updated, Gerald will rerun and update the pull request comments with a new list of notifyees and reviewers. Commenting #removeme on the pull request will stop Gerald from tagging you in the pull request.
 
 ## Adding a Rule
 
-The two relevant files for Gerald are `.github/NOTIFIED` and `.github/REVIEWERS`. These files follow the [Github CODEOWNERS syntax](https://docs.github.com/en/enterprise/2.15/user/articles/about-code-owners#:~:text=CODEOWNERS%20syntax,org%2Fteam%2Dname%20format.). The only difference is that the order of a rule does not matter; no rules take precedence over others.
+The two relevant files for Gerald are `.github/NOTIFIED` and `.github/REVIEWERS`. These files follow the [Github CODEOWNERS syntax](https://docs.github.com/en/enterprise/2.15/user/articles/about-code-owners#:~:text=CODEOWNERS%20syntax,org%2Fteam%2Dname%20format.). There are two main differences. First, the order of a rule does not matter; no rules take precedence over others. Additionally, Gerald supports Regular Expressions as well as Glob patterns. See below for more information.
 
 Rules are made in the format of:
 `<pattern> @<username or Organization/team-slug>`
