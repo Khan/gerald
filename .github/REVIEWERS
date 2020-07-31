@@ -6,5 +6,4 @@ Be sure to read through .github/Gerald-README.md before adding any rules!
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 # Make these people reviewers for any changes made to any file
-*                       @Khan/frontend-infra
-
+**/*            @Khan/frontend-infra
