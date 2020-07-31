@@ -5,12 +5,35 @@ import fs from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
 import {execCmd} from './execCmd';
-const globOptions = {
-    dot: true,
-    ignore: ['node_modules/**', 'coverage/**', '.git/**', 'flow-typed/**'],
-};
 
 type NameToFiles = {[name: string]: string[], ...};
+
+/**
+ * @desc Read ./.geraldignore and ./.gitignore if they exist.
+ * Split the files by newlines to serve as the list of files/directories to
+ * ignore for Gerald.
+ */
+const getGeraldIgnore = (): Array<string> => {
+    const ignore = [];
+    if (fs.existsSync('.geraldignore')) {
+        ignore.push(...fs.readFileSync('.geraldignore', 'utf-8').split('\n'));
+    }
+    if (fs.existsSync('.gitignore')) {
+        ignore.push(
+            ...fs
+                .readFileSync('.gitignore', 'utf-8')
+                .split('\n')
+                .filter(line => !ignore.includes(line)),
+        );
+    }
+    return ignore;
+};
+
+const geraldIgnore = getGeraldIgnore();
+const globOptions = {
+    dot: true,
+    ignore: geraldIgnore,
+};
 
 /**
  * @desc Add the username/files pair to the nameToFilesObj if the
@@ -180,8 +203,10 @@ export const getNotified = (
                 const matchedFiles: Array<string> = fg.sync(pattern, globOptions); // flow-uncovered-line
                 const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
-                for (const name of names) {
-                    pushOrSetToBin(notified, name, intersection);
+                if (intersection.length) {
+                    for (const name of names) {
+                        pushOrSetToBin(notified, name, intersection);
+                    }
                 }
             }
         }
@@ -243,15 +268,18 @@ export const getReviewers = (
         } else {
             const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
-            for (const name of names) {
-                // don't add yourself as a reviewer
-                const {username, justName, isRequired} = parseUsername(name);
-                if (justName === issuer) {
-                    continue;
-                }
 
-                const correctBin = isRequired ? requiredReviewers : reviewers;
-                pushOrSetToBin(correctBin, username, intersection);
+            if (intersection.length) {
+                for (const name of names) {
+                    // don't add yourself as a reviewer
+                    const {username, justName, isRequired} = parseUsername(name);
+                    if (justName === issuer) {
+                        continue;
+                    }
+
+                    const correctBin = isRequired ? requiredReviewers : reviewers;
+                    pushOrSetToBin(correctBin, username, intersection);
+                }
             }
         }
     }
