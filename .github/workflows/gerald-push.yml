@@ -10,7 +10,7 @@ jobs:
   gerald:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ github.event.commits }}
+      - run: echo ${{ github.event.commits.length }}
       - uses: actions/checkout@v2
         with:
           ref: '${{ github.ref }}'
