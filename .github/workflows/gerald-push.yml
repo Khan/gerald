@@ -10,10 +10,11 @@ jobs:
   gerald:
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${{ github.event }}
       - uses: actions/checkout@v2
         with:
           ref: '${{ github.ref }}'
-          fetch-depth: '$(node ./getFetchDepth/index.js ${{ secrets.KHAN_ACTIONS_BOT_TOKEN }})'
+          fetch-depth: '${{ github.event.commits.length }}'
       - name: Run Gerald
         uses: Khan/gerald@debug
         env:
