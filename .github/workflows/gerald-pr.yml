@@ -1,0 +1,21 @@
+name: Notify and Request Reviewers On Pull Request
+'on':
+ - pull_request
+jobs:
+  gerald:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out base branch
+        uses: actions/checkout@v2
+        with:
+          ref: '${{ github.base_ref }}'
+      - name: Check out head branch
+        uses: actions/checkout@v2
+        with:
+          ref: '${{ github.head_ref }}'
+      - name: Run Gerald
+        uses: Khan/gerald@debug
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          ADMIN_PERMISSION_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
+          EVENT: 'pull_request'
