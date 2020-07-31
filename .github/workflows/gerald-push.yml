@@ -16,7 +16,7 @@ jobs:
       - run: git fetch
           with:
             ref: '${{ github.ref }}'
-            fetch-depth:
+            fetch-depth: '${{ outputs.fetchDepth }}'
       - name: Run Gerald
         uses: Khan/gerald@debug
         env:

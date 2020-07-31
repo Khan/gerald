@@ -26,4 +26,4 @@ const octokit = require('@actions/github'); //flow-uncovered-line
 const extraPermGithub: Octokit = new octokit.GitHub(process.argv[2]);
 const context: Context = octokit.context;
 
-core.setOutput('fetch-depth', context.payload.commits.length); //flow-uncovered-line
+core.setOutput('fetchDepth', context.payload.commits.length); //flow-uncovered-line
