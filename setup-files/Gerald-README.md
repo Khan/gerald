@@ -10,7 +10,7 @@ The code for the project exists in the [Gerald repository](https://github.com/Kh
 
 Gerald is the name given to the custom Github Actions and code that reads in and handles **Notification Rules** and **Reviewer Rules** from the `.github/NOTIFIED` and `.github/REVIEWERS files`, respectively.
 
-Every rule has a condition and a list of Github usernames or team slugs. Every time a pull request is made, Gerald will test the files changed and the squashed diff of the pull request against all of the rules in the NOTIFIED and REVIEWERS files. Rules that test positive against the pull request are pulled into a list of notifyees and reviewers, depending on the file that the rule exists in. People in this list will be mentioned on the pull request, and reviews will be requested from the list of reviewers.
+Every rule has a condition and a list of Github usernames or team slugs. Every time a pull request is made, Gerald will test the files changed, and the squashed diff of the pull request, against all of the rules in the NOTIFIED and REVIEWERS files. Rules that test positive against the pull request are pulled into a list of notifyees and reviewers, depending on the file that the rule exists in. People in this list will be mentioned on the pull request, and reviews will be requested from the list of reviewers.
 
 Every time the pull request is updated, Gerald will rerun and update the pull request comments with a new list of notifyees and reviewers. Commenting #removeme on the pull request will stop Gerald from tagging you in the pull request.
 
