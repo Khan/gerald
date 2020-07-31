@@ -10,7 +10,6 @@ jobs:
   gerald:
     runs-on: ubuntu-latest
     steps:
-      - run: echo $(node -e "console.log(${{ github.event.commits }}.length)")
       - uses: actions/checkout@v2
         with:
           ref: '${{ github.ref }}'
