@@ -14,7 +14,6 @@ jobs:
         with:
           ref: '${{ github.ref }}'
           fetch-depth: '$(node ./getFetchDepth.js ${{ secrets.KHAN_ACTIONS_BOT_TOKEN }})'
-      - name: Get fetch depth
       - run: git fetch --depth=$(node ./getFetchDepth.js ${{ secrets.KHAN_ACTIONS_BOT_TOKEN }})
       - name: Run Gerald
         uses: Khan/gerald@debug
