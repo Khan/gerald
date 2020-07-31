@@ -191,6 +191,9 @@ export const runPullRequest = async () => {
 export const runPush = async () => {
     const nonMergeCommits = [];
     let prevCommit = context.payload.before;
+
+    await execCmd('git', ['fetch', `--depth=${context.payload.commits.length}`]);
+
     for (const commit of context.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
             ...ownerAndRepo,
