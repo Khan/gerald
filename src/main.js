@@ -191,7 +191,6 @@ export const runPullRequest = async () => {
 export const runPush = async () => {
     // loop through each commit in the push
     let prevCommit = context.payload.before;
-
     for (const commit of context.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
             ...ownerAndRepo,
