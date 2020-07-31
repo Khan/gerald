@@ -14,9 +14,9 @@ jobs:
       - name: Get fetch depth
         run: node ./getFetchDepth.js ${{ secrets.KHAN_ACITONS_BOT_TOKEN }}
       - run: git fetch
-          with:
-            ref: '${{ github.ref }}'
-            fetch-depth: '${{ outputs.fetchDepth }}'
+        with:
+          ref: '${{ github.ref }}'
+          fetch-depth: '${{ outputs.fetchDepth }}'
       - name: Run Gerald
         uses: Khan/gerald@debug
         env:
