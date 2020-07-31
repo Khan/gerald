@@ -4,7 +4,7 @@ This file is intended to help you set up [Gerald](github.com/Khan/gerald) on an 
 
 ## Prerequisite Setup
 
-Ensure that you have set up your GitHub repository with a [secret authentication token](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository) named `GERALD_SECRET` that has access to view teams, comment on commit messages and pull requests, and make review requests.
+Ensure that you have set up your GitHub repository with a [secret authentication token](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository) named `GERALD_SECRET` that has access to view teams, comment on commit messages and pull requests, and make review requests. Note: If you already have a secret authentication token with the proper permissions set up, you can change `GERALD_SECRET` to the name of your token in line 20 of `gerald-push.yml` and line 14 of `gerald-pr.yml`.
 
 To take advantage of Gerald's Required Reviewers functionality, ensure that you have [OLC tools](github.com/Khan/our-lovely-cli) set up. If OLC tools are not set up, required reviewers will function no differently than reviewers, but Gerald is still usable.
 
