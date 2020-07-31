@@ -7,6 +7,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git fetch
+        with:
+          ref: '${{ github.ref }}'
       - name: Run Gerald
         uses: Khan/gerald@debug
         env:
