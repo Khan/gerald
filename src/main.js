@@ -114,7 +114,7 @@ const makeCommitComment = async (
     peopleToFiles: {[string]: Array<string>, ...},
     commitSHA: string,
 ) => {
-    const names: stridjddddng[] = Object.keys(peopleToFiles);
+    const names: string[] = Object.keys(peopleToFiles);
     if (peopleToFiles && names.length) {
         let body: string = 'Notify of Push Without Pull Request\n\n';
         names.forEach((person: string) => {
