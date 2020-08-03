@@ -16,27 +16,39 @@ jest.mock('@actions/github', () => ({
     ...jest.requireActual('@actions/github'),
     GitHub: (auth: string) => {
         const commits: {[sha: string]: {data: {sha: string, parents: {length: number}}}, ...} = {
-            '0': {data: {sha: '0', parents: {length: 1}}},
-            '1': {data: {sha: '1', parents: {length: 1}}},
-            '10': {data: {sha: '10', parents: {length: 1}}},
-            '11': {data: {sha: '11', parents: {length: 1}}},
-            '12': {data: {sha: '12', parents: {length: 1}}},
-            '13': {data: {sha: '13', parents: {length: 1}}},
-            '14': {data: {sha: '14', parents: {length: 2}}},
-            '20': {data: {sha: '20', parents: {length: 1}}},
+            'suite1-commit1': {data: {sha: 'suite1-commit1', parents: {length: 1}}},
+            'suite1-commit2': {data: {sha: 'suite1-commit2', parents: {length: 1}}},
+            'suite2-commit1': {data: {sha: 'suite2-commit1', parents: {length: 1}}},
+            'suite2-commit2': {data: {sha: 'suite2-commit2', parents: {length: 1}}},
+            'suite2-commit3': {data: {sha: 'suite2-commit3', parents: {length: 1}}},
+            'suite2-commit4': {data: {sha: 'suite2-commit4', parents: {length: 1}}},
+            'suite2-commit5': {data: {sha: 'suite2-commit5', parents: {length: 2}}},
+            'suite3-commit1': {data: {sha: 'suite3-commit1', parents: {length: 1}}},
         };
         const messages: {[sha: string]: string, ...} = {};
         return {
             git: {
+                /**
+                 * For these tests, we're going to overload the getCommit command
+                 * to retreive both commits and messages. The __testGetMessage function
+                 * imported from ../main.js will prepend the commit SHAs with the text
+                 * 'message'. This is because there's not really another easy existing function
+                 * to hook into that can be called in main.js without throwing flow errors
+                 */
                 getCommit: async (params: {commit_sha: string, ...}) => {
-                    if (params.commit_sha.startsWith('m')) {
-                        return messages[params.commit_sha.slice(1)];
+                    if (params.commit_sha.startsWith('message')) {
+                        return messages[params.commit_sha.slice('message'.length)];
                     } else {
                         return commits[params.commit_sha];
                     }
                 },
             },
             repos: {
+                /**
+                 * This one is pretty simple. Every time we're trying to create a commit
+                 * comment, just add it to the messages dictionary using the commit SHA
+                 * as the key.
+                 */
                 createCommitComment: async (params: {commit_sha: string, body: string, ...}) => {
                     messages[params.commit_sha] = params.body;
                 },
@@ -67,7 +79,7 @@ src/pr-notify.js
 jest.mock('../utils.js', () => ({
     ...jest.requireActual('../utils.js'),
     getFileDiffs: async (diffString: string) => {
-        if (diffString === '12...13') {
+        if (diffString === 'suite2-commit3...suite2-commit4') {
             return {'src/main.js': '+ this line was added'};
         }
         return {};
@@ -101,9 +113,9 @@ describe('test that the mock works', () => {
                 issue: {owner: 'Khan', repo: 'Gerald', number: 0},
                 payload: {
                     pull_request: {},
-                    before: '0',
-                    after: '1',
-                    commits: [makeTestCommit('0', 'test')],
+                    before: 'suite1-commit1',
+                    after: 'suite1-commit2',
+                    commits: [makeTestCommit('suite1-commit1', 'test')],
                 },
                 actor: 'yipstanley',
             },
@@ -124,8 +136,10 @@ describe('test that the mock works', () => {
 
         await runPush(testObject);
 
-        expect(await __testGetCommit('0')).toEqual({data: {sha: '0', parents: {length: 1}}});
-        expect(await __testGetMessage('0')).toMatchInlineSnapshot(`
+        expect(await __testGetCommit('suite1-commit1')).toEqual({
+            data: {sha: 'suite1-commit1', parents: {length: 1}},
+        });
+        expect(await __testGetMessage('suite1-commit1')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`src/pr-notify.js\`, \`.github/workflows/build.yml\`
@@ -141,13 +155,13 @@ describe('test simple working case', () => {
                 issue: {owner: 'Khan', repo: 'Gerald', number: 0},
                 payload: {
                     pull_request: {},
-                    before: '10',
-                    after: '14',
+                    before: 'suite2-commit1',
+                    after: 'suite2-commit5',
                     commits: [
-                        makeTestCommit('11', 'First commit'),
-                        makeTestCommit('12', 'Second commit'),
-                        makeTestCommit('13', 'third commit'),
-                        makeTestCommit('14', 'lastCommit'),
+                        makeTestCommit('suite2-commit2', 'First commit'),
+                        makeTestCommit('suite2-commit3', 'Second commit'),
+                        makeTestCommit('suite2-commit4', 'third commit'),
+                        makeTestCommit('suite2-commit5', 'lastCommit'),
                     ],
                 },
                 actor: 'yipstanley',
@@ -170,16 +184,16 @@ src/**              @yipstanley
 
         await runPush(testObject);
 
-        // test that commit 13 has the correct message
-        expect(await __testGetMessage('13')).toMatchInlineSnapshot(`
+        // test that commit suite2-commit4 has the correct message
+        expect(await __testGetMessage('suite2-commit4')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`src/pr-notify.js\`
             @Khan/frontend-infra for changes to \`src/main.js\`
             "
         `);
-        // test that commit 14 doesn't have a message because it is a merge commit
-        expect(await __testGetMessage('14')).toEqual(undefined);
+        // test that commit suite2-commit5 doesn't have a message because it is a merge commit
+        expect(await __testGetMessage('suite2-commit5')).toEqual(undefined);
     });
 });
 
@@ -190,9 +204,9 @@ describe('test that make functions make well formatted messages', () => {
             '@Khan/frontend-infra': ['src/main.js', '.geraldignore'],
         };
 
-        await __makeCommitComment(peopleToFiles, '20');
+        await __makeCommitComment(peopleToFiles, 'suite3-commit1');
 
-        expect(await __testGetMessage('20')).toMatchInlineSnapshot(`
+        expect(await __testGetMessage('suite3-commit1')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`.github/workflows/build.yml\`

@@ -219,7 +219,7 @@ export const __testGetCommit = async (commitSHA: string) => {
 };
 
 export const __testGetMessage = async (commitSHA: string) => {
-    return extraPermGithub.git.getCommit({...ownerAndRepo, commit_sha: 'm' + commitSHA});
+    return extraPermGithub.git.getCommit({...ownerAndRepo, commit_sha: 'message' + commitSHA});
 };
 
 export const __makeCommitComment = makeCommitComment;
