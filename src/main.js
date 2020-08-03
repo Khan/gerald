@@ -4,16 +4,26 @@ import {
     type Octokit,
     type Octokit$IssuesListCommentsResponseItem,
     type Octokit$PullsListResponseItem,
-    type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
 type Context = {|
     issue: {|owner: string, repo: string, number: number|},
     payload: {|
-        pull_request: Octokit$PullsListResponseItem,
+        pull_request:
+            | Octokit$PullsListResponseItem
+            | {|base: {|ref: string|}, user: {|login: string|}|},
         before: string,
         after: string,
-        commits: {id: string, ...Octokit$PullsListCommitsResponseItemCommit}[],
+        commits: {
+            id: string,
+            author: any,
+            comment_count: number,
+            committer: any,
+            message: string,
+            tree: any,
+            url: string,
+            verification: any,
+        }[],
     |},
     actor: string,
 |};
@@ -31,11 +41,15 @@ const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
 const extraPermGithub: Octokit = new octokit.GitHub(process.env['ADMIN_PERMISSION_TOKEN']);
-const github: Octokit = new octokit.GitHub(process.env['GITHUB_TOKEN']);
 const context: Context = octokit.context;
 /* end flow-uncovered-block */
-
-const ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
+let ownerAndRepo;
+if (process.env['ADMIN_PERMISSION_TOKEN']) {
+    ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
+} else {
+    ownerAndRepo = {owner: 'Khan', repo: 'Gerald'};
+    console.error('THIS SHOULD ONLY BE HAPPENING IN TESTS');
+}
 const separator =
     '__________________________________________________________________________________________________________________________________';
 
@@ -136,7 +150,7 @@ export const runPullRequest = async () => {
     );
 
     // find any #removeme or existing khan-actions-bot comments
-    const existingComments = await github.issues.listComments({
+    const existingComments = await extraPermGithub.issues.listComments({
         ...ownerAndRepo,
         issue_number: context.issue.number,
     });
@@ -163,10 +177,17 @@ export const runPullRequest = async () => {
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
 
-export const runPush = async () => {
+type TestObject = {
+    context: Context,
+    testNotified: string,
+};
+
+export const runPush = async (__testObject: ?TestObject) => {
     // loop through each commit in the push
-    let prevCommit = context.payload.before;
-    for (const commit of context.payload.commits) {
+    const usedContext = __testObject ? __testObject.context : context;
+    const testNotified = __testObject ? __testObject.testNotified : undefined;
+    let prevCommit = usedContext.payload.before;
+    for (const commit of usedContext.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
             ...ownerAndRepo,
             commit_sha: commit.id,
@@ -182,7 +203,7 @@ export const runPush = async () => {
                 ])
             ).split('\n');
             const fileDiffs = await getFileDiffs(`${prevCommit}...${commitData.data.sha}`);
-            const notified = getNotified(filesChanged, fileDiffs, 'push');
+            const notified = getNotified(filesChanged, fileDiffs, 'push', testNotified);
 
             await makeCommitComment(notified, commitData.data.sha);
         }
@@ -191,3 +212,17 @@ export const runPush = async () => {
         prevCommit = commitData.data.sha;
     }
 };
+
+export const __testGetCommit = async (commitSHA: string) => {
+    return await extraPermGithub.git.getCommit({
+        ...ownerAndRepo,
+        commit_sha: commitSHA,
+    });
+};
+
+export const __testGetMessage = async (commitSHA: string) => {
+    return extraPermGithub.git.getCommit({...ownerAndRepo, commit_sha: 'message' + commitSHA});
+};
+
+export const __makeCommitComment = makeCommitComment;
+export const __makeCommentBody = makeCommentBody;
