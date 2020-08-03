@@ -376,4 +376,15 @@ describe('test that ignore files are parsed correctly', () => {
         expect(ignoredFiles.length).toEqual(3);
         expect(ignoredFiles).toEqual(['src', '.bashrc', '.github']);
     });
+
+    it('should ignore weird spacing problems', () => {
+        const testIgnoreFile = `src
+    .bashrc
+.github    `;
+
+        const ignoredFiles = __filterIgnoreFiles(testIgnoreFile);
+
+        expect(ignoredFiles.length).toEqual(3);
+        expect(ignoredFiles).toEqual(['src', '.bashrc', '.github']);
+    });
 });
