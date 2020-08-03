@@ -13,14 +13,23 @@ type NameToFiles = {[name: string]: string[], ...};
  * and comments.
  *
  * @param fileContents - A string of files/directories to ignore a la .gitignore.
- * Comments should start with a #
+ * Comments should start with a #.
  */
 const filterIgnoreFiles = (fileContents: string): Array<string> => {
-    return fileContents
+    const filteredOutMostCases = fileContents
         .split('\n')
         .map(line => line.trim())
         .filter(Boolean)
         .filter(line => !line.startsWith('#'));
+
+    // at this point, we have everything covered except for the case exhibited by the line below:
+    // directory_A # we want to ignore directory_A because of x, y, and z.
+    return filteredOutMostCases.map(line => {
+        if (line.indexOf('#') !== -1) {
+            return line.split('#')[0].trim();
+        }
+        return line;
+    });
 };
 
 /**
