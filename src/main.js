@@ -4,26 +4,16 @@ import {
     type Octokit,
     type Octokit$IssuesListCommentsResponseItem,
     type Octokit$PullsListResponseItem,
+    type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
 type Context = {|
     issue: {|owner: string, repo: string, number: number|},
     payload: {|
-        pull_request:
-            | Octokit$PullsListResponseItem
-            | {|base: {|ref: string|}, user: {|login: string|}|},
+        pull_request: Octokit$PullsListResponseItem,
         before: string,
         after: string,
-        commits: {
-            id: string,
-            author: any,
-            comment_count: number,
-            committer: any,
-            message: string,
-            tree: any,
-            url: string,
-            verification: any,
-        }[],
+        commits: Array<{id: string, ...Octokit$PullsListCommitsResponseItemCommit}>,
     |},
     actor: string,
 |};
@@ -177,12 +167,7 @@ export const runPullRequest = async () => {
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
 
-type TestObject = {
-    context: Context,
-    testNotified: string,
-};
-
-export const runPush = async (__testObject: ?TestObject) => {
+export const runPush = async (__testObject: ?__TestObject) => {
     // loop through each commit in the push
     const usedContext = __testObject ? __testObject.context : context;
     const testNotified = __testObject ? __testObject.testNotified : undefined;
@@ -212,6 +197,33 @@ export const runPush = async (__testObject: ?TestObject) => {
         prevCommit = commitData.data.sha;
     }
 };
+
+export type __TestCommit = {
+    id: string,
+    author: '__testAuthor',
+    comment_count: -1,
+    committer: '__testCommitter',
+    message: string,
+    tree: '__TESTING__',
+    url: '__TESTING__',
+    verification: '__TESTING__',
+};
+
+export type __TestObject = {
+    context: __TestContext,
+    testNotified: string,
+};
+
+type __TestContext = {|
+    issue: {|owner: string, repo: string, number: number|},
+    payload: {|
+        pull_request: {|base: {|ref: string|}, user: {|login: string|}|},
+        before: string,
+        after: string,
+        commits: Array<__TestCommit>,
+    |},
+    actor: string,
+|};
 
 /**
  * @desc ONLY TO BE USED FOR TESTING. This is used to allow main.test.js to

@@ -6,6 +6,8 @@ import {
     __testGetComment,
     runPush,
     __makeCommentBody,
+    type __TestCommit,
+    type __TestObject,
 } from '../main';
 
 /* flow-uncovered-block */
@@ -99,22 +101,22 @@ jest.mock('../utils.js', () => ({
  * @param id - Fake commit ID.
  * @param message - Commit message
  */
-const makeTestCommit = (id: string, message: string) => {
+const makeTestCommit = (id: string, message: string): __TestCommit => {
     return {
-        comment_count: 0,
+        comment_count: -1,
         message: message,
         id: id,
-        url: 'test.url',
-        author: 'yipstanley',
-        committer: 'yipstanley',
-        tree: {},
-        verification: {},
+        url: '__TESTING__',
+        author: '__testAuthor',
+        committer: '__testCommitter',
+        tree: '__TESTING__',
+        verification: '__TESTING__',
     };
 };
 
 describe('test that the mock works', () => {
     it('should work', async () => {
-        const testObject = {
+        const testObject: __TestObject = {
             context: {
                 issue: {owner: 'Khan', repo: 'Gerald', number: 0},
                 payload: {
@@ -161,7 +163,7 @@ describe('test that the mock works', () => {
 
 describe('test simple working case', () => {
     it('should work', async () => {
-        const testObject = {
+        const testObject: __TestObject = {
             context: {
                 issue: {owner: 'Khan', repo: 'Gerald', number: 0},
                 payload: {
@@ -206,7 +208,7 @@ src/**              @yipstanley
 
 describe("test that changes on a merge commit don't notify people", () => {
     it('should not make comments', async () => {
-        const testObject = {
+        const testObject: __TestObject = {
             context: {
                 issue: {owner: 'Khan', repo: 'Gerald', number: 0},
                 payload: {

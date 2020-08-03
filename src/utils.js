@@ -372,7 +372,7 @@ export const parseExistingComments = <
 
 /**
  * @desc Get the diff of each file that has been changed.
- * @param context - @actions/github context from which to find the base of the pull request.
+ * @param diffString - git diff <diffString>
  */
 export const getFileDiffs = async (diffString: string): {[string]: string, ...} => {
     // get raw diff and split it by 'diff --git', which appears at the start of every new file.
