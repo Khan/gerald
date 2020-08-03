@@ -4,7 +4,6 @@ import {
     type Octokit,
     type Octokit$IssuesListCommentsResponseItem,
     type Octokit$PullsListResponseItem,
-    type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
 type Context = {|
@@ -212,15 +211,16 @@ export const runPush = async (__testObject: ?TestObject) => {
     }
 };
 
-export const __testGetCommit = async (commit_sha: string) => {
+export const __testGetCommit = async (commitSHA: string) => {
     return await extraPermGithub.git.getCommit({
         ...ownerAndRepo,
-        commit_sha: commit_sha,
+        commit_sha: commitSHA,
     });
 };
 
-export const __testGetMessage = async (commit_sha: string) => {
-    return extraPermGithub.git.getCommit({...ownerAndRepo, commit_sha: 'm' + commit_sha});
+export const __testGetMessage = async (commitSHA: string) => {
+    return extraPermGithub.git.getCommit({...ownerAndRepo, commit_sha: 'm' + commitSHA});
 };
 
 export const __makeCommitComment = makeCommitComment;
+export const __makeCommentBody = makeCommentBody;
