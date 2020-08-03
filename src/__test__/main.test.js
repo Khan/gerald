@@ -3,13 +3,13 @@
 import {
     __makeCommitComment,
     __testGetCommit,
-    __testGetMessage,
+    __testGetComment,
     runPush,
     __makeCommentBody,
 } from '../main';
 
 /* flow-uncovered-block */
-/* Mock the GitHub object's commands so that they act on an internal corpus of commits and messages
+/* Mock the GitHub object's commands so that they act on an internal corpus of commits and comments
  * as opposed to authenticating the object and using actual GitHub.
  */
 jest.mock('@actions/github', () => ({
@@ -28,19 +28,19 @@ jest.mock('@actions/github', () => ({
             'suite3-commit3': {data: {sha: 'suite3-commit3', parents: {length: 1}}},
             'suite4-commit1': {data: {sha: 'suite4-commit1', parents: {length: 1}}},
         };
-        const messages: {[sha: string]: string, ...} = {};
+        const comments: {[sha: string]: string, ...} = {};
         return {
             git: {
                 /**
                  * For these tests, we're going to overload the getCommit command
-                 * to retreive both commits and messages. The __testGetMessage function
+                 * to retreive both commits and comments. The __testGetComment function
                  * imported from ../main.js will prepend the commit SHAs with the text
-                 * 'message'. This is because there's not really another easy existing function
+                 * 'comment'. This is because there's not really another easy existing function
                  * to hook into that can be called in main.js without throwing flow errors
                  */
                 getCommit: async (params: {commit_sha: string, ...}) => {
-                    if (params.commit_sha.startsWith('message')) {
-                        return messages[params.commit_sha.slice('message'.length)];
+                    if (params.commit_sha.startsWith('comment')) {
+                        return comments[params.commit_sha.slice('comment'.length)];
                     } else {
                         return commits[params.commit_sha];
                     }
@@ -49,11 +49,11 @@ jest.mock('@actions/github', () => ({
             repos: {
                 /**
                  * This one is pretty simple. Every time we're trying to create a commit
-                 * comment, just add it to the messages dictionary using the commit SHA
+                 * comment, just add it to the comments dictionary using the commit SHA
                  * as the key.
                  */
                 createCommitComment: async (params: {commit_sha: string, body: string, ...}) => {
-                    messages[params.commit_sha] = params.body;
+                    comments[params.commit_sha] = params.body;
                 },
             },
         };
@@ -146,11 +146,11 @@ describe('test that the mock works', () => {
             data: {sha: 'suite1-commit2', parents: {length: 1}},
         });
 
-        // check that commit1 has no message because it is not part of the push
-        expect(await __testGetMessage('suite1-commit1')).toEqual(undefined);
+        // check that commit1 has no comments because it is not part of the push
+        expect(await __testGetComment('suite1-commit1')).toEqual(undefined);
 
-        // check that commit2 has the correct message
-        expect(await __testGetMessage('suite1-commit2')).toMatchInlineSnapshot(`
+        // check that commit2 has the correct comment
+        expect(await __testGetComment('suite1-commit2')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`src/pr-notify.js\`, \`.github/workflows/build.yml\`
@@ -191,16 +191,16 @@ src/**              @yipstanley
 
         await runPush(testObject);
 
-        // test that commit suite2-commit4 has the correct message
-        expect(await __testGetMessage('suite2-commit4')).toMatchInlineSnapshot(`
+        // test that commit suite2-commit4 has the correct comment
+        expect(await __testGetComment('suite2-commit4')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`src/pr-notify.js\`
             @Khan/frontend-infra for changes to \`src/main.js\`
             "
         `);
-        // test that commit suite2-commit5 doesn't have a message because it is a merge commit
-        expect(await __testGetMessage('suite2-commit5')).toEqual(undefined);
+        // test that commit suite2-commit5 doesn't have a comment because it is a merge commit
+        expect(await __testGetComment('suite2-commit5')).toEqual(undefined);
     });
 });
 
@@ -233,19 +233,19 @@ describe("test that changes on a merge commit don't notify people", () => {
 
         await runPush(testObject);
 
-        // test that commit suite3-commit1 doesn't have a message because it's not in this push
-        expect(await __testGetMessage('suite3-commit1')).toEqual(undefined);
-        // test that commit suite3-commit2 doesn't have a message because it is a merge commit
+        // test that commit suite3-commit1 doesn't have a comment because it's not in this push
+        expect(await __testGetComment('suite3-commit1')).toEqual(undefined);
+        // test that commit suite3-commit2 doesn't have a comment because it is a merge commit
         // even though it has a change that matches the final rule.
-        expect(await __testGetMessage('suite3-commit2')).toEqual(undefined);
-        // test that commite suite3-commit3 doesn't have a message even though a commit in this
+        expect(await __testGetComment('suite3-commit2')).toEqual(undefined);
+        // test that commite suite3-commit3 doesn't have a comment even though a commit in this
         // push changed something that matches a rule.
-        expect(await __testGetMessage('suite3-commit3')).toEqual(undefined);
+        expect(await __testGetComment('suite3-commit3')).toEqual(undefined);
     });
 });
 
-describe('test that make functions make well formatted messages', () => {
-    it('should format the commit message nicely', async () => {
+describe('test that make functions make well formatted strings', () => {
+    it('should format the commit comment nicely', async () => {
         const peopleToFiles = {
             '@yipstanley': ['src/main.js', '.github/workflows/build.yml'],
             '@Khan/frontend-infra': ['src/main.js', '.geraldignore'],
@@ -253,7 +253,7 @@ describe('test that make functions make well formatted messages', () => {
 
         await __makeCommitComment(peopleToFiles, 'suite4-commit1');
 
-        expect(await __testGetMessage('suite4-commit1')).toMatchInlineSnapshot(`
+        expect(await __testGetComment('suite4-commit1')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`.github/workflows/build.yml\`
@@ -262,7 +262,7 @@ describe('test that make functions make well formatted messages', () => {
         `);
     });
 
-    it('should format the Gerald comment body correctly', async () => {
+    it('should format the Gerald pull request comment correctly', async () => {
         const peopleToFiles = {
             '@yipstanley': ['src/main.js', '.github/workflows/build.yml'],
             '@Khan/frontend-infra': ['src/main.js', '.geraldignore'],

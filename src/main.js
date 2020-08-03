@@ -213,6 +213,11 @@ export const runPush = async (__testObject: ?TestObject) => {
     }
 };
 
+/**
+ * @desc ONLY TO BE USED FOR TESTING. This is used to allow main.test.js to
+ * retrieve commits. This is necessary because main.test.js mocks a lot of the
+ * GitHub rest functions and "saves" commits into an object.
+ */
 export const __testGetCommit = async (commitSHA: string) => {
     return await extraPermGithub.git.getCommit({
         ...ownerAndRepo,
@@ -220,8 +225,16 @@ export const __testGetCommit = async (commitSHA: string) => {
     });
 };
 
-export const __testGetMessage = async (commitSHA: string) => {
-    return extraPermGithub.git.getCommit({...ownerAndRepo, commit_sha: 'message' + commitSHA});
+/**
+ * @desc ONLY TO BE USED FOR TESTING. This is used to allow main.test.js to
+ * retrieve commmit comments. This is necessary because main.test.js mocks a lot of the
+ * GitHub rest functions and "saves" commit comments into an object.
+ */
+export const __testGetComment = async (commitSHA: string) => {
+    return await extraPermGithub.git.getCommit({
+        ...ownerAndRepo,
+        commit_sha: 'comment' + commitSHA,
+    });
 };
 
 export const __makeCommitComment = makeCommitComment;
