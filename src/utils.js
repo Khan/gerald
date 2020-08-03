@@ -11,21 +11,31 @@ type NameToFiles = {[name: string]: string[], ...};
 /**
  * @desc Read ./.geraldignore and ./.gitignore if they exist.
  * Split the files by newlines to serve as the list of files/directories to
- * ignore for Gerald.
+ * ignore for Gerald. Be sure to ignore empty lines and comments (otherwise fast-glob
+ * will throw Type errors).
  */
 const getGeraldIgnore = (): Array<string> => {
     const ignore = [];
     if (fs.existsSync('.geraldignore')) {
-        ignore.push(...fs.readFileSync('.geraldignore', 'utf-8').split('\n'));
+        ignore.push(
+            ...fs
+                .readFileSync('.geraldignore', 'utf-8')
+                .split('\n')
+                .filter(Boolean)
+                .filter(line => !line.startsWith('#')),
+        );
     }
     if (fs.existsSync('.gitignore')) {
         ignore.push(
             ...fs
                 .readFileSync('.gitignore', 'utf-8')
                 .split('\n')
+                .filter(Boolean)
+                .filter(line => !line.startsWith('#'))
                 .filter(line => !ignore.includes(line)),
         );
     }
+
     return ignore;
 };
 
