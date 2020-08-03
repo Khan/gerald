@@ -5,6 +5,7 @@ import {
     __turnPatternIntoRegex,
     __parseUsername,
     __pushOrSetToBin,
+    __filterIgnoreFiles,
     getNotified,
     getReviewers,
     parseExistingComments,
@@ -324,5 +325,22 @@ describe('test get file diffs', () => {
         expect(result['testFile']).toEqual(mockTestFileDiff);
 
         expect(result['otherFile.js']).toEqual(mockOtherFileDiff);
+    });
+});
+
+describe('test that ignore files are parsed correctly', () => {
+    it('should work', () => {
+        const testIgnoreFile = `src
+
+.bashrc
+
+        .github
+
+        # don't actually read this line!`;
+
+        const ignoredFiles = __filterIgnoreFiles(testIgnoreFile);
+
+        expect(ignoredFiles.length).toEqual(3);
+        expect(ignoredFiles).toEqual(expect.arrayContaining(['src', '.bashrc', '.github']));
     });
 });
