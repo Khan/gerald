@@ -199,10 +199,10 @@ export const runPush = async (__testObject: ?__TestObject) => {
 };
 
 export type __TestCommit = {
-    id: string,
     author: '__testAuthor',
     comment_count: -1,
     committer: '__testCommitter',
+    id: string,
     message: string,
     tree: '__TESTING__',
     url: '__TESTING__',
@@ -215,14 +215,14 @@ export type __TestObject = {
 };
 
 type __TestContext = {|
-    issue: {|owner: string, repo: string, number: number|},
+    issue: {|owner: '__TESTING__', repo: '__TESTING__', number: -1|},
     payload: {|
-        pull_request: {|base: {|ref: string|}, user: {|login: string|}|},
+        pull_request: {|base: {|ref: '__TESTING__'|}, user: {|login: '__testUser'|}|},
         before: string,
         after: string,
         commits: Array<__TestCommit>,
     |},
-    actor: string,
+    actor: '__testActor',
 |};
 
 /**

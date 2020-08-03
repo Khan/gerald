@@ -103,13 +103,13 @@ jest.mock('../utils.js', () => ({
  */
 const makeTestCommit = (id: string, message: string): __TestCommit => {
     return {
-        comment_count: -1,
-        message: message,
-        id: id,
-        url: '__TESTING__',
         author: '__testAuthor',
+        comment_count: -1,
         committer: '__testCommitter',
+        id: id,
+        message: message,
         tree: '__TESTING__',
+        url: '__TESTING__',
         verification: '__TESTING__',
     };
 };
@@ -118,14 +118,14 @@ describe('test that the mock works', () => {
     it('should work', async () => {
         const testObject: __TestObject = {
             context: {
-                issue: {owner: 'Khan', repo: 'Gerald', number: 0},
+                issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
                 payload: {
-                    pull_request: {base: {ref: 'test'}, user: {login: '@yipstanley'}},
+                    pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
                     before: 'suite1-commit1',
                     after: 'suite1-commit2',
                     commits: [makeTestCommit('suite1-commit2', 'test')],
                 },
-                actor: 'yipstanley',
+                actor: '__testActor',
             },
             testNotified: `# comment
 *                   @userName
@@ -165,9 +165,9 @@ describe('test simple working case', () => {
     it('should work', async () => {
         const testObject: __TestObject = {
             context: {
-                issue: {owner: 'Khan', repo: 'Gerald', number: 0},
+                issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
                 payload: {
-                    pull_request: {base: {ref: 'test'}, user: {login: '@yipstanley'}},
+                    pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
                     before: 'suite2-commit1',
                     after: 'suite2-commit5',
                     commits: [
@@ -177,7 +177,7 @@ describe('test simple working case', () => {
                         makeTestCommit('suite2-commit5', 'lastCommit'),
                     ],
                 },
-                actor: 'yipstanley',
+                actor: '__testActor',
             },
             testNotified: `# comment
 *                   @userName
@@ -210,9 +210,9 @@ describe("test that changes on a merge commit don't notify people", () => {
     it('should not make comments', async () => {
         const testObject: __TestObject = {
             context: {
-                issue: {owner: 'Khan', repo: 'Gerald', number: 0},
+                issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
                 payload: {
-                    pull_request: {base: {ref: 'test'}, user: {login: '@yipstanley'}},
+                    pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
                     before: 'suite3-commit1',
                     after: 'suite3-commit3',
                     commits: [
@@ -220,7 +220,7 @@ describe("test that changes on a merge commit don't notify people", () => {
                         makeTestCommit('suite3-commit3', 'Second commit'),
                     ],
                 },
-                actor: 'yipstanley',
+                actor: '__testActor',
             },
             testNotified: `# comment
 *                   @userName
