@@ -24,6 +24,9 @@ jest.mock('@actions/github', () => ({
             'suite2-commit4': {data: {sha: 'suite2-commit4', parents: {length: 1}}},
             'suite2-commit5': {data: {sha: 'suite2-commit5', parents: {length: 2}}},
             'suite3-commit1': {data: {sha: 'suite3-commit1', parents: {length: 1}}},
+            'suite3-commit2': {data: {sha: 'suite3-commit2', parents: {length: 2}}},
+            'suite3-commit3': {data: {sha: 'suite3-commit3', parents: {length: 1}}},
+            'suite4-commit1': {data: {sha: 'suite4-commit1', parents: {length: 1}}},
         };
         const messages: {[sha: string]: string, ...} = {};
         return {
@@ -79,7 +82,10 @@ src/pr-notify.js
 jest.mock('../utils.js', () => ({
     ...jest.requireActual('../utils.js'),
     getFileDiffs: async (diffString: string) => {
+        // we're going to fake these diffs to force these commits to match a rule
         if (diffString === 'suite2-commit3...suite2-commit4') {
+            return {'src/main.js': '+ this line was added'};
+        } else if (diffString === 'suite3-commit1...suite3-commit2') {
             return {'src/main.js': '+ this line was added'};
         }
         return {};
@@ -115,7 +121,7 @@ describe('test that the mock works', () => {
                     pull_request: {},
                     before: 'suite1-commit1',
                     after: 'suite1-commit2',
-                    commits: [makeTestCommit('suite1-commit1', 'test')],
+                    commits: [makeTestCommit('suite1-commit2', 'test')],
                 },
                 actor: 'yipstanley',
             },
@@ -124,10 +130,6 @@ describe('test that the mock works', () => {
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
-.github/**          @githubUser
-**/*                @yipstanley @githubUser
-"/test/ig"          @testperson
-# *                 @otherperson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
@@ -136,10 +138,19 @@ describe('test that the mock works', () => {
 
         await runPush(testObject);
 
+        // check that both commits have been added and can be retrieved correctly.
         expect(await __testGetCommit('suite1-commit1')).toEqual({
             data: {sha: 'suite1-commit1', parents: {length: 1}},
         });
-        expect(await __testGetMessage('suite1-commit1')).toMatchInlineSnapshot(`
+        expect(await __testGetCommit('suite1-commit2')).toEqual({
+            data: {sha: 'suite1-commit2', parents: {length: 1}},
+        });
+
+        // check that commit1 has no message because it is not part of the push
+        expect(await __testGetMessage('suite1-commit1')).toEqual(undefined);
+
+        // check that commit2 has the correct message
+        expect(await __testGetMessage('suite1-commit2')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`src/pr-notify.js\`, \`.github/workflows/build.yml\`
@@ -171,10 +182,6 @@ describe('test simple working case', () => {
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
-.github/**          @githubUser
-**/*                @yipstanley @githubUser
-"/test/ig"          @testperson
-# *                 @otherperson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
@@ -197,16 +204,56 @@ src/**              @yipstanley
     });
 });
 
+describe("test that changes on a merge commit don't notify people", () => {
+    it('should not make comments', async () => {
+        const testObject = {
+            context: {
+                issue: {owner: 'Khan', repo: 'Gerald', number: 0},
+                payload: {
+                    pull_request: {},
+                    before: 'suite3-commit1',
+                    after: 'suite3-commit3',
+                    commits: [
+                        makeTestCommit('suite3-commit2', 'First commit'),
+                        makeTestCommit('suite3-commit3', 'Second commit'),
+                    ],
+                },
+                actor: 'yipstanley',
+            },
+            testNotified: `# comment
+*                   @userName
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+
+[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+"/^\\+/m"           @Khan/frontend-infra`,
+        };
+
+        await runPush(testObject);
+
+        // test that commit suite3-commit1 doesn't have a message because it's not in this push
+        expect(await __testGetMessage('suite3-commit1')).toEqual(undefined);
+        // test that commit suite3-commit2 doesn't have a message because it is a merge commit
+        // even though it has a change that matches the final rule.
+        expect(await __testGetMessage('suite3-commit2')).toEqual(undefined);
+        // test that commite suite3-commit3 doesn't have a message even though a commit in this
+        // push changed something that matches a rule.
+        expect(await __testGetMessage('suite3-commit3')).toEqual(undefined);
+    });
+});
+
 describe('test that make functions make well formatted messages', () => {
-    it('should work', async () => {
+    it('should format the commit message nicely', async () => {
         const peopleToFiles = {
             '@yipstanley': ['src/main.js', '.github/workflows/build.yml'],
             '@Khan/frontend-infra': ['src/main.js', '.geraldignore'],
         };
 
-        await __makeCommitComment(peopleToFiles, 'suite3-commit1');
+        await __makeCommitComment(peopleToFiles, 'suite4-commit1');
 
-        expect(await __testGetMessage('suite3-commit1')).toMatchInlineSnapshot(`
+        expect(await __testGetMessage('suite4-commit1')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`.github/workflows/build.yml\`
@@ -215,7 +262,7 @@ describe('test that make functions make well formatted messages', () => {
         `);
     });
 
-    it('should work', async () => {
+    it('should format the Gerald comment body correctly', async () => {
         const peopleToFiles = {
             '@yipstanley': ['src/main.js', '.github/workflows/build.yml'],
             '@Khan/frontend-infra': ['src/main.js', '.geraldignore'],
