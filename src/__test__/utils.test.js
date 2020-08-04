@@ -12,6 +12,7 @@ import {
     getFilteredLists,
     getCorrectSection,
 } from '../utils';
+import {readFileSync} from '../fs';
 
 const mockTestFileDiff = `a/testFile b/testFile
 new file mode 123456
@@ -36,6 +37,10 @@ export const testFn = () => {
 `;
 
 /* flow-uncovered-block */
+jest.mock('../fs.js', () => ({
+    readFileSync: jest.fn(),
+}));
+
 jest.mock('../execCmd.js', () => ({
     ...jest.requireActual('../execCmd.js'),
     execCmd: async (cmd: string, args: string[]) => {
@@ -46,6 +51,46 @@ jest.mock('../execCmd.js', () => ({
     },
 }));
 /* end flow-uncovered-block */
+
+const _mock = mockFn => {
+    return ((mockFn: JestMockFn<
+        [
+            string | number | Buffer | URL,
+            (
+                | 'utf-8'
+                | {|encoding: any, flag?: string|}
+                | 'ascii'
+                | 'utf8'
+                | 'utf16le'
+                | 'ucs2'
+                | 'ucs-2'
+                | 'base64'
+                | 'latin1'
+                | 'binary'
+                | 'hex'
+            ),
+        ],
+        string,
+    >): JestMockFn<
+        [
+            string | number | Buffer | URL,
+            (
+                | 'utf-8'
+                | {|encoding: any, flag?: string|}
+                | 'ascii'
+                | 'utf8'
+                | 'utf16le'
+                | 'ucs2'
+                | 'ucs-2'
+                | 'base64'
+                | 'latin1'
+                | 'binary'
+                | 'hex'
+            ),
+        ],
+        string,
+    >);
+};
 
 describe('maybe add', () => {
     it('should work', () => {
@@ -148,8 +193,13 @@ describe('push or set to bin', () => {
 });
 
 describe('get notified', () => {
+    beforeEach(() => {
+        jest.resetModules();
+    });
+
     it('should work', async () => {
-        const notifiedFile = `# comment
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
@@ -161,18 +211,19 @@ describe('get notified', () => {
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
-**/*.js             @owner`;
+**/*.js             @owner`,
+        );
 
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        expect(await getNotified(filesChanged, fileDiffs, 'pull_request', notifiedFile)).toEqual({
+        expect(await getNotified(filesChanged, fileDiffs, 'pull_request')).toEqual({
             '@yipstanley': ['src/execCmd.js', 'src/main.js'],
             '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'],
             '@testperson': ['yaml.yml'],
         });
 
-        expect(await getNotified(filesChanged, fileDiffs, 'push', notifiedFile)).toEqual({
+        expect(await getNotified(filesChanged, fileDiffs, 'push')).toEqual({
             '@owner': ['src/execCmd.js', 'src/main.js'],
         });
     });
@@ -180,7 +231,8 @@ describe('get notified', () => {
 
 describe('get reviewers', () => {
     it('should work', () => {
-        const reviewersFile = `# comment
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
@@ -188,16 +240,12 @@ describe('get reviewers', () => {
 .github/**          @githubUser!
 **/*.js             @yipstanley! @githubUser
 "/test/ig"          @testperson
-# *                 @otherperson`;
+# *                 @otherperson`,
+        );
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = getReviewers(
-            filesChanged,
-            fileDiffs,
-            'yipstanley',
-            reviewersFile,
-        );
+        const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
         expect(reviewers).toEqual({
             '@githubUser': ['src/execCmd.js', 'src/main.js'],
             '@testperson': ['yaml.yml'],
@@ -247,7 +295,8 @@ this should show up 2!`;
 
 describe('get filtered lists', () => {
     it('should work', () => {
-        const sampleFile = `# comment
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**          @githubUser!
@@ -255,7 +304,8 @@ describe('get filtered lists', () => {
 "/test/ig"          @testperson
 # *                 @otherperson
 
-[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)`;
+[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)`,
+        );
         const filesChanged = [
             'src/core.js',
             '.github/workflows/pr-actions.yml',
@@ -263,13 +313,8 @@ describe('get filtered lists', () => {
         ];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = getReviewers(
-            filesChanged,
-            fileDiffs,
-            'yipstanley',
-            sampleFile,
-        );
-        const notified = getNotified(filesChanged, fileDiffs, 'pull_request', sampleFile);
+        const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
+        const notified = getNotified(filesChanged, fileDiffs, 'pull_request');
         const {actualReviewers, teamReviewers} = getFilteredLists(
             reviewers,
             requiredReviewers,

@@ -1,22 +1,6 @@
 // @flow
 
-import {
-    type Octokit,
-    type Octokit$IssuesListCommentsResponseItem,
-    type Octokit$PullsListResponseItem,
-    type Octokit$PullsListCommitsResponseItemCommit,
-} from '@octokit/rest';
-
-type Context = {|
-    issue: {|owner: string, repo: string, number: number|},
-    payload: {|
-        pull_request: Octokit$PullsListResponseItem,
-        before: string,
-        after: string,
-        commits: Array<{id: string, ...Octokit$PullsListCommitsResponseItemCommit}>,
-    |},
-    actor: string,
-|};
+import {type Octokit$IssuesListCommentsResponseItem} from '@octokit/rest';
 
 import {
     getReviewers,
@@ -26,20 +10,8 @@ import {
     getFilteredLists,
 } from './utils';
 import {execCmd} from './execCmd';
+import {extraPermGithub, context, ownerAndRepo, type Context} from './core';
 
-const octokit = require('@actions/github'); //flow-uncovered-line
-
-/* flow-uncovered-block */
-const extraPermGithub: Octokit = new octokit.GitHub(process.env['ADMIN_PERMISSION_TOKEN']);
-const context: Context = octokit.context;
-/* end flow-uncovered-block */
-let ownerAndRepo;
-if (process.env['ADMIN_PERMISSION_TOKEN']) {
-    ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
-} else {
-    ownerAndRepo = {owner: 'Khan', repo: 'Gerald'};
-    console.error('THIS SHOULD ONLY BE HAPPENING IN TESTS');
-}
 const separator =
     '__________________________________________________________________________________________________________________________________';
 
@@ -167,10 +139,8 @@ export const runPullRequest = async () => {
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
 
-export const runPush = async (__testObject: ?__TestObject) => {
+export const runPush = async (usedContext: Context | __TestContext) => {
     // loop through each commit in the push
-    const usedContext = __testObject ? __testObject.context : context;
-    const testNotified = __testObject ? __testObject.testNotified : undefined;
     let prevCommit = usedContext.payload.before;
     for (const commit of usedContext.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
@@ -188,7 +158,7 @@ export const runPush = async (__testObject: ?__TestObject) => {
                 ])
             ).split('\n');
             const fileDiffs = await getFileDiffs(`${prevCommit}...${commitData.data.sha}`);
-            const notified = getNotified(filesChanged, fileDiffs, 'push', testNotified);
+            const notified = getNotified(filesChanged, fileDiffs, 'push');
 
             await makeCommitComment(notified, commitData.data.sha);
         }
@@ -209,11 +179,6 @@ export type __TestCommit = {
     verification: '__TESTING__',
 };
 
-export type __TestObject = {
-    context: __TestContext,
-    testNotified: string,
-};
-
 type __TestContext = {|
     issue: {|owner: '__TESTING__', repo: '__TESTING__', number: -1|},
     payload: {|
@@ -225,29 +190,6 @@ type __TestContext = {|
     actor: '__testActor',
 |};
 
-/**
- * @desc ONLY TO BE USED FOR TESTING. This is used to allow main.test.js to
- * retrieve commits. This is necessary because main.test.js mocks a lot of the
- * GitHub rest functions and "saves" commits into an object.
- */
-export const __testGetCommit = async (commitSHA: string) => {
-    return await extraPermGithub.git.getCommit({
-        ...ownerAndRepo,
-        commit_sha: commitSHA,
-    });
-};
-
-/**
- * @desc ONLY TO BE USED FOR TESTING. This is used to allow main.test.js to
- * retrieve commmit comments. This is necessary because main.test.js mocks a lot of the
- * GitHub rest functions and "saves" commit comments into an object.
- */
-export const __testGetComment = async (commitSHA: string) => {
-    return await extraPermGithub.git.getCommit({
-        ...ownerAndRepo,
-        commit_sha: 'comment' + commitSHA,
-    });
-};
-
 export const __makeCommitComment = makeCommitComment;
 export const __makeCommentBody = makeCommentBody;
+export const __extraPermGithub = extraPermGithub;

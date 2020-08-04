@@ -2,16 +2,21 @@
 
 import {
     __makeCommitComment,
-    __testGetCommit,
-    __testGetComment,
     runPush,
     __makeCommentBody,
+    __extraPermGithub,
     type __TestCommit,
-    type __TestObject,
 } from '../main';
+import {readFileSync} from '../fs';
 
 /* flow-uncovered-block */
-/* Mock the GitHub object's commands so that they act on an internal corpus of commits and comments
+// mock fs.js readFileSync so that we can provide different implementations in tests
+jest.mock('../fs.js', () => ({
+    readFileSync: jest.fn(),
+}));
+
+/*
+ * Mock the GitHub object's commands so that they act on an internal corpus of commits and comments
  * as opposed to authenticating the object and using actual GitHub.
  */
 jest.mock('@actions/github', () => ({
@@ -71,7 +76,7 @@ jest.mock('../execCmd.js', () => ({
     execCmd: async (cmd: string, args: string[]) => {
         return await new Promise((res, rej) => {
             const string = `src/main.js
-src/pr-notify.js
+src/core.js
 .github/workflows/build.yml`;
             process.nextTick(() => res(string));
         });
@@ -92,6 +97,10 @@ jest.mock('../utils.js', () => ({
         }
         return {};
     },
+}));
+
+jest.mock('../main.js', () => ({
+    ...jest.requireActual('../main.js'),
 }));
 /* end flow-uncovered-block */
 
@@ -114,20 +123,79 @@ const makeTestCommit = (id: string, message: string): __TestCommit => {
     };
 };
 
+/**
+ * Helper function to get around flow errors when mocking readFileSync
+ */
+const _mock = mockFn => {
+    return ((mockFn: JestMockFn<
+        [
+            string | number | Buffer | URL,
+            (
+                | 'utf-8'
+                | {|encoding: any, flag?: string|}
+                | 'ascii'
+                | 'utf8'
+                | 'utf16le'
+                | 'ucs2'
+                | 'ucs-2'
+                | 'base64'
+                | 'latin1'
+                | 'binary'
+                | 'hex'
+            ),
+        ],
+        string,
+    >): JestMockFn<
+        [
+            string | number | Buffer | URL,
+            (
+                | 'utf-8'
+                | {|encoding: any, flag?: string|}
+                | 'ascii'
+                | 'utf8'
+                | 'utf16le'
+                | 'ucs2'
+                | 'ucs-2'
+                | 'base64'
+                | 'latin1'
+                | 'binary'
+                | 'hex'
+            ),
+        ],
+        string,
+    >);
+};
+
+const getCommit = async (commitSHA: string) => {
+    return await __extraPermGithub.git.getCommit({
+        owner: '__TESTING__',
+        repo: '__TESTING__',
+        commit_sha: commitSHA,
+    });
+};
+
+const getComment = async (commitSHA: string) => {
+    return await __extraPermGithub.git.getCommit({
+        owner: '__TESTING__',
+        repo: '__TESTING__',
+        commit_sha: 'comment' + commitSHA,
+    });
+};
+
 describe('test that the mock works', () => {
     it('should work', async () => {
-        const testObject: __TestObject = {
-            context: {
-                issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
-                payload: {
-                    pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
-                    before: 'suite1-commit1',
-                    after: 'suite1-commit2',
-                    commits: [makeTestCommit('suite1-commit2', 'test')],
-                },
-                actor: '__testActor',
+        const context = {
+            issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
+            payload: {
+                pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
+                before: 'suite1-commit1',
+                after: 'suite1-commit2',
+                commits: [makeTestCommit('suite1-commit2', 'test')],
             },
-            testNotified: `# comment
+            actor: '__testActor',
+        };
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
@@ -136,26 +204,26 @@ describe('test that the mock works', () => {
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 **/*                @yipstanley`,
-        };
+        );
 
-        await runPush(testObject);
+        await runPush(context);
 
         // check that both commits have been added and can be retrieved correctly.
-        expect(await __testGetCommit('suite1-commit1')).toEqual({
+        expect(await getCommit('suite1-commit1')).toEqual({
             data: {sha: 'suite1-commit1', parents: {length: 1}},
         });
-        expect(await __testGetCommit('suite1-commit2')).toEqual({
+        expect(await getCommit('suite1-commit2')).toEqual({
             data: {sha: 'suite1-commit2', parents: {length: 1}},
         });
 
         // check that commit1 has no comments because it is not part of the push
-        expect(await __testGetComment('suite1-commit1')).toEqual(undefined);
+        expect(await getComment('suite1-commit1')).toEqual(undefined);
 
         // check that commit2 has the correct comment
-        expect(await __testGetComment('suite1-commit2')).toMatchInlineSnapshot(`
+        expect(await getComment('suite1-commit2')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
-            @yipstanley for changes to \`src/main.js\`, \`src/pr-notify.js\`, \`.github/workflows/build.yml\`
+            @yipstanley for changes to \`src/core.js\`, \`src/main.js\`, \`.github/workflows/build.yml\`
             "
         `);
     });
@@ -163,86 +231,84 @@ describe('test that the mock works', () => {
 
 describe('test simple working case', () => {
     it('should work', async () => {
-        const testObject: __TestObject = {
-            context: {
-                issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
-                payload: {
-                    pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
-                    before: 'suite2-commit1',
-                    after: 'suite2-commit5',
-                    commits: [
-                        makeTestCommit('suite2-commit2', 'First commit'),
-                        makeTestCommit('suite2-commit3', 'Second commit'),
-                        makeTestCommit('suite2-commit4', 'third commit'),
-                        makeTestCommit('suite2-commit5', 'lastCommit'),
-                    ],
-                },
-                actor: '__testActor',
+        const context = {
+            issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
+            payload: {
+                pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
+                before: 'suite2-commit1',
+                after: 'suite2-commit5',
+                commits: [
+                    makeTestCommit('suite2-commit2', 'First commit'),
+                    makeTestCommit('suite2-commit3', 'Second commit'),
+                    makeTestCommit('suite2-commit4', 'third commit'),
+                    makeTestCommit('suite2-commit5', 'lastCommit'),
+                ],
             },
-            testNotified: `# comment
+            actor: '__testActor',
+        };
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
-
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 src/**              @yipstanley
 "/^\\+/m"           @Khan/frontend-infra`,
-        };
+        );
 
-        await runPush(testObject);
+        await runPush(context);
 
         // test that commit suite2-commit4 has the correct comment
-        expect(await __testGetComment('suite2-commit4')).toMatchInlineSnapshot(`
+        expect(await getComment('suite2-commit4')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
-            @yipstanley for changes to \`src/main.js\`, \`src/pr-notify.js\`
+            @yipstanley for changes to \`src/core.js\`, \`src/main.js\`
             @Khan/frontend-infra for changes to \`src/main.js\`
             "
         `);
         // test that commit suite2-commit5 doesn't have a comment because it is a merge commit
-        expect(await __testGetComment('suite2-commit5')).toEqual(undefined);
+        expect(await getComment('suite2-commit5')).toEqual(undefined);
     });
 });
 
 describe("test that changes on a merge commit don't notify people", () => {
     it('should not make comments', async () => {
-        const testObject: __TestObject = {
-            context: {
-                issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
-                payload: {
-                    pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
-                    before: 'suite3-commit1',
-                    after: 'suite3-commit3',
-                    commits: [
-                        makeTestCommit('suite3-commit2', 'First commit'),
-                        makeTestCommit('suite3-commit3', 'Second commit'),
-                    ],
-                },
-                actor: '__testActor',
+        const context = {
+            issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
+            payload: {
+                pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
+                before: 'suite3-commit1',
+                after: 'suite3-commit3',
+                commits: [
+                    makeTestCommit('suite3-commit2', 'First commit'),
+                    makeTestCommit('suite3-commit3', 'Second commit'),
+                ],
             },
-            testNotified: `# comment
+            actor: '__testActor',
+        };
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
-
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 "/^\\+/m"           @Khan/frontend-infra`,
-        };
+        );
 
-        await runPush(testObject);
+        await runPush(context);
 
         // test that commit suite3-commit1 doesn't have a comment because it's not in this push
-        expect(await __testGetComment('suite3-commit1')).toEqual(undefined);
+        expect(await getComment('suite3-commit1')).toEqual(undefined);
         // test that commit suite3-commit2 doesn't have a comment because it is a merge commit
         // even though it has a change that matches the final rule.
-        expect(await __testGetComment('suite3-commit2')).toEqual(undefined);
+        expect(await getComment('suite3-commit2')).toEqual(undefined);
         // test that commite suite3-commit3 doesn't have a comment even though a commit in this
         // push changed something that matches a rule.
-        expect(await __testGetComment('suite3-commit3')).toEqual(undefined);
+        expect(await getComment('suite3-commit3')).toEqual(undefined);
     });
 });
 
@@ -255,7 +321,7 @@ describe('test that make functions make well formatted strings', () => {
 
         await __makeCommitComment(peopleToFiles, 'suite4-commit1');
 
-        expect(await __testGetComment('suite4-commit1')).toMatchInlineSnapshot(`
+        expect(await getComment('suite4-commit1')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/main.js\`, \`.github/workflows/build.yml\`
