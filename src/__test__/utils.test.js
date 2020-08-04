@@ -53,43 +53,7 @@ jest.mock('../execCmd.js', () => ({
 /* end flow-uncovered-block */
 
 const _mock = mockFn => {
-    return ((mockFn: JestMockFn<
-        [
-            string | number | Buffer | URL,
-            (
-                | 'utf-8'
-                | {|encoding: any, flag?: string|}
-                | 'ascii'
-                | 'utf8'
-                | 'utf16le'
-                | 'ucs2'
-                | 'ucs-2'
-                | 'base64'
-                | 'latin1'
-                | 'binary'
-                | 'hex'
-            ),
-        ],
-        string,
-    >): JestMockFn<
-        [
-            string | number | Buffer | URL,
-            (
-                | 'utf-8'
-                | {|encoding: any, flag?: string|}
-                | 'ascii'
-                | 'utf8'
-                | 'utf16le'
-                | 'ucs2'
-                | 'ucs-2'
-                | 'base64'
-                | 'latin1'
-                | 'binary'
-                | 'hex'
-            ),
-        ],
-        string,
-    >);
+    return ((mockFn: JestMockFn<any, any>): JestMockFn<any, any>);
 };
 
 describe('maybe add', () => {
