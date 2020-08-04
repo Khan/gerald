@@ -9,10 +9,10 @@ import {
     type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
+import {runPullRequest, runPush} from './main';
+
 const core = require('@actions/core'); //flow-uncovered-line
 const octokit = require('@actions/github'); //flow-uncovered-line
-
-const {runPullRequest, runPush} = require('./main.js');
 
 export type Context = {|
     issue: {|owner: string, repo: string, number: number|},
