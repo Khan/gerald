@@ -41,7 +41,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(375);
+/******/ 		return __webpack_require__(400);
 /******/ 	};
 /******/ 	// initialize runtime
 /******/ 	runtime(__webpack_require__);
@@ -2314,7 +2314,7 @@ module.exports = basePropertyDeep;
 /* 34 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var root = __webpack_require__(946);
+var root = __webpack_require__(375);
 
 /** Built-in value references. */
 var Uint8Array = root.Uint8Array;
@@ -7470,58 +7470,12 @@ Object.defineProperty(module, 'exports', {
 /* 75 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-module.exports = authenticationBeforeRequest;
+module.exports = getPreviousPage
 
-const btoa = __webpack_require__(730);
+const getPage = __webpack_require__(22)
 
-const withAuthorizationPrefix = __webpack_require__(225);
-
-function authenticationBeforeRequest(state, options) {
-  if (typeof state.auth === "string") {
-    options.headers.authorization = withAuthorizationPrefix(state.auth);
-    return;
-  }
-
-  if (state.auth.username) {
-    const hash = btoa(`${state.auth.username}:${state.auth.password}`);
-    options.headers.authorization = `Basic ${hash}`;
-    if (state.otp) {
-      options.headers["x-github-otp"] = state.otp;
-    }
-    return;
-  }
-
-  if (state.auth.clientId) {
-    // There is a special case for OAuth applications, when `clientId` and `clientSecret` is passed as
-    // Basic Authorization instead of query parameters. The only routes where that applies share the same
-    // URL though: `/applications/:client_id/tokens/:access_token`.
-    //
-    //  1. [Check an authorization](https://developer.github.com/v3/oauth_authorizations/#check-an-authorization)
-    //  2. [Reset an authorization](https://developer.github.com/v3/oauth_authorizations/#reset-an-authorization)
-    //  3. [Revoke an authorization for an application](https://developer.github.com/v3/oauth_authorizations/#revoke-an-authorization-for-an-application)
-    //
-    // We identify by checking the URL. It must merge both "/applications/:client_id/tokens/:access_token"
-    // as well as "/applications/123/tokens/token456"
-    if (/\/applications\/:?[\w_]+\/tokens\/:?[\w_]+($|\?)/.test(options.url)) {
-      const hash = btoa(`${state.auth.clientId}:${state.auth.clientSecret}`);
-      options.headers.authorization = `Basic ${hash}`;
-      return;
-    }
-
-    options.url += options.url.indexOf("?") === -1 ? "?" : "&";
-    options.url += `client_id=${state.auth.clientId}&client_secret=${state.auth.clientSecret}`;
-    return;
-  }
-
-  return Promise.resolve()
-
-    .then(() => {
-      return state.auth();
-    })
-
-    .then(authorization => {
-      options.headers.authorization = withAuthorizationPrefix(authorization);
-    });
+function getPreviousPage (octokit, link, headers) {
+  return getPage(octokit, link, 'prev', headers)
 }
 
 
@@ -9317,7 +9271,7 @@ const async_1 = __webpack_require__(70);
 const stream_1 = __webpack_require__(609);
 const sync_1 = __webpack_require__(853);
 const settings_1 = __webpack_require__(785);
-const utils = __webpack_require__(400);
+const utils = __webpack_require__(800);
 async function FastGlob(source, options) {
     assertPatternsInput(source);
     const works = getWorks(source, async_1.default, options);
@@ -32988,7 +32942,7 @@ function getScopeInformation(fnPath) {
 module.exports = authenticationPlugin;
 
 const { Deprecation } = __webpack_require__(593);
-const once = __webpack_require__(709);
+const once = __webpack_require__(946);
 
 const deprecateAuthenticate = once((log, deprecation) => log.warn(deprecation));
 
@@ -33555,7 +33509,7 @@ module.exports = parseOptions;
 
 const { Deprecation } = __webpack_require__(593);
 const { getUserAgent } = __webpack_require__(37);
-const once = __webpack_require__(709);
+const once = __webpack_require__(946);
 
 const pkg = __webpack_require__(790);
 
@@ -37780,7 +37734,7 @@ exports.quickSort = function (ary, comparator) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(400);
+const utils = __webpack_require__(800);
 class Matcher {
     constructor(_patterns, _settings, _micromatchOptions) {
         this._patterns = _patterns;
@@ -38064,7 +38018,7 @@ module.exports = cloneDeep;
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var getNative = __webpack_require__(116),
-    root = __webpack_require__(946);
+    root = __webpack_require__(375);
 
 /* Built-in method references that are verified to be native. */
 var Map = getNative(root, 'Map');
@@ -41775,7 +41729,7 @@ exports.compareByGeneratedPositionsInflated = compareByGeneratedPositionsInflate
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(400);
+const utils = __webpack_require__(800);
 class EntryFilter {
     constructor(_settings, _micromatchOptions) {
         this._settings = _settings;
@@ -56177,7 +56131,7 @@ function octokitValidate(octokit) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __webpack_require__(622);
 const fsStat = __webpack_require__(528);
-const utils = __webpack_require__(400);
+const utils = __webpack_require__(800);
 class Reader {
     constructor(_settings) {
         this._settings = _settings;
@@ -58418,7 +58372,7 @@ exports.ForAwaitStatement = ForAwaitStatement;
 module.exports = authenticate;
 
 const { Deprecation } = __webpack_require__(593);
-const once = __webpack_require__(709);
+const once = __webpack_require__(946);
 
 const deprecateAuthenticate = once((log, deprecation) => log.warn(deprecation));
 
@@ -60391,7 +60345,7 @@ function paginationMethodsPlugin (octokit) {
   octokit.getFirstPage = __webpack_require__(2).bind(null, octokit)
   octokit.getLastPage = __webpack_require__(281).bind(null, octokit)
   octokit.getNextPage = __webpack_require__(981).bind(null, octokit)
-  octokit.getPreviousPage = __webpack_require__(460).bind(null, octokit)
+  octokit.getPreviousPage = __webpack_require__(75).bind(null, octokit)
   octokit.hasFirstPage = __webpack_require__(847)
   octokit.hasLastPage = __webpack_require__(15)
   octokit.hasNextPage = __webpack_require__(893)
@@ -60430,9 +60384,18 @@ module.exports = factory();
 
 /***/ }),
 /* 375 */
-/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
-__webpack_require__(613);var core=__webpack_require__(827);var _require=__webpack_require__(547),runPullRequest=_require.runPullRequest,runPush=_require.runPush;try{if(process.env['EVENT']==='pull_request'){runPullRequest();}else{runPush();}}catch(error){core.setFailed(error.message);}
+var freeGlobal = __webpack_require__(364);
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+module.exports = root;
+
 
 /***/ }),
 /* 376 */,
@@ -62872,27 +62835,9 @@ module.exports = arrayEach;
 /***/ }),
 /* 399 */,
 /* 400 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.string = exports.stream = exports.pattern = exports.path = exports.fs = exports.errno = exports.array = void 0;
-const array = __webpack_require__(348);
-exports.array = array;
-const errno = __webpack_require__(162);
-exports.errno = errno;
-const fs = __webpack_require__(339);
-exports.fs = fs;
-const path = __webpack_require__(635);
-exports.path = path;
-const pattern = __webpack_require__(927);
-exports.pattern = pattern;
-const stream = __webpack_require__(973);
-exports.stream = stream;
-const string = __webpack_require__(202);
-exports.string = string;
-
+__webpack_require__(613);var core=__webpack_require__(827);var _require=__webpack_require__(547),runPullRequest=_require.runPullRequest,runPush=_require.runPush;try{if(process.env['EVENT']==='pull_request'){runPullRequest();}else{runPush();}}catch(error){core.setFailed(error.message);}
 
 /***/ }),
 /* 401 */
@@ -64602,7 +64547,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 /* 418 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var root = __webpack_require__(946);
+var root = __webpack_require__(375);
 
 /** Used to detect overreaching core-js shims. */
 var coreJsData = root['__core-js_shared__'];
@@ -67184,26 +67129,14 @@ module.exports = baseSlice;
 
 /***/ }),
 /* 459 */,
-/* 460 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-module.exports = getPreviousPage
-
-const getPage = __webpack_require__(22)
-
-function getPreviousPage (octokit, link, headers) {
-  return getPage(octokit, link, 'prev', headers)
-}
-
-
-/***/ }),
+/* 460 */,
 /* 461 */,
 /* 462 */,
 /* 463 */,
 /* 464 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var once = __webpack_require__(709)
+var once = __webpack_require__(946)
 var eos = __webpack_require__(602)
 var fs = __webpack_require__(747) // we only need fs to get the ReadStream and WriteStream prototypes
 
@@ -67433,7 +67366,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var deprecation = __webpack_require__(593);
-var once = _interopDefault(__webpack_require__(709));
+var once = _interopDefault(__webpack_require__(946));
 
 const logOnce = once(deprecation => console.warn(deprecation));
 /**
@@ -76701,9 +76634,9 @@ module.exports = authenticationPlugin;
 
 const { createTokenAuth } = __webpack_require__(268);
 const { Deprecation } = __webpack_require__(593);
-const once = __webpack_require__(709);
+const once = __webpack_require__(946);
 
-const beforeRequest = __webpack_require__(75);
+const beforeRequest = __webpack_require__(709);
 const requestError = __webpack_require__(577);
 const validate = __webpack_require__(760);
 const withAuthorizationPrefix = __webpack_require__(225);
@@ -76975,7 +76908,7 @@ module.exports = objectToString;
 /* 602 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var once = __webpack_require__(709);
+var once = __webpack_require__(946);
 
 var noop = function() {};
 
@@ -77252,7 +77185,7 @@ module.exports = {
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var getNative = __webpack_require__(116),
-    root = __webpack_require__(946);
+    root = __webpack_require__(375);
 
 /* Built-in method references that are verified to be native. */
 var WeakMap = getNative(root, 'WeakMap');
@@ -78157,7 +78090,7 @@ function is(type, node, opts) {
 /* 621 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var root = __webpack_require__(946);
+var root = __webpack_require__(375);
 
 /** Built-in value references. */
 var Symbol = root.Symbol;
@@ -79407,7 +79340,7 @@ function SpreadProperty(...args) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(400);
+const utils = __webpack_require__(800);
 class ErrorFilter {
     constructor(_settings) {
         this._settings = _settings;
@@ -82667,7 +82600,7 @@ function toIdentifier(name) {
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var getNative = __webpack_require__(116),
-    root = __webpack_require__(946);
+    root = __webpack_require__(375);
 
 /* Built-in method references that are verified to be native. */
 var Promise = getNative(root, 'Promise');
@@ -85862,7 +85795,7 @@ module.exports = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(400);
+const utils = __webpack_require__(800);
 class EntryTransformer {
     constructor(_settings) {
         this._settings = _settings;
@@ -85896,7 +85829,7 @@ exports.default = EntryTransformer;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertPatternGroupToTask = exports.convertPatternGroupsToTasks = exports.groupPatternsByBaseDirectory = exports.getNegativePatternsAsPositive = exports.getPositivePatterns = exports.convertPatternsToTasks = exports.generate = void 0;
-const utils = __webpack_require__(400);
+const utils = __webpack_require__(800);
 function generate(patterns, settings) {
     const positivePatterns = getPositivePatterns(patterns);
     const negativePatterns = getNegativePatternsAsPositive(patterns, settings.ignore);
@@ -85964,47 +85897,58 @@ exports.convertPatternGroupToTask = convertPatternGroupToTask;
 /* 709 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var wrappy = __webpack_require__(719)
-module.exports = wrappy(once)
-module.exports.strict = wrappy(onceStrict)
+module.exports = authenticationBeforeRequest;
 
-once.proto = once(function () {
-  Object.defineProperty(Function.prototype, 'once', {
-    value: function () {
-      return once(this)
-    },
-    configurable: true
-  })
+const btoa = __webpack_require__(730);
 
-  Object.defineProperty(Function.prototype, 'onceStrict', {
-    value: function () {
-      return onceStrict(this)
-    },
-    configurable: true
-  })
-})
+const withAuthorizationPrefix = __webpack_require__(225);
 
-function once (fn) {
-  var f = function () {
-    if (f.called) return f.value
-    f.called = true
-    return f.value = fn.apply(this, arguments)
+function authenticationBeforeRequest(state, options) {
+  if (typeof state.auth === "string") {
+    options.headers.authorization = withAuthorizationPrefix(state.auth);
+    return;
   }
-  f.called = false
-  return f
-}
 
-function onceStrict (fn) {
-  var f = function () {
-    if (f.called)
-      throw new Error(f.onceError)
-    f.called = true
-    return f.value = fn.apply(this, arguments)
+  if (state.auth.username) {
+    const hash = btoa(`${state.auth.username}:${state.auth.password}`);
+    options.headers.authorization = `Basic ${hash}`;
+    if (state.otp) {
+      options.headers["x-github-otp"] = state.otp;
+    }
+    return;
   }
-  var name = fn.name || 'Function wrapped with `once`'
-  f.onceError = name + " shouldn't be called more than once"
-  f.called = false
-  return f
+
+  if (state.auth.clientId) {
+    // There is a special case for OAuth applications, when `clientId` and `clientSecret` is passed as
+    // Basic Authorization instead of query parameters. The only routes where that applies share the same
+    // URL though: `/applications/:client_id/tokens/:access_token`.
+    //
+    //  1. [Check an authorization](https://developer.github.com/v3/oauth_authorizations/#check-an-authorization)
+    //  2. [Reset an authorization](https://developer.github.com/v3/oauth_authorizations/#reset-an-authorization)
+    //  3. [Revoke an authorization for an application](https://developer.github.com/v3/oauth_authorizations/#revoke-an-authorization-for-an-application)
+    //
+    // We identify by checking the URL. It must merge both "/applications/:client_id/tokens/:access_token"
+    // as well as "/applications/123/tokens/token456"
+    if (/\/applications\/:?[\w_]+\/tokens\/:?[\w_]+($|\?)/.test(options.url)) {
+      const hash = btoa(`${state.auth.clientId}:${state.auth.clientSecret}`);
+      options.headers.authorization = `Basic ${hash}`;
+      return;
+    }
+
+    options.url += options.url.indexOf("?") === -1 ? "?" : "&";
+    options.url += `client_id=${state.auth.clientId}&client_secret=${state.auth.clientSecret}`;
+    return;
+  }
+
+  return Promise.resolve()
+
+    .then(() => {
+      return state.auth();
+    })
+
+    .then(authorization => {
+      options.headers.authorization = withAuthorizationPrefix(authorization);
+    });
 }
 
 
@@ -86064,7 +86008,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var deprecation = __webpack_require__(593);
-var once = _interopDefault(__webpack_require__(709));
+var once = _interopDefault(__webpack_require__(946));
 
 const logOnce = once(deprecation => console.warn(deprecation));
 /**
@@ -92092,7 +92036,30 @@ exports.MappingList = MappingList;
 /***/ }),
 /* 798 */,
 /* 799 */,
-/* 800 */,
+/* 800 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.string = exports.stream = exports.pattern = exports.path = exports.fs = exports.errno = exports.array = void 0;
+const array = __webpack_require__(348);
+exports.array = array;
+const errno = __webpack_require__(162);
+exports.errno = errno;
+const fs = __webpack_require__(339);
+exports.fs = fs;
+const path = __webpack_require__(635);
+exports.path = path;
+const pattern = __webpack_require__(927);
+exports.pattern = pattern;
+const stream = __webpack_require__(973);
+exports.stream = stream;
+const string = __webpack_require__(202);
+exports.string = string;
+
+
+/***/ }),
 /* 801 */,
 /* 802 */,
 /* 803 */
@@ -96270,7 +96237,7 @@ module.exports = require("tty");
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var getNative = __webpack_require__(116),
-    root = __webpack_require__(946);
+    root = __webpack_require__(375);
 
 /* Built-in method references that are verified to be native. */
 var DataView = getNative(root, 'DataView');
@@ -99385,7 +99352,7 @@ module.exports = createBaseFor;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(400);
+const utils = __webpack_require__(800);
 const partial_1 = __webpack_require__(433);
 class DeepFilter {
     constructor(_settings, _micromatchOptions) {
@@ -99481,7 +99448,7 @@ function createTSUnionType(typeAnnotations) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* module decorator */ module = __webpack_require__.nmd(module);
-var root = __webpack_require__(946),
+var root = __webpack_require__(375),
     stubFalse = __webpack_require__(385);
 
 /** Detect free variable `exports`. */
@@ -99526,7 +99493,7 @@ module.exports = isBuffer;
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var getNative = __webpack_require__(116),
-    root = __webpack_require__(946);
+    root = __webpack_require__(375);
 
 /* Built-in method references that are verified to be native. */
 var Set = getNative(root, 'Set');
@@ -101686,15 +101653,48 @@ function toSequenceExpression(nodes, scope) {
 /* 946 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var freeGlobal = __webpack_require__(364);
+var wrappy = __webpack_require__(719)
+module.exports = wrappy(once)
+module.exports.strict = wrappy(onceStrict)
 
-/** Detect free variable `self`. */
-var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+once.proto = once(function () {
+  Object.defineProperty(Function.prototype, 'once', {
+    value: function () {
+      return once(this)
+    },
+    configurable: true
+  })
 
-/** Used as a reference to the global object. */
-var root = freeGlobal || freeSelf || Function('return this')();
+  Object.defineProperty(Function.prototype, 'onceStrict', {
+    value: function () {
+      return onceStrict(this)
+    },
+    configurable: true
+  })
+})
 
-module.exports = root;
+function once (fn) {
+  var f = function () {
+    if (f.called) return f.value
+    f.called = true
+    return f.value = fn.apply(this, arguments)
+  }
+  f.called = false
+  return f
+}
+
+function onceStrict (fn) {
+  var f = function () {
+    if (f.called)
+      throw new Error(f.onceError)
+    f.called = true
+    return f.value = fn.apply(this, arguments)
+  }
+  var name = fn.name || 'Function wrapped with `once`'
+  f.onceError = name + " shouldn't be called more than once"
+  f.called = false
+  return f
+}
 
 
 /***/ }),
@@ -105872,7 +105872,7 @@ function normalizeOptions(config) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* module decorator */ module = __webpack_require__.nmd(module);
-var root = __webpack_require__(946);
+var root = __webpack_require__(375);
 
 /** Detect free variable `exports`. */
 var freeExports =  true && exports && !exports.nodeType && exports;
