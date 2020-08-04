@@ -1,6 +1,11 @@
 // @flow
 
-import {type Octokit$IssuesListCommentsResponseItem} from '@octokit/rest';
+import {
+    type Octokit$IssuesListCommentsResponseItem,
+    type Octokit,
+    type Octokit$PullsListResponseItem,
+    type Octokit$PullsListCommitsResponseItemCommit,
+} from '@octokit/rest';
 
 import {
     getReviewers,
@@ -10,7 +15,29 @@ import {
     getFilteredLists,
 } from './utils';
 import {execCmd} from './execCmd';
-import {extraPermGithub, context, ownerAndRepo, type Context} from './core';
+
+export type Context = {|
+    issue: {|owner: string, repo: string, number: number|},
+    payload: {|
+        pull_request: Octokit$PullsListResponseItem,
+        before: string,
+        after: string,
+        commits: Array<{id: string, ...Octokit$PullsListCommitsResponseItemCommit}>,
+    |},
+    actor: string,
+|};
+
+const octokit = require('@actions/github'); //flow-uncovered-line
+
+/* flow-uncovered-block */
+const extraPermGithub: Octokit = new octokit.GitHub(process.env['ADMIN_PERMISSION_TOKEN']);
+export const context: Context = octokit.context;
+/* end flow-uncovered-block */
+
+let ownerAndRepo = {owner: '__TESTING__', repo: '__TESTING__'};
+if (process.env['ADMIN_PERMISSION_TOKEN']) {
+    ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
+}
 
 const separator =
     '__________________________________________________________________________________________________________________________________';
