@@ -258,7 +258,7 @@ describe('get filtered lists', () => {
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)`;
         const filesChanged = [
-            'src/pr-notify.js',
+            'src/core.js',
             '.github/workflows/pr-actions.yml',
             '.github/NOTIFIED',
         ];
