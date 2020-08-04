@@ -1,4 +1,4 @@
-// @flow
+// // @flow
 
 import {
     __makeCommitComment,
@@ -98,10 +98,6 @@ jest.mock('../utils.js', () => ({
         return {};
     },
 }));
-
-jest.mock('../main.js', () => ({
-    ...jest.requireActual('../main.js'),
-}));
 /* end flow-uncovered-block */
 
 /**
@@ -163,7 +159,6 @@ describe('test that the mock works', () => {
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
-
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 

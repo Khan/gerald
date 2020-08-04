@@ -31,18 +31,18 @@ export const context: Context = octokit.context;
 /* end flow-uncovered-block */
 
 export let ownerAndRepo = {owner: '__TESTING__', repo: '__TESTING__'};
-if (process.env['ADMIN_PERMISSION_TOKEN']) {
+if (process.env['ADMIN_PERMISSION_TOKEN'] && process.env['EVENT']) {
     ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
-}
 
-try {
-    if (process.env['EVENT'] === 'pull_request') {
-        runPullRequest();
-    } else {
-        runPush(context);
+    try {
+        if (process.env['EVENT'] === 'pull_request') {
+            runPullRequest();
+        } else {
+            runPush(context);
+        }
+        /* flow-uncovered-block */
+    } catch (error) {
+        core.setFailed(error.message);
+        /* end flow-uncovered-block */
     }
-    /* flow-uncovered-block */
-} catch (error) {
-    core.setFailed(error.message);
-    /* end flow-uncovered-block */
 }
