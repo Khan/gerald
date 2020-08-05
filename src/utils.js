@@ -421,7 +421,4 @@ export const __maybeAddIfMatch = maybeAddIfMatch;
 export const __turnPatternIntoRegex = turnPatternIntoRegex;
 export const __parseUsername = parseUsername;
 export const __pushOrSetToBin = pushOrSetToBin;
-<<<<<<< HEAD
 export const __filterIgnoreFiles = filterIgnoreFiles;
-=======
->>>>>>> Automated build push
