@@ -32,6 +32,20 @@ file-[1-5]          @owner1 # This is in the style of Regex character glasses (h
 # This rule will notify @owner1 on changes made to file-0, file-2, file-3, ..., file-9.
 file-[[:digit:]]    @owner1 # This uses POSIX character classes (https://github.com/micromatch/picomatch#posix-brackets)
 
+Regex Examples:
+
+# This rule will notify @owner1 on changes that include the word "gerald"
+"/gerald/ig"                @owner1
+
+# This rule will notify @owner1 on changes that *add* the word "gerald"
+"/^\+.*gerald/igm"          @owner1
+
+# This rule will notify @owner1 on changes that *remove* the word "gerald"
+"/^\-.*gerald/igm"          @owner1
+
+# This rule will notify @owner1 on changes that *add OR remove* the word "gerald"
+"/^(\-|\+).*gerald/igm"     @owner1
+
 ----Everything above this line will be ignored!----
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 

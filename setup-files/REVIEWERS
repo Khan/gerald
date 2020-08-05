@@ -4,8 +4,8 @@ Be sure to read through https://khanacademy.atlassian.net/wiki/spaces/FRONTEND/p
 
 Examples:
 
-# This rule will request @owner1 for review on changes to all files
-**/*                @owner1
+# This rule will request @owner1 for review on changes to all files. This rule will also request @owner2 for a blocking review.
+**/*                @owner1 @owner2!
 
 # This rule will request @owner1 and @Org/team1 for review on changes to all .js files
 **/*.js             @owner1 @Org/team1
@@ -31,6 +31,20 @@ file-[1-5]          @owner1 # This is in the style of Regex character glasses (h
 
 # This rule will request @owner1 for review on changes made to file-0, file-2, file-3, ..., file-9.
 file-[[:digit:]]    @owner1 # This uses POSIX character classes (https://github.com/micromatch/picomatch#posix-brackets)
+
+Regex Examples:
+
+# This rule will request @owner1 for review on changes that include the word "gerald"
+"/gerald/ig"                @owner1
+
+# This rule will request @owner1 for review on changes that *add* the word "gerald"
+"/^\+.*gerald/igm"          @owner1
+
+# This rule will request @owner1 for review on changes that *remove* the word "gerald"
+"/^\-.*gerald/igm"          @owner1
+
+# This rule will request @owner1 for review on changes that *add OR remove* the word "gerald"
+"/^(\-|\+).*gerald/igm"     @owner1
 
 ----Everything above this line will be ignored!----
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
