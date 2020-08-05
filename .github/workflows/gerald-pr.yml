@@ -1,6 +1,8 @@
-name: Notify and Request Reviewers On Pull Request
-'on':
- - pull_request
+name: Gerald - Notify and Request Reviewers On Pull Request
+on:
+   pull_request:
+   issue_comment:
+    types: [created]
 jobs:
   gerald:
     runs-on: ubuntu-latest
