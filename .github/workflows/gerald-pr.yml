@@ -1,7 +1,7 @@
 name: Gerald - Notify and Request Reviewers On Pull Request
 'on':
-   pull_request
-   issue_comment:
+ - pull_request
+ - issue_comment:
     types: [created]
 jobs:
   gerald:
