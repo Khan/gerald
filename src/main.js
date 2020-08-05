@@ -1,20 +1,11 @@
 // @flow
 
 import {
-    type Octokit$IssuesListCommentsResponseItem,
     type Octokit,
+    type Octokit$IssuesListCommentsResponseItem,
     type Octokit$PullsListResponseItem,
     type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
-
-import {
-    getReviewers,
-    getNotified,
-    getFileDiffs,
-    parseExistingComments,
-    getFilteredLists,
-} from './utils';
-import {execCmd} from './execCmd';
 
 export type Context = {|
     issue: {|owner: string, repo: string, number: number|},
@@ -26,6 +17,15 @@ export type Context = {|
     |},
     actor: string,
 |};
+
+import {
+    getReviewers,
+    getNotified,
+    getFileDiffs,
+    parseExistingComments,
+    getFilteredLists,
+} from './utils';
+import {execCmd} from './execCmd';
 
 const octokit = require('@actions/github'); //flow-uncovered-line
 
