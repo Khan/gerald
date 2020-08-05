@@ -213,7 +213,7 @@ export const getNotified = (
             let rule = match;
             // ignore inline comments
             if (match.includes('#')) {
-                rule = match.split('#')[0];
+                rule = match.split('#')[0].trim();
             }
             const untrimmedPattern = rule.match(/(.(?!  @))*/);
             const names = rule.match(/@([A-Za-z]*\/)?\S*/g);
