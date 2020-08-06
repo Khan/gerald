@@ -387,7 +387,7 @@ export const parseExistingComments = <
 
     existingComments.data.map(cmnt => {
         // only look at comments made by github-actions[bot] for <required> reviewers / notified comments
-        if (cmnt.user.login === 'khan-actions-bot') {
+        if (cmnt.body.match(/^# Gerald:/)) {
             actionBotComments.push(cmnt);
         } else {
             const removeMeMatch = cmnt.body.match(/\#removeme/i);
