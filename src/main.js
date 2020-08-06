@@ -7,16 +7,37 @@ import {
     type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
-export type Context = {|
-    issue: {|owner: string, repo: string, number: number|},
-    payload: {|
-        pull_request: Octokit$PullsListResponseItem,
-        before: string,
-        after: string,
-        commits: Array<{id: string, ...Octokit$PullsListCommitsResponseItemCommit}>,
-    |},
-    actor: string,
-|};
+export type Context =
+    | {|
+          issue: {|owner: string, repo: string, number: number|},
+          payload: {|
+              pull_request: Octokit$PullsListResponseItem,
+              before: string,
+              after: string,
+              commits: Array<{id: string, ...Octokit$PullsListCommitsResponseItemCommit}>,
+          |},
+          actor: string,
+      |}
+    // this is what the testing context looks like
+    | {|
+          issue: {|owner: '__TESTING__', repo: '__TESTING__', number: -1|},
+          payload: {|
+              pull_request: {|base: {|ref: '__TESTING__'|}, user: {|login: '__testUser'|}|},
+              before: string,
+              after: string,
+              commits: Array<{
+                  author: '__testAuthor',
+                  comment_count: -1,
+                  committer: '__testCommitter',
+                  id: string,
+                  message: string,
+                  tree: '__TESTING__',
+                  url: '__TESTING__',
+                  verification: '__TESTING__',
+              }>,
+          |},
+          actor: '__testActor',
+      |};
 
 import {
     getReviewers,
@@ -166,7 +187,7 @@ export const runPullRequest = async () => {
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
 
-export const runPush = async (usedContext: Context | __TestContext) => {
+export const runPush = async (usedContext: Context) => {
     // loop through each commit in the push
     let prevCommit = usedContext.payload.before;
     for (const commit of usedContext.payload.commits) {
@@ -205,17 +226,6 @@ export type __TestCommit = {
     url: '__TESTING__',
     verification: '__TESTING__',
 };
-
-type __TestContext = {|
-    issue: {|owner: '__TESTING__', repo: '__TESTING__', number: -1|},
-    payload: {|
-        pull_request: {|base: {|ref: '__TESTING__'|}, user: {|login: '__testUser'|}|},
-        before: string,
-        after: string,
-        commits: Array<__TestCommit>,
-    |},
-    actor: '__testActor',
-|};
 
 export const __makeCommitComment = makeCommitComment;
 export const __makeCommentBody = makeCommentBody;

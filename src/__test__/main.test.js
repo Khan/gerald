@@ -1,12 +1,6 @@
 // // @flow
 
-import {
-    __makeCommitComment,
-    runPush,
-    __makeCommentBody,
-    __extraPermGithub,
-    type __TestCommit,
-} from '../main';
+import {__makeCommitComment, runPush, __makeCommentBody, __extraPermGithub} from '../main';
 import {readFileSync} from '../fs';
 
 /* flow-uncovered-block */
@@ -106,7 +100,7 @@ jest.mock('../utils.js', () => ({
  * @param id - Fake commit ID.
  * @param message - Commit message
  */
-const makeTestCommit = (id: string, message: string): __TestCommit => {
+const makeTestCommit = (id: string, message: string) => {
     return {
         author: '__testAuthor',
         comment_count: -1,
