@@ -1,7 +1,6 @@
 name: Gerald - Notify and Request Reviewers On Pull Request
 'on':
- - pull_request:
- - issue_comment:
+   pull_request
 jobs:
   gerald:
     runs-on: ubuntu-latest
@@ -17,7 +16,6 @@ jobs:
       - name: Run Gerald
         uses: Khan/gerald@main
         env:
-          BASE: '${{ github.base_ref }}'
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          ADMIN_PERMISSION_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
+          ADMIN_PERMISSION_TOKEN: '${{ secrets.GERALD_SECRET }}'
           EVENT: 'pull_request'
