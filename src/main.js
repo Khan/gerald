@@ -33,6 +33,7 @@ const octokit = require('@actions/github'); //flow-uncovered-line
 const extraPermGithub: Octokit = new octokit.GitHub(process.env['ADMIN_PERMISSION_TOKEN']);
 const github: Octokit = new octokit.GitHub(process.env['GITHUB_TOKEN']);
 const context: Context = octokit.context;
+const BASE_REF = process.env['BASE'] || context.payload.pull_request.base.ref;
 /* end flow-uncovered-block */
 
 const ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
@@ -133,14 +134,10 @@ const makeCommitComment = async (
 export const runPullRequest = async () => {
     // get the files changed between the head of this branch and the origin of the base branch
     const filesChanged = (
-        await execCmd('git', [
-            'diff',
-            'origin/' + context.payload.pull_request.base.ref,
-            '--name-only',
-        ])
+        await execCmd('git', ['diff', 'origin/' + BASE_REF, '--name-only'])
     ).split('\n');
     // get the actual diff between the head of this branch adn the origin of the base branch, split by files
-    const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
+    const fileDiffs = await getFileDiffs('origin/' + BASE_REF);
 
     // figure out who to notify and request reviews from
     const notified = getNotified(filesChanged, fileDiffs, 'pull_request');
