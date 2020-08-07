@@ -10,23 +10,50 @@ import {execCmd} from './execCmd';
 type NameToFiles = {[name: string]: string[], ...};
 
 /**
+ * @desc Parse the ./.geraldignore and ./.gitignore style of files. Ignore new lines
+ * and comments.
+ *
+ * @param fileContents - A string of files/directories to ignore a la .gitignore.
+ * Comments should start with a #.
+ */
+const filterIgnoreFiles = (fileContents: string): Array<string> => {
+    const filteredOutMostCases = fileContents
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean)
+        .filter(line => !line.startsWith('#'));
+
+    // at this point, we have everything covered except for the case exhibited by the line below:
+    // directory_A # we want to ignore directory_A because of x, y, and z.
+    return filteredOutMostCases.map(line => {
+        if (line.indexOf('#') !== -1) {
+            return line.split('#')[0].trim();
+        }
+        return line;
+    });
+};
+
+/**
  * @desc Read ./.geraldignore and ./.gitignore if they exist.
  * Split the files by newlines to serve as the list of files/directories to
- * ignore for Gerald.
+ * ignore for Gerald. Be sure to ignore empty lines and comments (otherwise fast-glob
+ * will throw Type errors).
  */
 const getGeraldIgnore = (): Array<string> => {
     const ignore = [];
     if (fs.existsSync('.geraldignore')) {
-        ignore.push(...fs.readFileSync('.geraldignore', 'utf-8').split('\n'));
+        const geraldIgnore = filterIgnoreFiles(fs.readFileSync('.geraldignore', 'utf-8'));
+        ignore.push(...geraldIgnore);
     }
     if (fs.existsSync('.gitignore')) {
-        ignore.push(
-            ...fs
-                .readFileSync('.gitignore', 'utf-8')
-                .split('\n')
-                .filter(line => !ignore.includes(line)),
-        );
+        const gitIgnore = filterIgnoreFiles(fs.readFileSync('.gitignore', 'utf-8'));
+        for (const line of gitIgnore) {
+            if (!ignore.includes(line)) {
+                ignore.push(line);
+            }
+        }
     }
+
     return ignore;
 };
 
@@ -394,3 +421,4 @@ export const __maybeAddIfMatch = maybeAddIfMatch;
 export const __turnPatternIntoRegex = turnPatternIntoRegex;
 export const __parseUsername = parseUsername;
 export const __pushOrSetToBin = pushOrSetToBin;
+export const __filterIgnoreFiles = filterIgnoreFiles;
