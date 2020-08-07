@@ -250,7 +250,8 @@ describe('get reviewers', () => {
     });
 
     it('should ignore inline comments', () => {
-        const reviewersFile = `# comment
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
 *                   @userName
 
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
@@ -258,7 +259,8 @@ describe('get reviewers', () => {
 .github/**          @githubUser! # ah yes, the edge case of inline comments
 **/*.js             @yipstanley! @githubUser # these comments shan't bother Gerald, though
 "/test/ig"          @testperson # nope nope it should still work!
-# *                 @otherperson`;
+# *                 @otherperson`,
+        );
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
