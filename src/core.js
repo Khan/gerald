@@ -5,13 +5,13 @@ require('@babel/register');
 
 const core = require('@actions/core'); //flow-uncovered-line
 
-const {runPullRequest, runPush} = require('./main.js');
+const {runPullRequest, runPush, context} = require('./main.js');
 
 try {
     if (process.env['EVENT'] === 'pull_request') {
         runPullRequest();
     } else {
-        runPush();
+        runPush(context);
     }
     /* flow-uncovered-block */
 } catch (error) {
