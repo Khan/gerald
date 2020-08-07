@@ -1,3 +1,5 @@
+// @flow
+
 // GitHub and GitHub Action Constants
 export const PULL_REQUEST = 'pull_request';
 export const PUSH = 'push';
