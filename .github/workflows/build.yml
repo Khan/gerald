@@ -19,7 +19,7 @@ jobs:
       - run: yarn global add
       - run: npx babel src --out-dir js
         name: Transpile flow to javascript
-      - run: ncc build js/core.js
+      - run: ncc build js/gerald.js
         name: Build dist folder
       - name: Commit files
         run: |

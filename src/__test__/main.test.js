@@ -1,6 +1,6 @@
 // // @flow
 
-import {__makeCommitComment, runPush, __makeCommentBody, __extraPermGithub} from '../main';
+import {__makeCommitComment, runPush, __extraPermGithub} from '../runOnPush';
 import {readFileSync} from '../fs';
 
 /* flow-uncovered-block */
@@ -35,9 +35,9 @@ jest.mock('@actions/github', () => ({
                 /**
                  * For these tests, we're going to overload the getCommit command
                  * to retreive both commits and comments. The __testGetComment function
-                 * imported from ../main.js will prepend the commit SHAs with the text
+                 * imported from ../runOnPush.js will prepend the commit SHAs with the text
                  * 'comment'. This is because there's not really another easy existing function
-                 * to hook into that can be called in main.js without throwing flow errors
+                 * to hook into that can be called in runOnPush.js without throwing flow errors
                  */
                 getCommit: async (params: {commit_sha: string, ...}) => {
                     if (params.commit_sha.startsWith('comment')) {
@@ -69,8 +69,8 @@ jest.mock('../execCmd.js', () => ({
     ...jest.requireActual('../execCmd.js'),
     execCmd: async (cmd: string, args: string[]) => {
         return await new Promise((res, rej) => {
-            const string = `src/main.js
-src/core.js
+            const string = `src/runOnPush.js
+src/gerald.js
 .github/workflows/build.yml`;
             process.nextTick(() => res(string));
         });
@@ -85,9 +85,9 @@ jest.mock('../utils.js', () => ({
     getFileDiffs: async (diffString: string) => {
         // we're going to fake these diffs to force these commits to match a rule
         if (diffString === 'suite2-commit3...suite2-commit4') {
-            return {'src/main.js': '+ this line was added'};
+            return {'src/runOnPush.js': '+ this line was added'};
         } else if (diffString === 'suite3-commit1...suite3-commit2') {
-            return {'src/main.js': '+ this line was added'};
+            return {'src/runOnPush.js': '+ this line was added'};
         }
         return {};
     },
@@ -176,7 +176,7 @@ describe('test that the mock works', () => {
         expect(await getComment('suite1-commit2')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
-            @yipstanley for changes to \`src/core.js\`, \`src/main.js\`, \`.github/workflows/build.yml\`
+            @yipstanley for changes to \`src/gerald.js\`, \`src/runOnPush.js\`, \`.github/workflows/build.yml\`
             "
         `);
     });
@@ -217,8 +217,8 @@ src/**              @yipstanley
         expect(await getComment('suite2-commit4')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
-            @yipstanley for changes to \`src/core.js\`, \`src/main.js\`
-            @Khan/frontend-infra for changes to \`src/main.js\`
+            @yipstanley for changes to \`src/gerald.js\`, \`src/runOnPush.js\`
+            @Khan/frontend-infra for changes to \`src/runOnPush.js\`
             "
         `);
         // test that commit suite2-commit5 doesn't have a comment because it is a merge commit
@@ -265,11 +265,11 @@ describe("test that changes on a merge commit don't notify people", () => {
     });
 });
 
-describe('test that make functions make well formatted strings', () => {
+describe('test that makeCommitComment makes well formatted strings', () => {
     it('should format the commit comment nicely', async () => {
         const peopleToFiles = {
-            '@yipstanley': ['src/main.js', '.github/workflows/build.yml'],
-            '@Khan/frontend-infra': ['src/main.js', '.geraldignore'],
+            '@yipstanley': ['src/runOnPush.js', '.github/workflows/build.yml'],
+            '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
         };
 
         await __makeCommitComment(peopleToFiles, 'suite4-commit1');
@@ -277,26 +277,8 @@ describe('test that make functions make well formatted strings', () => {
         expect(await getComment('suite4-commit1')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
-            @yipstanley for changes to \`src/main.js\`, \`.github/workflows/build.yml\`
-            @Khan/frontend-infra for changes to \`src/main.js\`, \`.geraldignore\`
-            "
-        `);
-    });
-
-    it('should format the Gerald pull request comment correctly', async () => {
-        const peopleToFiles = {
-            '@yipstanley': ['src/main.js', '.github/workflows/build.yml'],
-            '@Khan/frontend-infra': ['src/main.js', '.geraldignore'],
-        };
-
-        const result = await __makeCommentBody(peopleToFiles, 'Reviewers:\n');
-
-        expect(result).toMatchInlineSnapshot(`
-            "### Reviewers:
-            @yipstanley for changes to \`src/main.js\`, \`.github/workflows/build.yml\`
-
-            @Khan/frontend-infra for changes to \`src/main.js\`, \`.geraldignore\`
-
+            @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`
+            @Khan/frontend-infra for changes to \`src/runOnPush.js\`, \`.geraldignore\`
             "
         `);
     });

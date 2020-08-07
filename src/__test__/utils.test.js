@@ -12,6 +12,7 @@ import {
     getFileDiffs,
     getFilteredLists,
     getCorrectSection,
+    makeCommentBody,
 } from '../utils';
 import {readFileSync} from '../fs';
 
@@ -179,17 +180,17 @@ describe('get notified', () => {
 **/*.js             @owner`,
         );
 
-        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
         expect(await getNotified(filesChanged, fileDiffs, 'pull_request')).toEqual({
-            '@yipstanley': ['src/execCmd.js', 'src/main.js'],
-            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'],
+            '@yipstanley': ['src/execCmd.js', 'src/runOnPush.js'],
+            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
             '@testperson': ['yaml.yml'],
         });
 
         expect(await getNotified(filesChanged, fileDiffs, 'push')).toEqual({
-            '@owner': ['src/execCmd.js', 'src/main.js'],
+            '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
         });
     });
 
@@ -208,17 +209,17 @@ describe('get notified', () => {
 
 **/*.js             @owner          # HAH Mr. gerald will also ignore you!`;
 
-        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
         expect(await getNotified(filesChanged, fileDiffs, 'pull_request', notifiedFile)).toEqual({
-            '@yipstanley': ['src/execCmd.js', 'src/main.js'],
-            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'],
+            '@yipstanley': ['src/execCmd.js', 'src/runOnPush.js'],
+            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
             '@testperson': ['yaml.yml'],
         });
 
         expect(await getNotified(filesChanged, fileDiffs, 'push', notifiedFile)).toEqual({
-            '@owner': ['src/execCmd.js', 'src/main.js'],
+            '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
         });
     });
 });
@@ -236,12 +237,12 @@ describe('get reviewers', () => {
 "/test/ig"          @testperson
 # *                 @otherperson`,
         );
-        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
         const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
         expect(reviewers).toEqual({
-            '@githubUser': ['src/execCmd.js', 'src/main.js'],
+            '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
             '@testperson': ['yaml.yml'],
         });
         expect(requiredReviewers).toEqual({
@@ -261,12 +262,12 @@ describe('get reviewers', () => {
 "/test/ig"          @testperson # nope nope it should still work!
 # *                 @otherperson`,
         );
-        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
         const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
         expect(reviewers).toEqual({
-            '@githubUser': ['src/execCmd.js', 'src/main.js'],
+            '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
             '@testperson': ['yaml.yml'],
         });
         expect(requiredReviewers).toEqual({
@@ -326,7 +327,7 @@ describe('get filtered lists', () => {
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)`,
         );
         const filesChanged = [
-            'src/core.js',
+            'src/gerald.js',
             '.github/workflows/pr-actions.yml',
             '.github/NOTIFIED',
         ];
@@ -449,5 +450,25 @@ describe('test that ignore files are parsed correctly', () => {
 
         expect(ignoredFiles.length).toEqual(3);
         expect(ignoredFiles).toEqual(['src', '.bashrc', '.github']);
+    });
+});
+
+describe('test that makeCommentBody makes a nicely-formatted string', () => {
+    it('should format the Gerald pull request comment correctly', async () => {
+        const peopleToFiles = {
+            '@yipstanley': ['src/runOnPush.js', '.github/workflows/build.yml'],
+            '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
+        };
+
+        const result = await makeCommentBody(peopleToFiles, 'Reviewers:\n');
+
+        expect(result).toMatchInlineSnapshot(`
+            "### Reviewers:
+            @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`
+
+            @Khan/frontend-infra for changes to \`src/runOnPush.js\`, \`.geraldignore\`
+
+            "
+        `);
     });
 });

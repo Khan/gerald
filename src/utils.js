@@ -33,6 +33,23 @@ import {
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
 type NameToFiles = {[name: string]: string[], ...};
+type CommentHeaders = 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n';
+
+export const makeCommentBody = (
+    peopleToFiles: {[string]: Array<string>, ...},
+    sectionHeader: CommentHeaders,
+) => {
+    const names: string[] = Object.keys(peopleToFiles);
+    if (names.length) {
+        let body = `### ${sectionHeader}`;
+        names.forEach((person: string) => {
+            const files = peopleToFiles[person];
+            body += `${person} for changes to \`${files.join('`, `')}\`\n\n`;
+        });
+        return body;
+    }
+    return '';
+};
 
 /**
  * @desc Parse the ./.geraldignore and ./.gitignore style of files. Ignore new lines

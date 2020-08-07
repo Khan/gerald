@@ -6,13 +6,14 @@ require('@babel/register');
 const core = require('@actions/core'); //flow-uncovered-line
 
 const {runOnComment} = require('./runOnComment');
-const {runPullRequest, runPush} = require('./main.js');
+const {runPush} = require('./runOnPush.js');
+const {runOnPullRequest} = require('./runOnPullRequest.js');
 const {context} = require('./setup');
 const {PULL_REQUEST, ENV_EVENT, COMMENT} = require('./constants');
 
 try {
     if (process.env[ENV_EVENT] === PULL_REQUEST) {
-        runPullRequest();
+        runOnPullRequest();
     } else if (process.env[ENV_EVENT] === COMMENT) {
         runOnComment();
     } else {
