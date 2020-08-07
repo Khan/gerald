@@ -4,6 +4,7 @@ import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from
 import fs from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
+import {readFileSync} from './fs';
 import {execCmd} from './execCmd';
 
 type NameToFiles = {[name: string]: string[], ...};
@@ -200,7 +201,7 @@ export const getNotified = (
     on: 'pull_request' | 'push',
     __testContent: ?string = undefined,
 ): NameToFiles => {
-    const buf = __testContent || fs.readFileSync('.github/NOTIFIED', 'utf-8');
+    const buf = readFileSync('.github/NOTIFIED', 'utf-8');
     const section = getCorrectSection(buf, 'NOTIFIED', on);
     if (!section) {
         return {};
@@ -253,9 +254,8 @@ export const getReviewers = (
     filesChanged: string[],
     fileDiffs: {[string]: string, ...},
     issuer: string,
-    __testContent: ?string = undefined,
 ): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
-    const buf = __testContent || fs.readFileSync('.github/REVIEWERS', 'utf-8');
+    const buf = readFileSync('.github/REVIEWERS', 'utf-8');
     const section = getCorrectSection(buf, 'REVIEWERS', 'pull_request');
 
     if (!section) {
@@ -399,7 +399,7 @@ export const parseExistingComments = <
 
 /**
  * @desc Get the diff of each file that has been changed.
- * @param context - @actions/github context from which to find the base of the pull request.
+ * @param diffString - git diff <diffString>
  */
 export const getFileDiffs = async (diffString: string): {[string]: string, ...} => {
     // get raw diff and split it by 'diff --git', which appears at the start of every new file.
