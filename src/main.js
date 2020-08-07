@@ -2,6 +2,8 @@
 
 import {type Octokit$IssuesListCommentsResponseItem} from '@octokit/rest';
 
+type CommentHeaders = 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n';
+
 import {
     getReviewers,
     getNotified,
@@ -10,14 +12,22 @@ import {
     getFilteredLists,
 } from './utils';
 import {execCmd} from './execCmd';
-import {ownerAndRepo, context, extraPermGithub, github} from './setup';
-
-const separator =
-    '__________________________________________________________________________________________________________________________________';
+import {ownerAndRepo, context, extraPermGithub, type Context} from './setup';
+import {
+    GERALD_COMMENT_FOOTER,
+    PULL_REQUEST,
+    PUSH,
+    GERALD_COMMENT_HEADER,
+    GERALD_COMMENT_NOTIFIED_HEADER,
+    GERALD_COMMENT_REQ_REVIEWERS_HEADER,
+    GERALD_COMMENT_REVIEWERS_HEADER,
+    MATCH_COMMENT_HEADER_REGEX,
+    GERALD_COMMIT_COMMENT_HEADER,
+} from './constants';
 
 const makeCommentBody = (
     peopleToFiles: {[string]: Array<string>, ...},
-    sectionHeader: 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n',
+    sectionHeader: CommentHeaders,
 ) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (names.length) {
@@ -43,12 +53,12 @@ const updatePullRequestComment = async (
     reviewers: {[string]: Array<string>, ...},
     requiredReviewers: {[string]: Array<string>, ...},
 ) => {
-    let body: string = '# Gerald:\n\n';
-    body += makeCommentBody(notifyees, 'Notified:\n');
-    body += makeCommentBody(reviewers, 'Reviewers:\n');
-    body += makeCommentBody(requiredReviewers, 'Required reviewers:\n');
-    if (body.match(/^### (Reviewers:|Required reviewers:|Notified:)$/m)) {
-        body += `\n${separator}\n_Don't want to be involved in this pull request? Comment \`#removeme\` and we won't notify you of further changes._`;
+    let body: string = GERALD_COMMENT_HEADER;
+    body += makeCommentBody(notifyees, GERALD_COMMENT_NOTIFIED_HEADER);
+    body += makeCommentBody(reviewers, GERALD_COMMENT_REVIEWERS_HEADER);
+    body += makeCommentBody(requiredReviewers, GERALD_COMMENT_REQ_REVIEWERS_HEADER);
+    if (body.match(MATCH_COMMENT_HEADER_REGEX)) {
+        body += GERALD_COMMENT_FOOTER;
 
         if (comment) {
             await extraPermGithub.issues.updateComment({
@@ -77,7 +87,7 @@ const makeCommitComment = async (
 ) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (peopleToFiles && names.length) {
-        let body: string = 'Notify of Push Without Pull Request\n\n';
+        let body: string = GERALD_COMMIT_COMMENT_HEADER;
         names.forEach((person: string) => {
             const files = peopleToFiles[person];
             body += `${person} for changes to \`${files.join('`, `')}\`\n`;
@@ -104,7 +114,7 @@ export const runPullRequest = async () => {
     const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
 
     // figure out who to notify and request reviews from
-    const notified = getNotified(filesChanged, fileDiffs, 'pull_request');
+    const notified = getNotified(filesChanged, fileDiffs, PULL_REQUEST);
     const {reviewers, requiredReviewers} = getReviewers(
         filesChanged,
         fileDiffs,
@@ -112,7 +122,7 @@ export const runPullRequest = async () => {
     );
 
     // find any #removeme or existing khan-actions-bot comments
-    const existingComments = await github.issues.listComments({
+    const existingComments = await extraPermGithub.issues.listComments({
         ...ownerAndRepo,
         issue_number: context.issue.number,
     });
@@ -139,10 +149,10 @@ export const runPullRequest = async () => {
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
 
-export const runPush = async () => {
+export const runPush = async (usedContext: Context) => {
     // loop through each commit in the push
-    let prevCommit = context.payload.before;
-    for (const commit of context.payload.commits) {
+    let prevCommit = usedContext.payload.before;
+    for (const commit of usedContext.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
             ...ownerAndRepo,
             commit_sha: commit.id,
@@ -158,7 +168,7 @@ export const runPush = async () => {
                 ])
             ).split('\n');
             const fileDiffs = await getFileDiffs(`${prevCommit}...${commitData.data.sha}`);
-            const notified = getNotified(filesChanged, fileDiffs, 'push');
+            const notified = getNotified(filesChanged, fileDiffs, PUSH);
 
             await makeCommitComment(notified, commitData.data.sha);
         }
@@ -167,3 +177,18 @@ export const runPush = async () => {
         prevCommit = commitData.data.sha;
     }
 };
+
+export type __TestCommit = {
+    author: '__testAuthor',
+    comment_count: -1,
+    committer: '__testCommitter',
+    id: string,
+    message: string,
+    tree: '__TESTING__',
+    url: '__TESTING__',
+    verification: '__TESTING__',
+};
+
+export const __makeCommitComment = makeCommitComment;
+export const __makeCommentBody = makeCommentBody;
+export const __extraPermGithub = extraPermGithub;

@@ -4,8 +4,34 @@ import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from
 import fs from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
+import {readFileSync} from './fs';
 import {execCmd} from './execCmd';
+import {
+    GERALD_IGNORE_FILE,
+    GIT_IGNORE_FILE,
+    PULL_REQUEST,
+    NOTIFIED,
+    NOTIFIED_FILE,
+    REVIEWERS_FILE,
+    REVIEWERS,
+    COMMENT_SYMBOL,
+    MATCH_REGEX_REGEX,
+    MATCH_PATTERN_REGEX,
+    MATCH_PULL_REQUEST_SECTION_HEADER_REGEX,
+    MATCH_PUSH_SECTION_HEADER_REGEX,
+    MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX,
+    MATCH_JUST_PULL_REQUEST_SECTION_REGEX,
+    MATCH_JUST_PUSH_SECTION_REGEX,
+    MATCH_USERNAME_OR_TEAM_REGEX,
+    MATCH_NON_COMMENT_LINES_REGEX,
+    MATCH_REMOVEME_TAG_REGEX,
+    MATCH_GERALD_COMMENT_HEADER_REGEX,
+    MATCH_GIT_DIFF_FILE_NAME,
+    MATCH_GIT_DIFF_FILE_SEPERATOR,
+} from './constants';
 
+type Section = 'pull_request' | 'push';
+type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
 type NameToFiles = {[name: string]: string[], ...};
 
 /**
@@ -20,13 +46,13 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
         .split('\n')
         .map(line => line.trim())
         .filter(Boolean)
-        .filter(line => !line.startsWith('#'));
+        .filter(line => !line.startsWith(COMMENT_SYMBOL));
 
     // at this point, we have everything covered except for the case exhibited by the line below:
     // directory_A # we want to ignore directory_A because of x, y, and z.
     return filteredOutMostCases.map(line => {
-        if (line.indexOf('#') !== -1) {
-            return line.split('#')[0].trim();
+        if (line.indexOf(COMMENT_SYMBOL) !== -1) {
+            return line.split(COMMENT_SYMBOL)[0].trim();
         }
         return line;
     });
@@ -40,12 +66,12 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
  */
 const getGeraldIgnore = (): Array<string> => {
     const ignore = [];
-    if (fs.existsSync('.geraldignore')) {
-        const geraldIgnore = filterIgnoreFiles(fs.readFileSync('.geraldignore', 'utf-8'));
+    if (fs.existsSync(GERALD_IGNORE_FILE)) {
+        const geraldIgnore = filterIgnoreFiles(fs.readFileSync(GERALD_IGNORE_FILE, 'utf-8'));
         ignore.push(...geraldIgnore);
     }
-    if (fs.existsSync('.gitignore')) {
-        const gitIgnore = filterIgnoreFiles(fs.readFileSync('.gitignore', 'utf-8'));
+    if (fs.existsSync(GIT_IGNORE_FILE)) {
+        const gitIgnore = filterIgnoreFiles(fs.readFileSync(GIT_IGNORE_FILE, 'utf-8'));
         for (const line of gitIgnore) {
             if (!ignore.includes(line)) {
                 ignore.push(line);
@@ -96,7 +122,7 @@ const maybeAddIfMatch = (
  * @throws if no RegExp can be interpreted from the pattern
  */
 const turnPatternIntoRegex = (pattern: string): RegExp => {
-    const match = /^"\/(.*?)\/([a-z]*)"$/.exec(pattern);
+    const match = MATCH_REGEX_REGEX.exec(pattern);
     if (!match) {
         throw new Error(`The RegExp: ${pattern} isn't valid`);
     }
@@ -151,39 +177,32 @@ const pushOrSetToBin = (bin: NameToFiles, username: string, files: Array<string>
  * @param section - What section of the file do you want? Only the NOTIFIED file has a 'push' section.
  * @throws if the file is missing a section header or if there was a request to look at the 'push' section of the REVIEWERS file.
  */
-export const getCorrectSection = (
-    rawFile: string,
-    file: 'NOTIFIED' | 'REVIEWERS',
-    section: 'pull_request' | 'push',
-) => {
-    if (!rawFile.match(/\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)) {
+export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Section) => {
+    if (!rawFile.match(MATCH_PULL_REQUEST_SECTION_HEADER_REGEX)) {
         throw new Error(
             `Invalid ${file} file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.`,
         );
     }
 
-    if (
-        file === 'NOTIFIED' &&
-        !rawFile.match(/\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm)
-    ) {
+    if (file === NOTIFIED && !rawFile.match(MATCH_PUSH_SECTION_HEADER_REGEX)) {
         throw new Error(
             `Invalid ${file} file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.`,
         );
     }
     let sectionRegexp;
-    if (section === 'pull_request') {
+    if (section === PULL_REQUEST) {
         sectionRegexp =
-            file === 'NOTIFIED'
-                ? /(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm
-                : /(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;
+            file === NOTIFIED
+                ? MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX
+                : MATCH_JUST_PULL_REQUEST_SECTION_REGEX;
     }
     // if we're requesting the push section, make sure it's on the NOTIFIED file.
-    else if (file === 'NOTIFIED') {
-        sectionRegexp = /(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;
+    else if (file === NOTIFIED) {
+        sectionRegexp = MATCH_JUST_PUSH_SECTION_REGEX;
     } else {
         throw new Error("The REVIEWERS file does not have a 'push' section.");
     }
-    return sectionRegexp.exec(rawFile);
+    return rawFile.match(sectionRegexp);
 };
 
 /**
@@ -197,21 +216,26 @@ export const getCorrectSection = (
 export const getNotified = (
     filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
-    on: 'pull_request' | 'push',
+    on: Section,
     __testContent: ?string = undefined,
 ): NameToFiles => {
-    const buf = __testContent || fs.readFileSync('.github/NOTIFIED', 'utf-8');
-    const section = getCorrectSection(buf, 'NOTIFIED', on);
+    const buf = readFileSync(NOTIFIED_FILE, 'utf-8');
+    const section = getCorrectSection(buf, NOTIFIED, on);
     if (!section) {
         return {};
     }
 
-    const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
+    const matches = section[0].match(/^[^\#\n].*/gm); // ignore newline comments
     const notified: NameToFiles = {};
     if (matches) {
         for (const match of matches) {
-            const untrimmedPattern = match.match(/(.(?!  @))*/);
-            const names = match.match(/@([A-Za-z]*\/)?\S*/g);
+            let rule = match;
+            // ignore inline comments
+            if (match.includes(COMMENT_SYMBOL)) {
+                rule = match.split(COMMENT_SYMBOL)[0].trim();
+            }
+            const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
+            const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
             if (!untrimmedPattern || !names) {
                 continue;
             }
@@ -253,16 +277,15 @@ export const getReviewers = (
     filesChanged: string[],
     fileDiffs: {[string]: string, ...},
     issuer: string,
-    __testContent: ?string = undefined,
 ): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
-    const buf = __testContent || fs.readFileSync('.github/REVIEWERS', 'utf-8');
-    const section = getCorrectSection(buf, 'REVIEWERS', 'pull_request');
+    const buf = readFileSync(REVIEWERS_FILE, 'utf-8');
+    const section = getCorrectSection(buf, REVIEWERS, PULL_REQUEST);
 
     if (!section) {
         return {reviewers: {}, requiredReviewers: {}};
     }
 
-    const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
+    const matches = section[0].match(MATCH_NON_COMMENT_LINES_REGEX); // ignore newline comments
     const reviewers: {[string]: Array<string>, ...} = {};
     const requiredReviewers: {[string]: Array<string>, ...} = {};
     if (!matches) {
@@ -270,8 +293,13 @@ export const getReviewers = (
     }
 
     for (const match of matches) {
-        const untrimmedPattern = match.match(/(.(?!  @))*/);
-        const names = match.match(/@([A-Za-z]*\/)?\S*/g);
+        let rule = match;
+        // ignore inline comments
+        if (match.includes(COMMENT_SYMBOL)) {
+            rule = match.split(COMMENT_SYMBOL)[0].trim();
+        }
+        const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
+        const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
         if (!untrimmedPattern || !names) {
             continue;
         }
@@ -380,7 +408,7 @@ export const parseExistingComments = <
         if (cmnt.user.login === 'khan-actions-bot') {
             actionBotComments.push(cmnt);
         } else {
-            const removeMeMatch = cmnt.body.match(/\#removeme/i);
+            const removeMeMatch = cmnt.body.match(MATCH_REMOVEME_TAG_REGEX);
             if (removeMeMatch) {
                 removedJustNames.push(cmnt.user.login);
             }
@@ -388,7 +416,7 @@ export const parseExistingComments = <
     });
 
     actionBotComments.forEach(comment => {
-        const megaCommentMatch = comment.body.match(/^# Gerald/i);
+        const megaCommentMatch = comment.body.match(MATCH_GERALD_COMMENT_HEADER_REGEX);
         if (megaCommentMatch) {
             megaComment = comment;
         }
@@ -399,16 +427,18 @@ export const parseExistingComments = <
 
 /**
  * @desc Get the diff of each file that has been changed.
- * @param context - @actions/github context from which to find the base of the pull request.
+ * @param diffString - git diff <diffString>
  */
 export const getFileDiffs = async (diffString: string): {[string]: string, ...} => {
     // get raw diff and split it by 'diff --git', which appears at the start of every new file.
-    const rawDiffs = (await execCmd('git', ['diff', diffString])).split(/^diff --git /m);
+    const rawDiffs = (await execCmd('git', ['diff', diffString])).split(
+        MATCH_GIT_DIFF_FILE_SEPERATOR,
+    );
     const fileToDiff: {[string]: string, ...} = {}; // object of {[file: string]: string}
 
     for (const diff of rawDiffs) {
         // each diff starts with 'a/<relativeFilePath>', so we can grab the filename from that
-        const fileName = diff.match(/(?<=^a\/)\S*/);
+        const fileName = diff.match(MATCH_GIT_DIFF_FILE_NAME);
         if (fileName) {
             fileToDiff[fileName[0]] = diff;
         }
