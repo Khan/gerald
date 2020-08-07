@@ -13,8 +13,6 @@ import {
     NOTIFIED_FILE,
     REVIEWERS_FILE,
     REVIEWERS,
-    type Section,
-    type GeraldFile,
     COMMENT_SYMBOL,
     MATCH_REGEX_REGEX,
     MATCH_PATTERN_REGEX,
@@ -30,6 +28,8 @@ import {
     MATCH_GIT_DIFF_FILE_SEPERATOR,
 } from './constants';
 
+type Section = 'pull_request' | 'push';
+type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
 type NameToFiles = {[name: string]: string[], ...};
 
 /**

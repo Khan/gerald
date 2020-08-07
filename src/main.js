@@ -13,7 +13,6 @@ import {
     GERALD_COMMENT_FOOTER,
     PULL_REQUEST,
     PUSH,
-    type CommentHeaders,
     GERALD_COMMENT_HEADER,
     GERALD_COMMENT_NOTIFIED_HEADER,
     GERALD_COMMENT_REQ_REVIEWERS_HEADER,
@@ -32,6 +31,8 @@ type Context = {|
     |},
     actor: string,
 |};
+
+type CommentHeaders = 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n';
 
 import {
     getReviewers,
