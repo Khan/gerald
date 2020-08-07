@@ -7,20 +7,6 @@ import {
     type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
-import {
-    ENV_ADMIN_TOKEN,
-    ENV_GITHUB_TOKEN,
-    GERALD_COMMENT_FOOTER,
-    PULL_REQUEST,
-    PUSH,
-    GERALD_COMMENT_HEADER,
-    GERALD_COMMENT_NOTIFIED_HEADER,
-    GERALD_COMMENT_REQ_REVIEWERS_HEADER,
-    GERALD_COMMENT_REVIEWERS_HEADER,
-    MATCH_COMMENT_HEADER_REGEX,
-    GERALD_COMMIT_COMMENT_HEADER,
-} from './constants';
-
 type Context = {|
     issue: {|owner: string, repo: string, number: number|},
     payload: {|
@@ -42,6 +28,19 @@ import {
     getFilteredLists,
 } from './utils';
 import {execCmd} from './execCmd';
+import {
+    ENV_ADMIN_TOKEN,
+    ENV_GITHUB_TOKEN,
+    GERALD_COMMENT_FOOTER,
+    PULL_REQUEST,
+    PUSH,
+    GERALD_COMMENT_HEADER,
+    GERALD_COMMENT_NOTIFIED_HEADER,
+    GERALD_COMMENT_REQ_REVIEWERS_HEADER,
+    GERALD_COMMENT_REVIEWERS_HEADER,
+    MATCH_COMMENT_HEADER_REGEX,
+    GERALD_COMMIT_COMMENT_HEADER,
+} from './constants';
 
 const octokit = require('@actions/github'); //flow-uncovered-line
 
