@@ -207,12 +207,17 @@ export const getNotified = (
         return {};
     }
 
-    const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
+    const matches = section[0].match(/^[^\#\n].*/gm); // ignore newline comments
     const notified: NameToFiles = {};
     if (matches) {
         for (const match of matches) {
-            const untrimmedPattern = match.match(/(.(?!  @))*/);
-            const names = match.match(/@([A-Za-z]*\/)?\S*/g);
+            let rule = match;
+            // ignore inline comments
+            if (match.includes('#')) {
+                rule = match.split('#')[0].trim();
+            }
+            const untrimmedPattern = rule.match(/(.(?!  @))*/);
+            const names = rule.match(/@([A-Za-z]*\/)?\S*/g);
             if (!untrimmedPattern || !names) {
                 continue;
             }
@@ -262,7 +267,7 @@ export const getReviewers = (
         return {reviewers: {}, requiredReviewers: {}};
     }
 
-    const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
+    const matches = section[0].match(/^[^\#\n].*/gm); // ignore newline comments
     const reviewers: {[string]: Array<string>, ...} = {};
     const requiredReviewers: {[string]: Array<string>, ...} = {};
     if (!matches) {
@@ -270,8 +275,13 @@ export const getReviewers = (
     }
 
     for (const match of matches) {
-        const untrimmedPattern = match.match(/(.(?!  @))*/);
-        const names = match.match(/@([A-Za-z]*\/)?\S*/g);
+        let rule = match;
+        // ignore inline comments
+        if (match.includes('#')) {
+            rule = match.split('#')[0].trim();
+        }
+        const untrimmedPattern = rule.match(/(.(?!  @))*/);
+        const names = rule.match(/@([A-Za-z]*\/)?\S*/g);
         if (!untrimmedPattern || !names) {
             continue;
         }

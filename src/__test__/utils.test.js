@@ -192,6 +192,35 @@ describe('get notified', () => {
             '@owner': ['src/execCmd.js', 'src/main.js'],
         });
     });
+
+    it('should ignore inline comments', async () => {
+        const notifiedFile = `# comment
+*                   @userName
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+.github/**          @githubUser # Gerald is more powerful than this edge case
+**/*.js             @yipstanley @githubUser # inline comments are no problem for the one
+"/test/ig"          @testperson # Mr. Gerald will ignore you now
+# *                 @otherperson
+
+[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+**/*.js             @owner          # HAH Mr. gerald will also ignore you!`;
+
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
+        const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
+
+        expect(await getNotified(filesChanged, fileDiffs, 'pull_request', notifiedFile)).toEqual({
+            '@yipstanley': ['src/execCmd.js', 'src/main.js'],
+            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'],
+            '@testperson': ['yaml.yml'],
+        });
+
+        expect(await getNotified(filesChanged, fileDiffs, 'push', notifiedFile)).toEqual({
+            '@owner': ['src/execCmd.js', 'src/main.js'],
+        });
+    });
 });
 
 describe('get reviewers', () => {
@@ -205,6 +234,31 @@ describe('get reviewers', () => {
 .github/**          @githubUser!
 **/*.js             @yipstanley! @githubUser
 "/test/ig"          @testperson
+# *                 @otherperson`,
+        );
+        const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
+        const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
+
+        const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
+        expect(reviewers).toEqual({
+            '@githubUser': ['src/execCmd.js', 'src/main.js'],
+            '@testperson': ['yaml.yml'],
+        });
+        expect(requiredReviewers).toEqual({
+            '@githubUser': ['.github/workflows/build.yml'],
+        });
+    });
+
+    it('should ignore inline comments', () => {
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
+*                   @userName
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+.github/**          @githubUser! # ah yes, the edge case of inline comments
+**/*.js             @yipstanley! @githubUser # these comments shan't bother Gerald, though
+"/test/ig"          @testperson # nope nope it should still work!
 # *                 @otherperson`,
         );
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
