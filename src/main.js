@@ -7,6 +7,21 @@ import {
     type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
+import {
+    ENV_ADMIN_TOKEN,
+    ENV_GITHUB_TOKEN,
+    GERALD_COMMENT_FOOTER,
+    PULL_REQUEST,
+    PUSH,
+    type CommentHeaders,
+    GERALD_COMMENT_HEADER,
+    GERALD_COMMENT_NOTIFIED_HEADER,
+    GERALD_COMMENT_REQ_REVIEWERS_HEADER,
+    GERALD_COMMENT_REVIEWERS_HEADER,
+    MATCH_COMMENT_HEADER_REGEX,
+    GERALD_COMMIT_COMMENT_HEADER,
+} from './constants';
+
 type Context = {|
     issue: {|owner: string, repo: string, number: number|},
     payload: {|
@@ -30,18 +45,16 @@ import {execCmd} from './execCmd';
 const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
-const extraPermGithub: Octokit = new octokit.GitHub(process.env['ADMIN_PERMISSION_TOKEN']);
-const github: Octokit = new octokit.GitHub(process.env['GITHUB_TOKEN']);
+const extraPermGithub: Octokit = new octokit.GitHub(process.env[ENV_ADMIN_TOKEN]);
+const github: Octokit = new octokit.GitHub(process.env[ENV_GITHUB_TOKEN]);
 const context: Context = octokit.context;
 /* end flow-uncovered-block */
 
 const ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
-const separator =
-    '__________________________________________________________________________________________________________________________________';
 
 const makeCommentBody = (
     peopleToFiles: {[string]: Array<string>, ...},
-    sectionHeader: 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n',
+    sectionHeader: CommentHeaders,
 ) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (names.length) {
@@ -67,12 +80,12 @@ const updatePullRequestComment = async (
     reviewers: {[string]: Array<string>, ...},
     requiredReviewers: {[string]: Array<string>, ...},
 ) => {
-    let body: string = '# Gerald:\n\n';
-    body += makeCommentBody(notifyees, 'Notified:\n');
-    body += makeCommentBody(reviewers, 'Reviewers:\n');
-    body += makeCommentBody(requiredReviewers, 'Required reviewers:\n');
-    if (body.match(/^### (Reviewers:|Required reviewers:|Notified:)$/m)) {
-        body += `\n${separator}\n_Don't want to be involved in this pull request? Comment \`#removeme\` and we won't notify you of further changes._`;
+    let body: string = GERALD_COMMENT_HEADER;
+    body += makeCommentBody(notifyees, GERALD_COMMENT_NOTIFIED_HEADER);
+    body += makeCommentBody(reviewers, GERALD_COMMENT_REVIEWERS_HEADER);
+    body += makeCommentBody(requiredReviewers, GERALD_COMMENT_REQ_REVIEWERS_HEADER);
+    if (body.match(MATCH_COMMENT_HEADER_REGEX)) {
+        body += GERALD_COMMENT_FOOTER;
 
         if (comment) {
             await extraPermGithub.issues.updateComment({
@@ -101,7 +114,7 @@ const makeCommitComment = async (
 ) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (peopleToFiles && names.length) {
-        let body: string = 'Notify of Push Without Pull Request\n\n';
+        let body: string = GERALD_COMMIT_COMMENT_HEADER;
         names.forEach((person: string) => {
             const files = peopleToFiles[person];
             body += `${person} for changes to \`${files.join('`, `')}\`\n`;
@@ -128,7 +141,7 @@ export const runPullRequest = async () => {
     const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
 
     // figure out who to notify and request reviews from
-    const notified = getNotified(filesChanged, fileDiffs, 'pull_request');
+    const notified = getNotified(filesChanged, fileDiffs, PULL_REQUEST);
     const {reviewers, requiredReviewers} = getReviewers(
         filesChanged,
         fileDiffs,
@@ -182,7 +195,7 @@ export const runPush = async () => {
                 ])
             ).split('\n');
             const fileDiffs = await getFileDiffs(`${prevCommit}...${commitData.data.sha}`);
-            const notified = getNotified(filesChanged, fileDiffs, 'push');
+            const notified = getNotified(filesChanged, fileDiffs, PUSH);
 
             await makeCommitComment(notified, commitData.data.sha);
         }
