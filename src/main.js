@@ -1,43 +1,6 @@
 // @flow
 
-import {
-    type Octokit,
-    type Octokit$IssuesListCommentsResponseItem,
-    type Octokit$PullsListResponseItem,
-    type Octokit$PullsListCommitsResponseItemCommit,
-} from '@octokit/rest';
-
-export type Context =
-    | {|
-          issue: {|owner: string, repo: string, number: number|},
-          payload: {|
-              pull_request: Octokit$PullsListResponseItem,
-              before: string,
-              after: string,
-              commits: Array<{id: string, ...Octokit$PullsListCommitsResponseItemCommit}>,
-          |},
-          actor: string,
-      |}
-    // this is what the testing context looks like
-    | {|
-          issue: {|owner: '__TESTING__', repo: '__TESTING__', number: -1|},
-          payload: {|
-              pull_request: {|base: {|ref: '__TESTING__'|}, user: {|login: '__testUser'|}|},
-              before: string,
-              after: string,
-              commits: Array<{
-                  author: '__testAuthor',
-                  comment_count: -1,
-                  committer: '__testCommitter',
-                  id: string,
-                  message: string,
-                  tree: '__TESTING__',
-                  url: '__TESTING__',
-                  verification: '__TESTING__',
-              }>,
-          |},
-          actor: '__testActor',
-      |};
+import {type Octokit$IssuesListCommentsResponseItem} from '@octokit/rest';
 
 type CommentHeaders = 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n';
 
@@ -49,8 +12,8 @@ import {
     getFilteredLists,
 } from './utils';
 import {execCmd} from './execCmd';
+import {ownerAndRepo, context, extraPermGithub, type Context} from './setup';
 import {
-    ENV_ADMIN_TOKEN,
     GERALD_COMMENT_FOOTER,
     PULL_REQUEST,
     PUSH,
@@ -61,18 +24,6 @@ import {
     MATCH_COMMENT_HEADER_REGEX,
     GERALD_COMMIT_COMMENT_HEADER,
 } from './constants';
-
-const octokit = require('@actions/github'); //flow-uncovered-line
-
-/* flow-uncovered-block */
-const extraPermGithub: Octokit = new octokit.GitHub(process.env[ENV_ADMIN_TOKEN]);
-export const context: Context = octokit.context;
-/* end flow-uncovered-block */
-
-let ownerAndRepo = {owner: '__TESTING__', repo: '__TESTING__'};
-if (process.env['ADMIN_PERMISSION_TOKEN']) {
-    ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
-}
 
 const makeCommentBody = (
     peopleToFiles: {[string]: Array<string>, ...},
