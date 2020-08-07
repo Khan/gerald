@@ -20,6 +20,7 @@ import {
     MATCH_PUSH_SECTION_HEADER_REGEX,
     MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX,
     MATCH_JUST_PULL_REQUEST_SECTION_REGEX,
+    MATCH_JUST_PUSH_SECTION_REGEX,
     MATCH_USERNAME_OR_TEAM_REGEX,
     MATCH_NON_COMMENT_LINES_REGEX,
     MATCH_REMOVEME_TAG_REGEX,
@@ -196,11 +197,11 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
     }
     // if we're requesting the push section, make sure it's on the NOTIFIED file.
     else if (file === NOTIFIED) {
-        sectionRegexp = MATCH_JUST_PULL_REQUEST_SECTION_REGEX;
+        sectionRegexp = MATCH_JUST_PUSH_SECTION_REGEX;
     } else {
         throw new Error("The REVIEWERS file does not have a 'push' section.");
     }
-    return sectionRegexp.exec(rawFile);
+    return rawFile.match(sectionRegexp);
 };
 
 /**
