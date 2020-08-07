@@ -4,6 +4,7 @@ import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from
 import fs from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
+import {readFileSync} from './fs';
 import {execCmd} from './execCmd';
 import {
     GERALD_IGNORE_FILE,
@@ -218,18 +219,23 @@ export const getNotified = (
     on: Section,
     __testContent: ?string = undefined,
 ): NameToFiles => {
-    const buf = __testContent || fs.readFileSync(NOTIFIED_FILE, 'utf-8');
+    const buf = readFileSync(NOTIFIED_FILE, 'utf-8');
     const section = getCorrectSection(buf, NOTIFIED, on);
     if (!section) {
         return {};
     }
 
-    const matches = section[0].match(/^[^\#\n].*/gm); // ignore comments
+    const matches = section[0].match(/^[^\#\n].*/gm); // ignore newline comments
     const notified: NameToFiles = {};
     if (matches) {
         for (const match of matches) {
-            const untrimmedPattern = match.match(MATCH_PATTERN_REGEX);
-            const names = match.match(MATCH_USERNAME_OR_TEAM_REGEX);
+            let rule = match;
+            // ignore inline comments
+            if (match.includes(COMMENT_SYMBOL)) {
+                rule = match.split(COMMENT_SYMBOL)[0].trim();
+            }
+            const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
+            const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
             if (!untrimmedPattern || !names) {
                 continue;
             }
@@ -271,16 +277,15 @@ export const getReviewers = (
     filesChanged: string[],
     fileDiffs: {[string]: string, ...},
     issuer: string,
-    __testContent: ?string = undefined,
 ): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
-    const buf = __testContent || fs.readFileSync(REVIEWERS_FILE, 'utf-8');
+    const buf = readFileSync(REVIEWERS_FILE, 'utf-8');
     const section = getCorrectSection(buf, REVIEWERS, PULL_REQUEST);
 
     if (!section) {
         return {reviewers: {}, requiredReviewers: {}};
     }
 
-    const matches = section[0].match(MATCH_NON_COMMENT_LINES_REGEX); // ignore comments
+    const matches = section[0].match(MATCH_NON_COMMENT_LINES_REGEX); // ignore newline comments
     const reviewers: {[string]: Array<string>, ...} = {};
     const requiredReviewers: {[string]: Array<string>, ...} = {};
     if (!matches) {
@@ -288,8 +293,13 @@ export const getReviewers = (
     }
 
     for (const match of matches) {
-        const untrimmedPattern = match.match(MATCH_PATTERN_REGEX);
-        const names = match.match(MATCH_USERNAME_OR_TEAM_REGEX);
+        let rule = match;
+        // ignore inline comments
+        if (match.includes(COMMENT_SYMBOL)) {
+            rule = match.split(COMMENT_SYMBOL)[0].trim();
+        }
+        const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
+        const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
         if (!untrimmedPattern || !names) {
             continue;
         }
@@ -417,7 +427,7 @@ export const parseExistingComments = <
 
 /**
  * @desc Get the diff of each file that has been changed.
- * @param context - @actions/github context from which to find the base of the pull request.
+ * @param diffString - git diff <diffString>
  */
 export const getFileDiffs = async (diffString: string): {[string]: string, ...} => {
     // get raw diff and split it by 'diff --git', which appears at the start of every new file.

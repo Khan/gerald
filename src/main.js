@@ -7,16 +7,37 @@ import {
     type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
 
-type Context = {|
-    issue: {|owner: string, repo: string, number: number|},
-    payload: {|
-        pull_request: Octokit$PullsListResponseItem,
-        before: string,
-        after: string,
-        commits: {id: string, ...Octokit$PullsListCommitsResponseItemCommit}[],
-    |},
-    actor: string,
-|};
+export type Context =
+    | {|
+          issue: {|owner: string, repo: string, number: number|},
+          payload: {|
+              pull_request: Octokit$PullsListResponseItem,
+              before: string,
+              after: string,
+              commits: Array<{id: string, ...Octokit$PullsListCommitsResponseItemCommit}>,
+          |},
+          actor: string,
+      |}
+    // this is what the testing context looks like
+    | {|
+          issue: {|owner: '__TESTING__', repo: '__TESTING__', number: -1|},
+          payload: {|
+              pull_request: {|base: {|ref: '__TESTING__'|}, user: {|login: '__testUser'|}|},
+              before: string,
+              after: string,
+              commits: Array<{
+                  author: '__testAuthor',
+                  comment_count: -1,
+                  committer: '__testCommitter',
+                  id: string,
+                  message: string,
+                  tree: '__TESTING__',
+                  url: '__TESTING__',
+                  verification: '__TESTING__',
+              }>,
+          |},
+          actor: '__testActor',
+      |};
 
 type CommentHeaders = 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n';
 
@@ -30,7 +51,6 @@ import {
 import {execCmd} from './execCmd';
 import {
     ENV_ADMIN_TOKEN,
-    ENV_GITHUB_TOKEN,
     GERALD_COMMENT_FOOTER,
     PULL_REQUEST,
     PUSH,
@@ -46,11 +66,13 @@ const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
 const extraPermGithub: Octokit = new octokit.GitHub(process.env[ENV_ADMIN_TOKEN]);
-const github: Octokit = new octokit.GitHub(process.env[ENV_GITHUB_TOKEN]);
-const context: Context = octokit.context;
+export const context: Context = octokit.context;
 /* end flow-uncovered-block */
 
-const ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
+let ownerAndRepo = {owner: '__TESTING__', repo: '__TESTING__'};
+if (process.env['ADMIN_PERMISSION_TOKEN']) {
+    ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
+}
 
 const makeCommentBody = (
     peopleToFiles: {[string]: Array<string>, ...},
@@ -149,7 +171,7 @@ export const runPullRequest = async () => {
     );
 
     // find any #removeme or existing khan-actions-bot comments
-    const existingComments = await github.issues.listComments({
+    const existingComments = await extraPermGithub.issues.listComments({
         ...ownerAndRepo,
         issue_number: context.issue.number,
     });
@@ -176,10 +198,10 @@ export const runPullRequest = async () => {
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
 
-export const runPush = async () => {
+export const runPush = async (usedContext: Context) => {
     // loop through each commit in the push
-    let prevCommit = context.payload.before;
-    for (const commit of context.payload.commits) {
+    let prevCommit = usedContext.payload.before;
+    for (const commit of usedContext.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
             ...ownerAndRepo,
             commit_sha: commit.id,
@@ -204,3 +226,18 @@ export const runPush = async () => {
         prevCommit = commitData.data.sha;
     }
 };
+
+export type __TestCommit = {
+    author: '__testAuthor',
+    comment_count: -1,
+    committer: '__testCommitter',
+    id: string,
+    message: string,
+    tree: '__TESTING__',
+    url: '__TESTING__',
+    verification: '__TESTING__',
+};
+
+export const __makeCommitComment = makeCommitComment;
+export const __makeCommentBody = makeCommentBody;
+export const __extraPermGithub = extraPermGithub;
