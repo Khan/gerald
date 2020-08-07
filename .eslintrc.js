@@ -101,7 +101,7 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['src/core.js', 'src/main.js', 'src/execCmd.js'],
+            files: ['src/core.js', 'src/execCmd.js', 'src/setup.js'],
             rules: {
                 'import/no-commonjs': 'off',
             },

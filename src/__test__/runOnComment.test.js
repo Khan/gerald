@@ -2,13 +2,12 @@
 
 import {__makeNewComment} from '../runOnComment';
 
-/* flow-uncovered-block */
 jest.mock('../setup.js', () => ({
     extraPermGithub: {
         issues: {
             updateComment: jest.fn(),
             deleteComment: jest.fn(),
-            listComments: async any => {
+            listComments: async () => {
                 return [];
             },
         },
@@ -16,7 +15,6 @@ jest.mock('../setup.js', () => ({
     context: {issue: {number: -1}},
     ownerAndRepo: {owner: '__TESTING__', repo: '__TESTING__'},
 }));
-/* end flow-uncovered-block */
 
 describe('test that comment is parsed and changed appropriately', () => {
     it('should work', () => {
