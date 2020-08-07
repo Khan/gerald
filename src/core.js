@@ -6,7 +6,8 @@ require('@babel/register');
 const core = require('@actions/core'); //flow-uncovered-line
 
 const {runOnComment} = require('./runOnComment');
-const {runPullRequest, runPush, context} = require('./main.js');
+const {runPullRequest, runPush} = require('./main.js');
+const {context} = require('./setup');
 const {PULL_REQUEST, ENV_EVENT, COMMENT} = require('./constants');
 
 try {
