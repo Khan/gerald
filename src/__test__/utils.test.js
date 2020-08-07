@@ -262,12 +262,7 @@ describe('get reviewers', () => {
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/main.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = getReviewers(
-            filesChanged,
-            fileDiffs,
-            'yipstanley',
-            reviewersFile,
-        );
+        const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
         expect(reviewers).toEqual({
             '@githubUser': ['src/execCmd.js', 'src/main.js'],
             '@testperson': ['yaml.yml'],
