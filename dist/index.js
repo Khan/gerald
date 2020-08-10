@@ -60348,7 +60348,7 @@ function paginationMethodsPlugin (octokit) {
   octokit.getPreviousPage = __webpack_require__(75).bind(null, octokit)
   octokit.hasFirstPage = __webpack_require__(847)
   octokit.hasLastPage = __webpack_require__(15)
-  octokit.hasNextPage = __webpack_require__(893)
+  octokit.hasNextPage = __webpack_require__(817)
   octokit.hasPreviousPage = __webpack_require__(676)
 }
 
@@ -61223,7 +61223,12 @@ exports.Context = Context;
 //# sourceMappingURL=context.js.map
 
 /***/ }),
-/* 391 */,
+/* 391 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__extraPermGithub=exports.__makeCommentBody=exports.__makeCommitComment=exports.runPush=exports.runPullRequest=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _extends2=_interopRequireDefault(__webpack_require__(306));var _utils=__webpack_require__(587);var _execCmd=__webpack_require__(529);var _setup=__webpack_require__(809);var _constants=__webpack_require__(961);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var makeCommentBody=function makeCommentBody(peopleToFiles,sectionHeader){var names=Object.keys(peopleToFiles);if(names.length){var body="### "+sectionHeader;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n\n";});return body;}return'';};var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function updatePullRequestComment$(_context){while(1){switch(_context.prev=_context.next){case 0:body=_constants.GERALD_COMMENT_HEADER;body+=makeCommentBody(notifyees,_constants.GERALD_COMMENT_NOTIFIED_HEADER);body+=makeCommentBody(reviewers,_constants.GERALD_COMMENT_REVIEWERS_HEADER);body+=makeCommentBody(requiredReviewers,_constants.GERALD_COMMENT_REQ_REVIEWERS_HEADER);if(!body.match(_constants.MATCH_COMMENT_HEADER_REGEX)){_context.next=15;break;}body+=_constants.GERALD_COMMENT_FOOTER;if(!comment){_context.next=11;break;}_context.next=9;return _regenerator.default.awrap(_setup.extraPermGithub.issues.updateComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id,body:body})));case 9:_context.next=13;break;case 11:_context.next=13;return _regenerator.default.awrap(_setup.extraPermGithub.issues.createComment((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number,body:body})));case 13:_context.next=18;break;case 15:if(!comment){_context.next=18;break;}_context.next=18;return _regenerator.default.awrap(_setup.extraPermGithub.issues.deleteComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id})));case 18:case"end":return _context.stop();}}},null,null,null,Promise);};var makeCommitComment=function makeCommitComment(peopleToFiles,commitSHA){var names,body;return _regenerator.default.async(function makeCommitComment$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:names=Object.keys(peopleToFiles);if(!(peopleToFiles&&names.length)){_context2.next=6;break;}body=_constants.GERALD_COMMIT_COMMENT_HEADER;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n";});_context2.next=6;return _regenerator.default.awrap(_setup.extraPermGithub.repos.createCommitComment((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commitSHA,body:body})));case 6:case"end":return _context2.stop();}}},null,null,null,Promise);};var runPullRequest=function runPullRequest(){var filesChanged,fileDiffs,notified,_getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function runPullRequest$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff','origin/'+_setup.context.payload.pull_request.base.ref,'--name-only']));case 2:filesChanged=_context3.sent.split('\n');_context3.next=5;return _regenerator.default.awrap((0,_utils.getFileDiffs)('origin/'+_setup.context.payload.pull_request.base.ref));case 5:fileDiffs=_context3.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,_constants.PULL_REQUEST);_getReviewers=(0,_utils.getReviewers)(filesChanged,fileDiffs,_setup.context.payload.pull_request.user.login),reviewers=_getReviewers.reviewers,requiredReviewers=_getReviewers.requiredReviewers;_context3.next=10;return _regenerator.default.awrap(_setup.extraPermGithub.issues.listComments((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number})));case 10:existingComments=_context3.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=(0,_utils.getFilteredLists)(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=15;return _regenerator.default.awrap(_setup.extraPermGithub.pulls.createReviewRequest((0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number,reviewers:actualReviewers,team_reviewers:teamReviewers})));case 15:_context3.next=17;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 17:case"end":return _context3.stop();}}},null,null,null,Promise);};exports.runPullRequest=runPullRequest;var runPush=function runPush(usedContext){var prevCommit,_iterator,_step,commit,commitData,filesChanged,fileDiffs,notified;return _regenerator.default.async(function runPush$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:prevCommit=usedContext.payload.before;_iterator=_createForOfIteratorHelperLoose(usedContext.payload.commits);case 2:if((_step=_iterator()).done){_context4.next=20;break;}commit=_step.value;_context4.next=6;return _regenerator.default.awrap(_setup.extraPermGithub.git.getCommit((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commit.id})));case 6:commitData=_context4.sent;if(!(commitData.data.parents.length===1)){_context4.next=17;break;}_context4.next=10;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',prevCommit+"..."+commitData.data.sha,'--name-only']));case 10:filesChanged=_context4.sent.split('\n');_context4.next=13;return _regenerator.default.awrap((0,_utils.getFileDiffs)(prevCommit+"..."+commitData.data.sha));case 13:fileDiffs=_context4.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,_constants.PUSH);_context4.next=17;return _regenerator.default.awrap(makeCommitComment(notified,commitData.data.sha));case 17:prevCommit=commitData.data.sha;case 18:_context4.next=2;break;case 20:case"end":return _context4.stop();}}},null,null,null,Promise);};exports.runPush=runPush;var __makeCommitComment=makeCommitComment;exports.__makeCommitComment=__makeCommitComment;var __makeCommentBody=makeCommentBody;exports.__makeCommentBody=__makeCommentBody;var __extraPermGithub=_setup.extraPermGithub;exports.__extraPermGithub=__extraPermGithub;
+
+/***/ }),
 /* 392 */,
 /* 393 */,
 /* 394 */
@@ -62837,7 +62842,7 @@ module.exports = arrayEach;
 /* 400 */
 /***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
-__webpack_require__(613);var core=__webpack_require__(827);var _require=__webpack_require__(547),runPullRequest=_require.runPullRequest,runPush=_require.runPush,context=_require.context;var _require2=__webpack_require__(961),PULL_REQUEST=_require2.PULL_REQUEST,ENV_EVENT=_require2.ENV_EVENT;try{if(process.env[ENV_EVENT]===PULL_REQUEST){runPullRequest();}else{runPush(context);}}catch(error){core.setFailed(error.message);}
+__webpack_require__(613);var core=__webpack_require__(827);var _require=__webpack_require__(893),runOnComment=_require.runOnComment;var _require2=__webpack_require__(391),runPullRequest=_require2.runPullRequest,runPush=_require2.runPush;var _require3=__webpack_require__(809),context=_require3.context;var _require4=__webpack_require__(961),PULL_REQUEST=_require4.PULL_REQUEST,ENV_EVENT=_require4.ENV_EVENT,COMMENT=_require4.COMMENT;try{if(process.env[ENV_EVENT]===PULL_REQUEST){runPullRequest();}else if(process.env[ENV_EVENT]===COMMENT){runOnComment();}else{runPush(context);}}catch(error){core.setFailed(error.message);}
 
 /***/ }),
 /* 401 */
@@ -71656,63 +71661,7 @@ function _assertUnremoved() {
 /* 531 */,
 /* 532 */,
 /* 533 */,
-/* 534 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-"use strict";
-
-const pump = __webpack_require__(464);
-const bufferStream = __webpack_require__(128);
-
-class MaxBufferError extends Error {
-	constructor() {
-		super('maxBuffer exceeded');
-		this.name = 'MaxBufferError';
-	}
-}
-
-function getStream(inputStream, options) {
-	if (!inputStream) {
-		return Promise.reject(new Error('Expected a stream'));
-	}
-
-	options = Object.assign({maxBuffer: Infinity}, options);
-
-	const {maxBuffer} = options;
-
-	let stream;
-	return new Promise((resolve, reject) => {
-		const rejectPromise = error => {
-			if (error) { // A null check
-				error.bufferedData = stream.getBufferedValue();
-			}
-			reject(error);
-		};
-
-		stream = pump(inputStream, bufferStream(options), error => {
-			if (error) {
-				rejectPromise(error);
-				return;
-			}
-
-			resolve();
-		});
-
-		stream.on('data', () => {
-			if (stream.getBufferedLength() > maxBuffer) {
-				rejectPromise(new MaxBufferError());
-			}
-		});
-	}).then(() => stream.getBufferedValue());
-}
-
-module.exports = getStream;
-module.exports.buffer = (stream, options) => getStream(stream, Object.assign({}, options, {encoding: 'buffer'}));
-module.exports.array = (stream, options) => getStream(stream, Object.assign({}, options, {array: true}));
-module.exports.MaxBufferError = MaxBufferError;
-
-
-/***/ }),
+/* 534 */,
 /* 535 */,
 /* 536 */,
 /* 537 */,
@@ -72530,9 +72479,60 @@ module.exports = baseMatches;
 /***/ }),
 /* 546 */,
 /* 547 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
-var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__extraPermGithub=exports.__makeCommentBody=exports.__makeCommitComment=exports.runPush=exports.runPullRequest=exports.context=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _extends2=_interopRequireDefault(__webpack_require__(306));var _utils=__webpack_require__(587);var _execCmd=__webpack_require__(529);var _constants=__webpack_require__(961);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var octokit=__webpack_require__(938);var extraPermGithub=new octokit.GitHub(process.env[_constants.ENV_ADMIN_TOKEN]);var context=octokit.context;exports.context=context;var ownerAndRepo={owner:'__TESTING__',repo:'__TESTING__'};if(process.env['ADMIN_PERMISSION_TOKEN']){ownerAndRepo={owner:context.issue.owner,repo:context.issue.repo};}var makeCommentBody=function makeCommentBody(peopleToFiles,sectionHeader){var names=Object.keys(peopleToFiles);if(names.length){var body="### "+sectionHeader;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n\n";});return body;}return'';};var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function updatePullRequestComment$(_context){while(1){switch(_context.prev=_context.next){case 0:body=_constants.GERALD_COMMENT_HEADER;body+=makeCommentBody(notifyees,_constants.GERALD_COMMENT_NOTIFIED_HEADER);body+=makeCommentBody(reviewers,_constants.GERALD_COMMENT_REVIEWERS_HEADER);body+=makeCommentBody(requiredReviewers,_constants.GERALD_COMMENT_REQ_REVIEWERS_HEADER);if(!body.match(_constants.MATCH_COMMENT_HEADER_REGEX)){_context.next=15;break;}body+=_constants.GERALD_COMMENT_FOOTER;if(!comment){_context.next=11;break;}_context.next=9;return _regenerator.default.awrap(extraPermGithub.issues.updateComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id,body:body})));case 9:_context.next=13;break;case 11:_context.next=13;return _regenerator.default.awrap(extraPermGithub.issues.createComment((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number,body:body})));case 13:_context.next=18;break;case 15:if(!comment){_context.next=18;break;}_context.next=18;return _regenerator.default.awrap(extraPermGithub.issues.deleteComment((0,_extends2.default)({},ownerAndRepo,{comment_id:comment.id})));case 18:case"end":return _context.stop();}}},null,null,null,Promise);};var makeCommitComment=function makeCommitComment(peopleToFiles,commitSHA){var names,body;return _regenerator.default.async(function makeCommitComment$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:names=Object.keys(peopleToFiles);if(!(peopleToFiles&&names.length)){_context2.next=6;break;}body=_constants.GERALD_COMMIT_COMMENT_HEADER;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n";});_context2.next=6;return _regenerator.default.awrap(extraPermGithub.repos.createCommitComment((0,_extends2.default)({},ownerAndRepo,{commit_sha:commitSHA,body:body})));case 6:case"end":return _context2.stop();}}},null,null,null,Promise);};var runPullRequest=function runPullRequest(){var filesChanged,fileDiffs,notified,_getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function runPullRequest$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff','origin/'+context.payload.pull_request.base.ref,'--name-only']));case 2:filesChanged=_context3.sent.split('\n');_context3.next=5;return _regenerator.default.awrap((0,_utils.getFileDiffs)('origin/'+context.payload.pull_request.base.ref));case 5:fileDiffs=_context3.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,_constants.PULL_REQUEST);_getReviewers=(0,_utils.getReviewers)(filesChanged,fileDiffs,context.payload.pull_request.user.login),reviewers=_getReviewers.reviewers,requiredReviewers=_getReviewers.requiredReviewers;_context3.next=10;return _regenerator.default.awrap(extraPermGithub.issues.listComments((0,_extends2.default)({},ownerAndRepo,{issue_number:context.issue.number})));case 10:existingComments=_context3.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=(0,_utils.getFilteredLists)(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=15;return _regenerator.default.awrap(extraPermGithub.pulls.createReviewRequest((0,_extends2.default)({},ownerAndRepo,{pull_number:context.issue.number,reviewers:actualReviewers,team_reviewers:teamReviewers})));case 15:_context3.next=17;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 17:case"end":return _context3.stop();}}},null,null,null,Promise);};exports.runPullRequest=runPullRequest;var runPush=function runPush(usedContext){var prevCommit,_iterator,_step,commit,commitData,filesChanged,fileDiffs,notified;return _regenerator.default.async(function runPush$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:prevCommit=usedContext.payload.before;_iterator=_createForOfIteratorHelperLoose(usedContext.payload.commits);case 2:if((_step=_iterator()).done){_context4.next=20;break;}commit=_step.value;_context4.next=6;return _regenerator.default.awrap(extraPermGithub.git.getCommit((0,_extends2.default)({},ownerAndRepo,{commit_sha:commit.id})));case 6:commitData=_context4.sent;if(!(commitData.data.parents.length===1)){_context4.next=17;break;}_context4.next=10;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',prevCommit+"..."+commitData.data.sha,'--name-only']));case 10:filesChanged=_context4.sent.split('\n');_context4.next=13;return _regenerator.default.awrap((0,_utils.getFileDiffs)(prevCommit+"..."+commitData.data.sha));case 13:fileDiffs=_context4.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,_constants.PUSH);_context4.next=17;return _regenerator.default.awrap(makeCommitComment(notified,commitData.data.sha));case 17:prevCommit=commitData.data.sha;case 18:_context4.next=2;break;case 20:case"end":return _context4.stop();}}},null,null,null,Promise);};exports.runPush=runPush;var __makeCommitComment=makeCommitComment;exports.__makeCommitComment=__makeCommitComment;var __makeCommentBody=makeCommentBody;exports.__makeCommentBody=__makeCommentBody;var __extraPermGithub=extraPermGithub;exports.__extraPermGithub=__extraPermGithub;
+"use strict";
+
+const pump = __webpack_require__(464);
+const bufferStream = __webpack_require__(128);
+
+class MaxBufferError extends Error {
+	constructor() {
+		super('maxBuffer exceeded');
+		this.name = 'MaxBufferError';
+	}
+}
+
+function getStream(inputStream, options) {
+	if (!inputStream) {
+		return Promise.reject(new Error('Expected a stream'));
+	}
+
+	options = Object.assign({maxBuffer: Infinity}, options);
+
+	const {maxBuffer} = options;
+
+	let stream;
+	return new Promise((resolve, reject) => {
+		const rejectPromise = error => {
+			if (error) { // A null check
+				error.bufferedData = stream.getBufferedValue();
+			}
+			reject(error);
+		};
+
+		stream = pump(inputStream, bufferStream(options), error => {
+			if (error) {
+				rejectPromise(error);
+				return;
+			}
+
+			resolve();
+		});
+
+		stream.on('data', () => {
+			if (stream.getBufferedLength() > maxBuffer) {
+				rejectPromise(new MaxBufferError());
+			}
+		});
+	}).then(() => stream.getBufferedValue());
+}
+
+module.exports = getStream;
+module.exports.buffer = (stream, options) => getStream(stream, Object.assign({}, options, {encoding: 'buffer'}));
+module.exports.array = (stream, options) => getStream(stream, Object.assign({}, options, {array: true}));
+module.exports.MaxBufferError = MaxBufferError;
+
 
 /***/ }),
 /* 548 */
@@ -85344,7 +85344,7 @@ const crossSpawn = __webpack_require__(701);
 const stripEof = __webpack_require__(658);
 const npmRunPath = __webpack_require__(923);
 const isStream = __webpack_require__(25);
-const _getStream = __webpack_require__(534);
+const _getStream = __webpack_require__(547);
 const pFinally = __webpack_require__(291);
 const onExit = __webpack_require__(841);
 const errname = __webpack_require__(147);
@@ -92468,7 +92468,12 @@ module.exports = baseAssign;
 
 
 /***/ }),
-/* 809 */,
+/* 809 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+Object.defineProperty(exports,"__esModule",{value:true});exports.ownerAndRepo=exports.context=exports.extraPermGithub=void 0;var _constants=__webpack_require__(961);var octokit=__webpack_require__(938);var extraPermGithub=new octokit.GitHub(process.env[_constants.ENV_ADMIN_TOKEN]);exports.extraPermGithub=extraPermGithub;var context=octokit.context;exports.context=context;var ownerAndRepo={owner:'__TESTING__',repo:'__TESTING__'};exports.ownerAndRepo=ownerAndRepo;if(process.env[_constants.ENV_ADMIN_TOKEN]){exports.ownerAndRepo=ownerAndRepo={owner:context.issue.owner,repo:context.issue.repo};}
+
+/***/ }),
 /* 810 */,
 /* 811 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
@@ -92622,7 +92627,21 @@ const readConfigPackage = (0, _utils.makeStaticFileCache)((filepath, content) =>
 });
 
 /***/ }),
-/* 817 */,
+/* 817 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+module.exports = hasNextPage
+
+const deprecate = __webpack_require__(769)
+const getPageLinks = __webpack_require__(150)
+
+function hasNextPage (link) {
+  deprecate(`octokit.hasNextPage() – You can use octokit.paginate or async iterators instead: https://github.com/octokit/rest.js#pagination.`)
+  return getPageLinks(link).next
+}
+
+
+/***/ }),
 /* 818 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -98438,18 +98457,9 @@ exports.HttpClient = HttpClient;
 
 /***/ }),
 /* 893 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-module.exports = hasNextPage
-
-const deprecate = __webpack_require__(769)
-const getPageLinks = __webpack_require__(150)
-
-function hasNextPage (link) {
-  deprecate(`octokit.hasNextPage() – You can use octokit.paginate or async iterators instead: https://github.com/octokit/rest.js#pagination.`)
-  return getPageLinks(link).next
-}
-
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__makeNewComment=exports.runOnComment=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _extends2=_interopRequireDefault(__webpack_require__(306));var _utils=__webpack_require__(587);var _setup=__webpack_require__(809);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var makeNewComment=function makeNewComment(existingBody,removedJustNames){var newComment=existingBody;for(var _iterator=_createForOfIteratorHelperLoose(removedJustNames),_step;!(_step=_iterator()).done;){var justName=_step.value;var regex=new RegExp("\n^@"+justName+".*$\n",'gm');if(newComment.match(regex)){newComment=newComment.replace(regex,'');}}return newComment;};var updateOrDeletePRComment=function updateOrDeletePRComment(newComment,commentID,removedJustNames){var keepComment;return _regenerator.default.async(function updateOrDeletePRComment$(_context){while(1){switch(_context.prev=_context.next){case 0:keepComment=newComment.match(/@([A-Za-z]*\/)?\S*/g);if(!keepComment){_context.next=6;break;}_context.next=4;return _regenerator.default.awrap(_setup.extraPermGithub.issues.updateComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:commentID,body:newComment})));case 4:_context.next=8;break;case 6:_context.next=8;return _regenerator.default.awrap(_setup.extraPermGithub.issues.deleteComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:commentID})));case 8:case"end":return _context.stop();}}},null,null,null,Promise);};var runOnComment=function runOnComment(){var existingComments,_parseExistingComment,megaComment,removedJustNames,newComment;return _regenerator.default.async(function runOnComment$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:_context2.next=2;return _regenerator.default.awrap(_setup.extraPermGithub.issues.listComments((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number})));case 2:existingComments=_context2.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;if(!megaComment){_context2.next=8;break;}newComment=makeNewComment(megaComment.body,removedJustNames);_context2.next=8;return _regenerator.default.awrap(updateOrDeletePRComment(newComment,megaComment.id,removedJustNames));case 8:case"end":return _context2.stop();}}},null,null,null,Promise);};exports.runOnComment=runOnComment;var __makeNewComment=makeNewComment;exports.__makeNewComment=__makeNewComment;
 
 /***/ }),
 /* 894 */,
