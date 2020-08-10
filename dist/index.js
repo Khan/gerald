@@ -41,7 +41,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(400);
+/******/ 		return __webpack_require__(483);
 /******/ 	};
 /******/ 	// initialize runtime
 /******/ 	runtime(__webpack_require__);
@@ -7826,7 +7826,7 @@ module.exports = equalByTag;
 /* 83 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var defineProperty = __webpack_require__(483);
+var defineProperty = __webpack_require__(230);
 
 /**
  * The base implementation of `assignValue` and `assignMergeValue` without
@@ -9271,7 +9271,7 @@ const async_1 = __webpack_require__(70);
 const stream_1 = __webpack_require__(609);
 const sync_1 = __webpack_require__(853);
 const settings_1 = __webpack_require__(785);
-const utils = __webpack_require__(800);
+const utils = __webpack_require__(400);
 async function FastGlob(source, options) {
     assertPatternsInput(source);
     const works = getWorks(source, async_1.default, options);
@@ -37734,7 +37734,7 @@ exports.quickSort = function (ary, comparator) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(800);
+const utils = __webpack_require__(400);
 class Matcher {
     constructor(_patterns, _settings, _micromatchOptions) {
         this._patterns = _patterns;
@@ -38989,7 +38989,23 @@ function _nonIterableRest() {
 module.exports = _nonIterableRest;
 
 /***/ }),
-/* 230 */,
+/* 230 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+var getNative = __webpack_require__(116);
+
+var defineProperty = (function() {
+  try {
+    var func = getNative(Object, 'defineProperty');
+    func({}, '', {});
+    return func;
+  } catch (e) {}
+}());
+
+module.exports = defineProperty;
+
+
+/***/ }),
 /* 231 */
 /***/ (function(module) {
 
@@ -41729,7 +41745,7 @@ exports.compareByGeneratedPositionsInflated = compareByGeneratedPositionsInflate
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(800);
+const utils = __webpack_require__(400);
 class EntryFilter {
     constructor(_settings, _micromatchOptions) {
         this._settings = _settings;
@@ -56131,7 +56147,7 @@ function octokitValidate(octokit) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __webpack_require__(622);
 const fsStat = __webpack_require__(528);
-const utils = __webpack_require__(800);
+const utils = __webpack_require__(400);
 class Reader {
     constructor(_settings) {
         this._settings = _settings;
@@ -60653,7 +60669,7 @@ module.exports = baseClone;
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var constant = __webpack_require__(997),
-    defineProperty = __webpack_require__(483),
+    defineProperty = __webpack_require__(230),
     identity = __webpack_require__(881);
 
 /**
@@ -61223,12 +61239,7 @@ exports.Context = Context;
 //# sourceMappingURL=context.js.map
 
 /***/ }),
-/* 391 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__extraPermGithub=exports.__makeCommentBody=exports.__makeCommitComment=exports.runPush=exports.runPullRequest=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _extends2=_interopRequireDefault(__webpack_require__(306));var _utils=__webpack_require__(587);var _execCmd=__webpack_require__(529);var _setup=__webpack_require__(809);var _constants=__webpack_require__(961);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var makeCommentBody=function makeCommentBody(peopleToFiles,sectionHeader){var names=Object.keys(peopleToFiles);if(names.length){var body="### "+sectionHeader;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n\n";});return body;}return'';};var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function updatePullRequestComment$(_context){while(1){switch(_context.prev=_context.next){case 0:body=_constants.GERALD_COMMENT_HEADER;body+=makeCommentBody(notifyees,_constants.GERALD_COMMENT_NOTIFIED_HEADER);body+=makeCommentBody(reviewers,_constants.GERALD_COMMENT_REVIEWERS_HEADER);body+=makeCommentBody(requiredReviewers,_constants.GERALD_COMMENT_REQ_REVIEWERS_HEADER);if(!body.match(_constants.MATCH_COMMENT_HEADER_REGEX)){_context.next=15;break;}body+=_constants.GERALD_COMMENT_FOOTER;if(!comment){_context.next=11;break;}_context.next=9;return _regenerator.default.awrap(_setup.extraPermGithub.issues.updateComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id,body:body})));case 9:_context.next=13;break;case 11:_context.next=13;return _regenerator.default.awrap(_setup.extraPermGithub.issues.createComment((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number,body:body})));case 13:_context.next=18;break;case 15:if(!comment){_context.next=18;break;}_context.next=18;return _regenerator.default.awrap(_setup.extraPermGithub.issues.deleteComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id})));case 18:case"end":return _context.stop();}}},null,null,null,Promise);};var makeCommitComment=function makeCommitComment(peopleToFiles,commitSHA){var names,body;return _regenerator.default.async(function makeCommitComment$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:names=Object.keys(peopleToFiles);if(!(peopleToFiles&&names.length)){_context2.next=6;break;}body=_constants.GERALD_COMMIT_COMMENT_HEADER;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n";});_context2.next=6;return _regenerator.default.awrap(_setup.extraPermGithub.repos.createCommitComment((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commitSHA,body:body})));case 6:case"end":return _context2.stop();}}},null,null,null,Promise);};var runPullRequest=function runPullRequest(){var filesChanged,fileDiffs,notified,_getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function runPullRequest$(_context3){while(1){switch(_context3.prev=_context3.next){case 0:_context3.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff','origin/'+_setup.context.payload.pull_request.base.ref,'--name-only']));case 2:filesChanged=_context3.sent.split('\n');_context3.next=5;return _regenerator.default.awrap((0,_utils.getFileDiffs)('origin/'+_setup.context.payload.pull_request.base.ref));case 5:fileDiffs=_context3.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,_constants.PULL_REQUEST);_getReviewers=(0,_utils.getReviewers)(filesChanged,fileDiffs,_setup.context.payload.pull_request.user.login),reviewers=_getReviewers.reviewers,requiredReviewers=_getReviewers.requiredReviewers;_context3.next=10;return _regenerator.default.awrap(_setup.extraPermGithub.issues.listComments((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number})));case 10:existingComments=_context3.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=(0,_utils.getFilteredLists)(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=15;return _regenerator.default.awrap(_setup.extraPermGithub.pulls.createReviewRequest((0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number,reviewers:actualReviewers,team_reviewers:teamReviewers})));case 15:_context3.next=17;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 17:case"end":return _context3.stop();}}},null,null,null,Promise);};exports.runPullRequest=runPullRequest;var runPush=function runPush(usedContext){var prevCommit,_iterator,_step,commit,commitData,filesChanged,fileDiffs,notified;return _regenerator.default.async(function runPush$(_context4){while(1){switch(_context4.prev=_context4.next){case 0:prevCommit=usedContext.payload.before;_iterator=_createForOfIteratorHelperLoose(usedContext.payload.commits);case 2:if((_step=_iterator()).done){_context4.next=20;break;}commit=_step.value;_context4.next=6;return _regenerator.default.awrap(_setup.extraPermGithub.git.getCommit((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commit.id})));case 6:commitData=_context4.sent;if(!(commitData.data.parents.length===1)){_context4.next=17;break;}_context4.next=10;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',prevCommit+"..."+commitData.data.sha,'--name-only']));case 10:filesChanged=_context4.sent.split('\n');_context4.next=13;return _regenerator.default.awrap((0,_utils.getFileDiffs)(prevCommit+"..."+commitData.data.sha));case 13:fileDiffs=_context4.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,_constants.PUSH);_context4.next=17;return _regenerator.default.awrap(makeCommitComment(notified,commitData.data.sha));case 17:prevCommit=commitData.data.sha;case 18:_context4.next=2;break;case 20:case"end":return _context4.stop();}}},null,null,null,Promise);};exports.runPush=runPush;var __makeCommitComment=makeCommitComment;exports.__makeCommitComment=__makeCommitComment;var __makeCommentBody=makeCommentBody;exports.__makeCommentBody=__makeCommentBody;var __extraPermGithub=_setup.extraPermGithub;exports.__extraPermGithub=__extraPermGithub;
-
-/***/ }),
+/* 391 */,
 /* 392 */,
 /* 393 */,
 /* 394 */
@@ -62840,9 +62851,27 @@ module.exports = arrayEach;
 /***/ }),
 /* 399 */,
 /* 400 */
-/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-__webpack_require__(613);var core=__webpack_require__(827);var _require=__webpack_require__(893),runOnComment=_require.runOnComment;var _require2=__webpack_require__(391),runPullRequest=_require2.runPullRequest,runPush=_require2.runPush;var _require3=__webpack_require__(809),context=_require3.context;var _require4=__webpack_require__(961),PULL_REQUEST=_require4.PULL_REQUEST,ENV_EVENT=_require4.ENV_EVENT,COMMENT=_require4.COMMENT;try{if(process.env[ENV_EVENT]===PULL_REQUEST){runPullRequest();}else if(process.env[ENV_EVENT]===COMMENT){runOnComment();}else{runPush(context);}}catch(error){core.setFailed(error.message);}
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.string = exports.stream = exports.pattern = exports.path = exports.fs = exports.errno = exports.array = void 0;
+const array = __webpack_require__(348);
+exports.array = array;
+const errno = __webpack_require__(162);
+exports.errno = errno;
+const fs = __webpack_require__(339);
+exports.fs = fs;
+const path = __webpack_require__(635);
+exports.path = path;
+const pattern = __webpack_require__(927);
+exports.pattern = pattern;
+const stream = __webpack_require__(973);
+exports.stream = stream;
+const string = __webpack_require__(202);
+exports.string = string;
+
 
 /***/ }),
 /* 401 */
@@ -66759,7 +66788,12 @@ function _arrayWithoutHoles(arr) {
 module.exports = _arrayWithoutHoles;
 
 /***/ }),
-/* 456 */,
+/* 456 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__extraPermGithub=exports.__makeCommitComment=exports.runPush=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _extends2=_interopRequireDefault(__webpack_require__(306));var _utils=__webpack_require__(587);var _execCmd=__webpack_require__(529);var _setup=__webpack_require__(809);var _constants=__webpack_require__(961);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var makeCommitComment=function makeCommitComment(peopleToFiles,commitSHA){var names,body;return _regenerator.default.async(function makeCommitComment$(_context){while(1){switch(_context.prev=_context.next){case 0:names=Object.keys(peopleToFiles);if(!(peopleToFiles&&names.length)){_context.next=6;break;}body=_constants.GERALD_COMMIT_COMMENT_HEADER;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n";});_context.next=6;return _regenerator.default.awrap(_setup.extraPermGithub.repos.createCommitComment((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commitSHA,body:body})));case 6:case"end":return _context.stop();}}},null,null,null,Promise);};var runPush=function runPush(usedContext){var prevCommit,_iterator,_step,commit,commitData,filesChanged,fileDiffs,notified;return _regenerator.default.async(function runPush$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:prevCommit=usedContext.payload.before;_iterator=_createForOfIteratorHelperLoose(usedContext.payload.commits);case 2:if((_step=_iterator()).done){_context2.next=20;break;}commit=_step.value;_context2.next=6;return _regenerator.default.awrap(_setup.extraPermGithub.git.getCommit((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commit.id})));case 6:commitData=_context2.sent;if(!(commitData.data.parents.length===1)){_context2.next=17;break;}_context2.next=10;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',prevCommit+"..."+commitData.data.sha,'--name-only']));case 10:filesChanged=_context2.sent.split('\n');_context2.next=13;return _regenerator.default.awrap((0,_utils.getFileDiffs)(prevCommit+"..."+commitData.data.sha));case 13:fileDiffs=_context2.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,_constants.PUSH);_context2.next=17;return _regenerator.default.awrap(makeCommitComment(notified,commitData.data.sha));case 17:prevCommit=commitData.data.sha;case 18:_context2.next=2;break;case 20:case"end":return _context2.stop();}}},null,null,null,Promise);};exports.runPush=runPush;var __makeCommitComment=makeCommitComment;exports.__makeCommitComment=__makeCommitComment;var __extraPermGithub=_setup.extraPermGithub;exports.__extraPermGithub=__extraPermGithub;
+
+/***/ }),
 /* 457 */
 /***/ (function(module) {
 
@@ -67134,7 +67168,12 @@ module.exports = baseSlice;
 
 /***/ }),
 /* 459 */,
-/* 460 */,
+/* 460 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.runOnPullRequest=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _extends2=_interopRequireDefault(__webpack_require__(306));var _utils=__webpack_require__(587);var _execCmd=__webpack_require__(529);var _setup=__webpack_require__(809);var _constants=__webpack_require__(961);var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function updatePullRequestComment$(_context){while(1){switch(_context.prev=_context.next){case 0:body=_constants.GERALD_COMMENT_HEADER;body+=(0,_utils.makeCommentBody)(notifyees,_constants.GERALD_COMMENT_NOTIFIED_HEADER);body+=(0,_utils.makeCommentBody)(reviewers,_constants.GERALD_COMMENT_REVIEWERS_HEADER);body+=(0,_utils.makeCommentBody)(requiredReviewers,_constants.GERALD_COMMENT_REQ_REVIEWERS_HEADER);if(!body.match(_constants.MATCH_COMMENT_HEADER_REGEX)){_context.next=15;break;}body+=_constants.GERALD_COMMENT_FOOTER;if(!comment){_context.next=11;break;}_context.next=9;return _regenerator.default.awrap(_setup.extraPermGithub.issues.updateComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id,body:body})));case 9:_context.next=13;break;case 11:_context.next=13;return _regenerator.default.awrap(_setup.extraPermGithub.issues.createComment((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number,body:body})));case 13:_context.next=18;break;case 15:if(!comment){_context.next=18;break;}_context.next=18;return _regenerator.default.awrap(_setup.extraPermGithub.issues.deleteComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id})));case 18:case"end":return _context.stop();}}},null,null,null,Promise);};var runOnPullRequest=function runOnPullRequest(){var filesChanged,fileDiffs,notified,_getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function runOnPullRequest$(_context2){while(1){switch(_context2.prev=_context2.next){case 0:_context2.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff','origin/'+_setup.context.payload.pull_request.base.ref,'--name-only']));case 2:filesChanged=_context2.sent.split('\n');_context2.next=5;return _regenerator.default.awrap((0,_utils.getFileDiffs)('origin/'+_setup.context.payload.pull_request.base.ref));case 5:fileDiffs=_context2.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,_constants.PULL_REQUEST);_getReviewers=(0,_utils.getReviewers)(filesChanged,fileDiffs,_setup.context.payload.pull_request.user.login),reviewers=_getReviewers.reviewers,requiredReviewers=_getReviewers.requiredReviewers;_context2.next=10;return _regenerator.default.awrap(_setup.extraPermGithub.issues.listComments((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number})));case 10:existingComments=_context2.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=(0,_utils.getFilteredLists)(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context2.next=15;return _regenerator.default.awrap(_setup.extraPermGithub.pulls.createReviewRequest((0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number,reviewers:actualReviewers,team_reviewers:teamReviewers})));case 15:_context2.next=17;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 17:case"end":return _context2.stop();}}},null,null,null,Promise);};exports.runOnPullRequest=runOnPullRequest;
+
+/***/ }),
 /* 461 */,
 /* 462 */,
 /* 463 */,
@@ -68106,20 +68145,9 @@ module.exports.sync = (filename, opts = {}) => {
 /***/ }),
 /* 482 */,
 /* 483 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
-var getNative = __webpack_require__(116);
-
-var defineProperty = (function() {
-  try {
-    var func = getNative(Object, 'defineProperty');
-    func({}, '', {});
-    return func;
-  } catch (e) {}
-}());
-
-module.exports = defineProperty;
-
+__webpack_require__(613);var core=__webpack_require__(827);var _require=__webpack_require__(893),runOnComment=_require.runOnComment;var _require2=__webpack_require__(456),runPush=_require2.runPush;var _require3=__webpack_require__(460),runOnPullRequest=_require3.runOnPullRequest;var _require4=__webpack_require__(809),context=_require4.context;var _require5=__webpack_require__(961),PULL_REQUEST=_require5.PULL_REQUEST,ENV_EVENT=_require5.ENV_EVENT,COMMENT=_require5.COMMENT;try{if(process.env[ENV_EVENT]===PULL_REQUEST){runOnPullRequest();}else if(process.env[ENV_EVENT]===COMMENT){runOnComment();}else{runPush(context);}}catch(error){core.setFailed(error.message);}
 
 /***/ }),
 /* 484 */
@@ -76431,7 +76459,7 @@ function VoidTypeAnnotation() {
 /* 587 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__filterIgnoreFiles=exports.__pushOrSetToBin=exports.__parseUsername=exports.__turnPatternIntoRegex=exports.__maybeAddIfMatch=exports.getFileDiffs=exports.parseExistingComments=exports.getFilteredLists=exports.getReviewers=exports.getNotified=exports.getCorrectSection=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _slicedToArray2=_interopRequireDefault(__webpack_require__(479));var _toConsumableArray2=_interopRequireDefault(__webpack_require__(775));var _fs=_interopRequireDefault(__webpack_require__(747));var _fastGlob=_interopRequireDefault(__webpack_require__(98));var _fs2=__webpack_require__(630);var _execCmd=__webpack_require__(529);var _constants=__webpack_require__(961);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var filterIgnoreFiles=function filterIgnoreFiles(fileContents){var filteredOutMostCases=fileContents.split('\n').map(function(line){return line.trim();}).filter(Boolean).filter(function(line){return!line.startsWith(_constants.COMMENT_SYMBOL);});return filteredOutMostCases.map(function(line){if(line.indexOf(_constants.COMMENT_SYMBOL)!==-1){return line.split(_constants.COMMENT_SYMBOL)[0].trim();}return line;});};var getGeraldIgnore=function getGeraldIgnore(){var ignore=[];if(_fs.default.existsSync(_constants.GERALD_IGNORE_FILE)){var _geraldIgnore=filterIgnoreFiles(_fs.default.readFileSync(_constants.GERALD_IGNORE_FILE,'utf-8'));ignore.push.apply(ignore,(0,_toConsumableArray2.default)(_geraldIgnore));}if(_fs.default.existsSync(_constants.GIT_IGNORE_FILE)){var gitIgnore=filterIgnoreFiles(_fs.default.readFileSync(_constants.GIT_IGNORE_FILE,'utf-8'));for(var _iterator=_createForOfIteratorHelperLoose(gitIgnore),_step;!(_step=_iterator()).done;){var line=_step.value;if(!ignore.includes(line)){ignore.push(line);}}}return ignore;};var geraldIgnore=getGeraldIgnore();var globOptions={dot:true,ignore:geraldIgnore};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,fileDiffs,nameToFilesObj){for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(pattern.test(diff)){if(nameToFilesObj[name]){if(!nameToFilesObj[name].includes(file)){nameToFilesObj[name].push(file);}}else{nameToFilesObj[name]=[file];}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=_constants.MATCH_REGEX_REGEX.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,files){if(bin[username]){for(var _iterator2=_createForOfIteratorHelperLoose(files),_step2;!(_step2=_iterator2()).done;){var file=_step2.value;if(!bin[username].includes(file)){bin[username].push(file);}}}else{bin[username]=files;}};var getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(_constants.MATCH_PULL_REQUEST_SECTION_HEADER_REGEX)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file===_constants.NOTIFIED&&!rawFile.match(_constants.MATCH_PUSH_SECTION_HEADER_REGEX)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section===_constants.PULL_REQUEST){sectionRegexp=file===_constants.NOTIFIED?_constants.MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX:_constants.MATCH_JUST_PULL_REQUEST_SECTION_REGEX;}else if(file===_constants.NOTIFIED){sectionRegexp=_constants.MATCH_JUST_PUSH_SECTION_REGEX;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return rawFile.match(sectionRegexp);};exports.getCorrectSection=getCorrectSection;var getNotified=function getNotified(filesChanged,fileDiffs,on){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=(0,_fs2.readFileSync)(_constants.NOTIFIED_FILE,'utf-8');var section=getCorrectSection(buf,_constants.NOTIFIED,on);if(!section){return{};}var matches=section[0].match(/^[^\#\n].*/gm);var notified={};if(matches){for(var _iterator3=_createForOfIteratorHelperLoose(matches),_step3;!(_step3=_iterator3()).done;){var match=_step3.value;var rule=match;if(match.includes(_constants.COMMENT_SYMBOL)){rule=match.split(_constants.COMMENT_SYMBOL)[0].trim();}var untrimmedPattern=rule.match(_constants.MATCH_PATTERN_REGEX);var names=rule.match(_constants.MATCH_USERNAME_OR_TEAM_REGEX);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator4=_createForOfIteratorHelperLoose(names),_step4;!(_step4=_iterator4()).done;){var _name=_step4.value;maybeAddIfMatch(regex,_name,fileDiffs,notified);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator5=_createForOfIteratorHelperLoose(names),_step5;!(_step5=_iterator5()).done;){var _name2=_step5.value;pushOrSetToBin(notified,_name2,intersection);}}}}}return notified;};exports.getNotified=getNotified;var getReviewers=function getReviewers(filesChanged,fileDiffs,issuer){var buf=(0,_fs2.readFileSync)(_constants.REVIEWERS_FILE,'utf-8');var section=getCorrectSection(buf,_constants.REVIEWERS,_constants.PULL_REQUEST);if(!section){return{reviewers:{},requiredReviewers:{}};}var matches=section[0].match(_constants.MATCH_NON_COMMENT_LINES_REGEX);var reviewers={};var requiredReviewers={};if(!matches){return{reviewers:reviewers,requiredReviewers:requiredReviewers};}for(var _iterator6=_createForOfIteratorHelperLoose(matches),_step6;!(_step6=_iterator6()).done;){var match=_step6.value;var rule=match;if(match.includes(_constants.COMMENT_SYMBOL)){rule=match.split(_constants.COMMENT_SYMBOL)[0].trim();}var untrimmedPattern=rule.match(_constants.MATCH_PATTERN_REGEX);var names=rule.match(_constants.MATCH_USERNAME_OR_TEAM_REGEX);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator7=_createForOfIteratorHelperLoose(names),_step7;!(_step7=_iterator7()).done;){var _name3=_step7.value;var _parseUsername=parseUsername(_name3),username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(justName===issuer){continue;}var correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,fileDiffs,correctBin);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator8=_createForOfIteratorHelperLoose(names),_step8;!(_step8=_iterator8()).done;){var _name4=_step8.value;var _parseUsername2=parseUsername(_name4),_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(_justName===issuer){continue;}var _correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,intersection);}}}}return{reviewers:reviewers,requiredReviewers:requiredReviewers};};exports.getReviewers=getReviewers;var getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator9=_createForOfIteratorHelperLoose(removedJustNames),_step9;!(_step9=_iterator9()).done;){var justName=_step9.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};exports.getFilteredLists=getFilteredLists;var parseExistingComments=function parseExistingComments(existingComments){var actionBotComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.user.login==='khan-actions-bot'){actionBotComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(_constants.MATCH_REMOVEME_TAG_REGEX);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});actionBotComments.forEach(function(comment){var megaCommentMatch=comment.body.match(_constants.MATCH_GERALD_COMMENT_HEADER_REGEX);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};exports.parseExistingComments=parseExistingComments;var getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator10,_step10,diff,fileName;return _regenerator.default.async(function getFileDiffs$(_context){while(1){switch(_context.prev=_context.next){case 0:_context.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString]));case 2:rawDiffs=_context.sent.split(_constants.MATCH_GIT_DIFF_FILE_SEPERATOR);fileToDiff={};for(_iterator10=_createForOfIteratorHelperLoose(rawDiffs);!(_step10=_iterator10()).done;){diff=_step10.value;fileName=diff.match(_constants.MATCH_GIT_DIFF_FILE_NAME);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context.abrupt("return",fileToDiff);case 6:case"end":return _context.stop();}}},null,null,null,Promise);};exports.getFileDiffs=getFileDiffs;var __maybeAddIfMatch=maybeAddIfMatch;exports.__maybeAddIfMatch=__maybeAddIfMatch;var __turnPatternIntoRegex=turnPatternIntoRegex;exports.__turnPatternIntoRegex=__turnPatternIntoRegex;var __parseUsername=parseUsername;exports.__parseUsername=__parseUsername;var __pushOrSetToBin=pushOrSetToBin;exports.__pushOrSetToBin=__pushOrSetToBin;var __filterIgnoreFiles=filterIgnoreFiles;exports.__filterIgnoreFiles=__filterIgnoreFiles;
+var _interopRequireDefault=__webpack_require__(5);Object.defineProperty(exports,"__esModule",{value:true});exports.__filterIgnoreFiles=exports.__pushOrSetToBin=exports.__parseUsername=exports.__turnPatternIntoRegex=exports.__maybeAddIfMatch=exports.getFileDiffs=exports.parseExistingComments=exports.getFilteredLists=exports.getReviewers=exports.getNotified=exports.getCorrectSection=exports.makeCommentBody=void 0;var _regenerator=_interopRequireDefault(__webpack_require__(292));var _slicedToArray2=_interopRequireDefault(__webpack_require__(479));var _toConsumableArray2=_interopRequireDefault(__webpack_require__(775));var _fs=_interopRequireDefault(__webpack_require__(747));var _fastGlob=_interopRequireDefault(__webpack_require__(98));var _fs2=__webpack_require__(630);var _execCmd=__webpack_require__(529);var _constants=__webpack_require__(961);function _createForOfIteratorHelperLoose(o,allowArrayLike){var it;if(typeof Symbol==="undefined"||o[Symbol.iterator]==null){if(Array.isArray(o)||(it=_unsupportedIterableToArray(o))||allowArrayLike&&o&&typeof o.length==="number"){if(it)o=it;var i=0;return function(){if(i>=o.length)return{done:true};return{done:false,value:o[i++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}it=o[Symbol.iterator]();return it.next.bind(it);}function _unsupportedIterableToArray(o,minLen){if(!o)return;if(typeof o==="string")return _arrayLikeToArray(o,minLen);var n=Object.prototype.toString.call(o).slice(8,-1);if(n==="Object"&&o.constructor)n=o.constructor.name;if(n==="Map"||n==="Set")return Array.from(o);if(n==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return _arrayLikeToArray(o,minLen);}function _arrayLikeToArray(arr,len){if(len==null||len>arr.length)len=arr.length;for(var i=0,arr2=new Array(len);i<len;i++){arr2[i]=arr[i];}return arr2;}var makeCommentBody=function makeCommentBody(peopleToFiles,sectionHeader){var names=Object.keys(peopleToFiles);if(names.length){var body="### "+sectionHeader;names.forEach(function(person){var files=peopleToFiles[person];body+=person+" for changes to `"+files.join('`, `')+"`\n\n";});return body;}return'';};exports.makeCommentBody=makeCommentBody;var filterIgnoreFiles=function filterIgnoreFiles(fileContents){var filteredOutMostCases=fileContents.split('\n').map(function(line){return line.trim();}).filter(Boolean).filter(function(line){return!line.startsWith(_constants.COMMENT_SYMBOL);});return filteredOutMostCases.map(function(line){if(line.indexOf(_constants.COMMENT_SYMBOL)!==-1){return line.split(_constants.COMMENT_SYMBOL)[0].trim();}return line;});};var getGeraldIgnore=function getGeraldIgnore(){var ignore=[];if(_fs.default.existsSync(_constants.GERALD_IGNORE_FILE)){var _geraldIgnore=filterIgnoreFiles(_fs.default.readFileSync(_constants.GERALD_IGNORE_FILE,'utf-8'));ignore.push.apply(ignore,(0,_toConsumableArray2.default)(_geraldIgnore));}if(_fs.default.existsSync(_constants.GIT_IGNORE_FILE)){var gitIgnore=filterIgnoreFiles(_fs.default.readFileSync(_constants.GIT_IGNORE_FILE,'utf-8'));for(var _iterator=_createForOfIteratorHelperLoose(gitIgnore),_step;!(_step=_iterator()).done;){var line=_step.value;if(!ignore.includes(line)){ignore.push(line);}}}return ignore;};var geraldIgnore=getGeraldIgnore();var globOptions={dot:true,ignore:geraldIgnore};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,fileDiffs,nameToFilesObj){for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(pattern.test(diff)){if(nameToFilesObj[name]){if(!nameToFilesObj[name].includes(file)){nameToFilesObj[name].push(file);}}else{nameToFilesObj[name]=[file];}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=_constants.MATCH_REGEX_REGEX.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,files){if(bin[username]){for(var _iterator2=_createForOfIteratorHelperLoose(files),_step2;!(_step2=_iterator2()).done;){var file=_step2.value;if(!bin[username].includes(file)){bin[username].push(file);}}}else{bin[username]=files;}};var getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(_constants.MATCH_PULL_REQUEST_SECTION_HEADER_REGEX)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file===_constants.NOTIFIED&&!rawFile.match(_constants.MATCH_PUSH_SECTION_HEADER_REGEX)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section===_constants.PULL_REQUEST){sectionRegexp=file===_constants.NOTIFIED?_constants.MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX:_constants.MATCH_JUST_PULL_REQUEST_SECTION_REGEX;}else if(file===_constants.NOTIFIED){sectionRegexp=_constants.MATCH_JUST_PUSH_SECTION_REGEX;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return rawFile.match(sectionRegexp);};exports.getCorrectSection=getCorrectSection;var getNotified=function getNotified(filesChanged,fileDiffs,on){var __testContent=arguments.length>3&&arguments[3]!==undefined?arguments[3]:undefined;var buf=(0,_fs2.readFileSync)(_constants.NOTIFIED_FILE,'utf-8');var section=getCorrectSection(buf,_constants.NOTIFIED,on);if(!section){return{};}var matches=section[0].match(/^[^\#\n].*/gm);var notified={};if(matches){for(var _iterator3=_createForOfIteratorHelperLoose(matches),_step3;!(_step3=_iterator3()).done;){var match=_step3.value;var rule=match;if(match.includes(_constants.COMMENT_SYMBOL)){rule=match.split(_constants.COMMENT_SYMBOL)[0].trim();}var untrimmedPattern=rule.match(_constants.MATCH_PATTERN_REGEX);var names=rule.match(_constants.MATCH_USERNAME_OR_TEAM_REGEX);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator4=_createForOfIteratorHelperLoose(names),_step4;!(_step4=_iterator4()).done;){var _name=_step4.value;maybeAddIfMatch(regex,_name,fileDiffs,notified);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator5=_createForOfIteratorHelperLoose(names),_step5;!(_step5=_iterator5()).done;){var _name2=_step5.value;pushOrSetToBin(notified,_name2,intersection);}}}}}return notified;};exports.getNotified=getNotified;var getReviewers=function getReviewers(filesChanged,fileDiffs,issuer){var buf=(0,_fs2.readFileSync)(_constants.REVIEWERS_FILE,'utf-8');var section=getCorrectSection(buf,_constants.REVIEWERS,_constants.PULL_REQUEST);if(!section){return{reviewers:{},requiredReviewers:{}};}var matches=section[0].match(_constants.MATCH_NON_COMMENT_LINES_REGEX);var reviewers={};var requiredReviewers={};if(!matches){return{reviewers:reviewers,requiredReviewers:requiredReviewers};}for(var _iterator6=_createForOfIteratorHelperLoose(matches),_step6;!(_step6=_iterator6()).done;){var match=_step6.value;var rule=match;if(match.includes(_constants.COMMENT_SYMBOL)){rule=match.split(_constants.COMMENT_SYMBOL)[0].trim();}var untrimmedPattern=rule.match(_constants.MATCH_PATTERN_REGEX);var names=rule.match(_constants.MATCH_USERNAME_OR_TEAM_REGEX);if(!untrimmedPattern||!names){continue;}var pattern=untrimmedPattern[0].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);for(var _iterator7=_createForOfIteratorHelperLoose(names),_step7;!(_step7=_iterator7()).done;){var _name3=_step7.value;var _parseUsername=parseUsername(_name3),username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(justName===issuer){continue;}var correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,fileDiffs,correctBin);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator8=_createForOfIteratorHelperLoose(names),_step8;!(_step8=_iterator8()).done;){var _name4=_step8.value;var _parseUsername2=parseUsername(_name4),_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(_justName===issuer){continue;}var _correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,intersection);}}}}return{reviewers:reviewers,requiredReviewers:requiredReviewers};};exports.getReviewers=getReviewers;var getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator9=_createForOfIteratorHelperLoose(removedJustNames),_step9;!(_step9=_iterator9()).done;){var justName=_step9.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};exports.getFilteredLists=getFilteredLists;var parseExistingComments=function parseExistingComments(existingComments){var actionBotComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.user.login==='khan-actions-bot'){actionBotComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(_constants.MATCH_REMOVEME_TAG_REGEX);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});actionBotComments.forEach(function(comment){var megaCommentMatch=comment.body.match(_constants.MATCH_GERALD_COMMENT_HEADER_REGEX);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};exports.parseExistingComments=parseExistingComments;var getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator10,_step10,diff,fileName;return _regenerator.default.async(function getFileDiffs$(_context){while(1){switch(_context.prev=_context.next){case 0:_context.next=2;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString]));case 2:rawDiffs=_context.sent.split(_constants.MATCH_GIT_DIFF_FILE_SEPERATOR);fileToDiff={};for(_iterator10=_createForOfIteratorHelperLoose(rawDiffs);!(_step10=_iterator10()).done;){diff=_step10.value;fileName=diff.match(_constants.MATCH_GIT_DIFF_FILE_NAME);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context.abrupt("return",fileToDiff);case 6:case"end":return _context.stop();}}},null,null,null,Promise);};exports.getFileDiffs=getFileDiffs;var __maybeAddIfMatch=maybeAddIfMatch;exports.__maybeAddIfMatch=__maybeAddIfMatch;var __turnPatternIntoRegex=turnPatternIntoRegex;exports.__turnPatternIntoRegex=__turnPatternIntoRegex;var __parseUsername=parseUsername;exports.__parseUsername=__parseUsername;var __pushOrSetToBin=pushOrSetToBin;exports.__pushOrSetToBin=__pushOrSetToBin;var __filterIgnoreFiles=filterIgnoreFiles;exports.__filterIgnoreFiles=__filterIgnoreFiles;
 
 /***/ }),
 /* 588 */
@@ -79340,7 +79368,7 @@ function SpreadProperty(...args) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(800);
+const utils = __webpack_require__(400);
 class ErrorFilter {
     constructor(_settings) {
         this._settings = _settings;
@@ -85800,7 +85828,7 @@ module.exports = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(800);
+const utils = __webpack_require__(400);
 class EntryTransformer {
     constructor(_settings) {
         this._settings = _settings;
@@ -85834,7 +85862,7 @@ exports.default = EntryTransformer;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertPatternGroupToTask = exports.convertPatternGroupsToTasks = exports.groupPatternsByBaseDirectory = exports.getNegativePatternsAsPositive = exports.getPositivePatterns = exports.convertPatternsToTasks = exports.generate = void 0;
-const utils = __webpack_require__(800);
+const utils = __webpack_require__(400);
 function generate(patterns, settings) {
     const positivePatterns = getPositivePatterns(patterns);
     const negativePatterns = getNegativePatternsAsPositive(patterns, settings.ignore);
@@ -92041,30 +92069,7 @@ exports.MappingList = MappingList;
 /***/ }),
 /* 798 */,
 /* 799 */,
-/* 800 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.string = exports.stream = exports.pattern = exports.path = exports.fs = exports.errno = exports.array = void 0;
-const array = __webpack_require__(348);
-exports.array = array;
-const errno = __webpack_require__(162);
-exports.errno = errno;
-const fs = __webpack_require__(339);
-exports.fs = fs;
-const path = __webpack_require__(635);
-exports.path = path;
-const pattern = __webpack_require__(927);
-exports.pattern = pattern;
-const stream = __webpack_require__(973);
-exports.stream = stream;
-const string = __webpack_require__(202);
-exports.string = string;
-
-
-/***/ }),
+/* 800 */,
 /* 801 */,
 /* 802 */,
 /* 803 */
@@ -99367,7 +99372,7 @@ module.exports = createBaseFor;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __webpack_require__(800);
+const utils = __webpack_require__(400);
 const partial_1 = __webpack_require__(433);
 class DeepFilter {
     constructor(_settings, _micromatchOptions) {
