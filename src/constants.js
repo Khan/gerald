@@ -12,7 +12,7 @@ export const ENV_EVENT = 'EVENT';
 export const GERALD_IGNORE_FILE = '.geraldignore';
 export const GIT_IGNORE_FILE = '.gitignore';
 export const NOTIFIED_FILE = '.github/NOTIFIED';
-export const REVIEWERS_FILE = '.github/NOTIFIED';
+export const REVIEWERS_FILE = '.github/REVIEWERS';
 export const NOTIFIED = 'NOTIFIED';
 export const REVIEWERS = 'REVIEWERS';
 export const COMMENT_SYMBOL = '#';
@@ -32,7 +32,7 @@ export const MATCH_GIT_DIFF_FILE_SEPERATOR = /^diff --git /m;
 
 // Gerald Comment Regexes
 export const MATCH_REMOVEME_TAG_REGEX = /\#removeme/i;
-export const MATCH_GERALD_COMMENT_HEADER_REGEX = /^#Gerald:/;
+export const MATCH_GERALD_COMMENT_HEADER_REGEX = /^# Gerald:/;
 export const MATCH_COMMENT_HEADER_REGEX = /^### (Reviewers:|Required reviewers:|Notified:)$/m;
 
 // Gerald Files Regexes
