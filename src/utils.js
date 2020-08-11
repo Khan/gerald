@@ -85,6 +85,9 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
  *
  * @param removedJustNames - Just the usernames (not including @) of the people
  * who have requeseted to be removed.
+ * @param params - The owner, repo, and pull_number parameters for Octokit requests.
+ * They can't be imported, because that would make this file really difficult to test.
+ * @param githubClient - The Octokit client that we can make calls on. We also can't import this.
  */
 export const maybeRemoveReviewRequests = async (
     removedJustNames: Array<string>,
