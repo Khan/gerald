@@ -101,7 +101,11 @@ export const runOnPullRequest = async () => {
         removedJustNames,
     );
 
-    await maybeRemoveReviewRequests(removedJustNames);
+    await maybeRemoveReviewRequests(
+        removedJustNames,
+        {...ownerAndRepo, pull_number: context.issue.number},
+        extraPermGithub,
+    );
     await extraPermGithub.pulls.createReviewRequest({
         ...ownerAndRepo,
         pull_number: context.issue.number,

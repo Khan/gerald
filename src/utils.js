@@ -1,6 +1,10 @@
 // @flow
 
-import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from '@octokit/rest';
+import {
+    type Octokit,
+    type Octokit$IssuesListCommentsResponseItem,
+    type Octokit$Response,
+} from '@octokit/rest';
 import fs from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
@@ -29,7 +33,6 @@ import {
     MATCH_GIT_DIFF_FILE_NAME,
     MATCH_GIT_DIFF_FILE_SEPERATOR,
 } from './constants';
-import {ownerAndRepo, context, extraPermGithub} from './setup';
 
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
@@ -83,18 +86,18 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
  * @param removedJustNames - Just the usernames (not including @) of the people
  * who have requeseted to be removed.
  */
-export const maybeRemoveReviewRequests = async (removedJustNames: Array<string>) => {
-    const {data: reviewRequests} = await extraPermGithub.pulls.listReviewRequests({
-        ...ownerAndRepo,
-        pull_number: context.issue.number,
-    });
+export const maybeRemoveReviewRequests = async (
+    removedJustNames: Array<string>,
+    params: {owner: string, repo: string, pull_number: number},
+    githubClient: Octokit,
+) => {
+    const {data: reviewRequests} = await githubClient.pulls.listReviewRequests({...params});
     const toRemove = reviewRequests.users
         .filter(user => removedJustNames.includes(user.login))
         .map(user => user.login);
     if (toRemove.length) {
-        await extraPermGithub.pulls.deleteReviewRequest({
-            ...ownerAndRepo,
-            pull_number: context.issue.number,
+        await githubClient.pulls.deleteReviewRequest({
+            ...params,
             reviewers: toRemove,
         });
     }
