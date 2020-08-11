@@ -29,6 +29,7 @@ import {
     MATCH_GIT_DIFF_FILE_NAME,
     MATCH_GIT_DIFF_FILE_SEPERATOR,
 } from './constants';
+import {ownerAndRepo, context, extraPermGithub} from './setup';
 
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
@@ -73,6 +74,23 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
         }
         return line;
     });
+};
+
+export const maybeRemoveReviewRequests = async (removedJustNames: Array<string>) => {
+    const {data: reviewRequests} = await extraPermGithub.pulls.listReviewRequests({
+        ...ownerAndRepo,
+        pull_number: context.issue.number,
+    });
+    const toRemove = reviewRequests.users
+        .filter(user => removedJustNames.includes(user.login))
+        .map(user => user.login);
+    if (toRemove.length) {
+        await extraPermGithub.pulls.deleteReviewRequest({
+            ...ownerAndRepo,
+            pull_number: context.issue.number,
+            reviewers: toRemove,
+        });
+    }
 };
 
 /**
