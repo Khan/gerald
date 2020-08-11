@@ -28,6 +28,9 @@ jest.mock('@actions/github', () => ({
             'suite3-commit2': {data: {sha: 'suite3-commit2', parents: {length: 2}}},
             'suite3-commit3': {data: {sha: 'suite3-commit3', parents: {length: 1}}},
             'suite4-commit1': {data: {sha: 'suite4-commit1', parents: {length: 1}}},
+            'suite4-commit2': {data: {sha: 'suite4-commit2', parents: {length: 1}}},
+            'suite4-commit3': {data: {sha: 'suite4-commit3', parents: {length: 1}}},
+            'suite5-commit1': {data: {sha: 'suite5-commit1', parents: {length: 1}}},
         };
         const comments: {[sha: string]: string, ...} = {};
         return {
@@ -84,12 +87,14 @@ jest.mock('../utils.js', () => ({
     ...jest.requireActual('../utils.js'),
     getFileDiffs: async (diffString: string) => {
         // we're going to fake these diffs to force these commits to match a rule
-        if (diffString === 'suite2-commit3...suite2-commit4') {
-            return {'src/runOnPush.js': '+ this line was added'};
-        } else if (diffString === 'suite3-commit1...suite3-commit2') {
-            return {'src/runOnPush.js': '+ this line was added'};
+        switch (diffString) {
+            case 'suite2-commit3...suite2-commit4':
+            case 'suite3-commit1...suite3-commit2':
+            case 'suite4-commit1...suite4-commit2':
+                return {'src/runOnPush.js': '+ this line was added'};
+            default:
+                return {};
         }
-        return {};
     },
 }));
 /* end flow-uncovered-block */
@@ -100,7 +105,7 @@ jest.mock('../utils.js', () => ({
  * @param id - Fake commit ID.
  * @param message - Commit message
  */
-const makeTestCommit = (id: string, message: string) => {
+const makeTestCommit = (id: string, message: string, verified: boolean = false) => {
     return {
         author: '__testAuthor',
         comment_count: -1,
@@ -109,7 +114,7 @@ const makeTestCommit = (id: string, message: string) => {
         message: message,
         tree: '__TESTING__',
         url: '__TESTING__',
-        verification: '__TESTING__',
+        verification: {verified: verified},
     };
 };
 
@@ -265,6 +270,45 @@ describe("test that changes on a merge commit don't notify people", () => {
     });
 });
 
+describe('test that changes to verified commits dont notify people', () => {
+    it('should not make comments', async () => {
+        const context = {
+            issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
+            payload: {
+                pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
+                before: 'suite4-commit1',
+                after: 'suite4-commit3',
+                commits: [
+                    makeTestCommit('suite4-commit2', 'First commit', true),
+                    makeTestCommit('suite4-commit3', 'Second commit', true),
+                ],
+            },
+            actor: '__testActor',
+        };
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
+*                   @userName
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+"/^\\+/m"           @Khan/frontend-infra`,
+        );
+
+        await runPush(context);
+
+        // test that commit suite4-commit1 doesn't have a comment because it's not in this push
+        expect(await getComment('suite4-commit1')).toEqual(undefined);
+        // test that commit suite4-commit2 doesn't have a comment because it is verified
+        // even though it has a change that matches the final rule.
+        expect(await getComment('suite4-commit2')).toEqual(undefined);
+        // test that commite suite4-commit3 doesn't have a comment even though a commit in this
+        // push changed something that matches a rule.
+        expect(await getComment('suite4-commit3')).toEqual(undefined);
+    });
+});
+
 describe('test that makeCommitComment makes well formatted strings', () => {
     it('should format the commit comment nicely', async () => {
         const peopleToFiles = {
@@ -272,9 +316,9 @@ describe('test that makeCommitComment makes well formatted strings', () => {
             '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
         };
 
-        await __makeCommitComment(peopleToFiles, 'suite4-commit1');
+        await __makeCommitComment(peopleToFiles, 'suite5-commit1');
 
-        expect(await getComment('suite4-commit1')).toMatchInlineSnapshot(`
+        expect(await getComment('suite5-commit1')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`

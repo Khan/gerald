@@ -34,7 +34,7 @@ export type Context =
                   message: string,
                   tree: '__TESTING__',
                   url: '__TESTING__',
-                  verification: '__TESTING__',
+                  verification: {verified: boolean},
               }>,
           |},
           actor: '__testActor',
