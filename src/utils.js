@@ -76,6 +76,13 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
     });
 };
 
+/**
+ * @desc If any of the usernames in removedJustNames are reviewers, we should also
+ * remove them as a reviewer.
+ *
+ * @param removedJustNames - Just the usernames (not including @) of the people
+ * who have requeseted to be removed.
+ */
 export const maybeRemoveReviewRequests = async (removedJustNames: Array<string>) => {
     const {data: reviewRequests} = await extraPermGithub.pulls.listReviewRequests({
         ...ownerAndRepo,
