@@ -1,47 +1,50 @@
 // @flow
 
-import {
-    type Octokit,
-    type Octokit$IssuesListCommentsResponseItem,
-    type Octokit$PullsListResponseItem,
-    type Octokit$PullsListCommitsResponseItemCommit,
-} from '@octokit/rest';
+import {type Octokit$IssuesListCommentsResponseItem} from '@octokit/rest';
 
 import {parseExistingComments} from './utils';
+import {ownerAndRepo, context, extraPermGithub} from './setup';
 
-type Context = {|
-    issue: {|owner: string, repo: string, number: number|},
-    payload: {|
-        pull_request: Octokit$PullsListResponseItem,
-        before: string,
-        after: string,
-        commits: {id: string, ...Octokit$PullsListCommitsResponseItemCommit}[],
-    |},
-    actor: string,
-|};
+const makeNewComment = (existingBody: string, removedJustNames: Array<string>): string => {
+    let newComment = existingBody;
+    // look through each of the names and see if the existing comment mentions these names
+    for (const justName of removedJustNames) {
+        const regex = new RegExp(`\n^@${justName}.*$\n`, 'gm');
 
-const octokit = require('@actions/github'); //flow-uncovered-line
+        // if so, remove them. $TODO{Stanley} - remove review requests as well.
+        if (newComment.match(regex)) {
+            newComment = newComment.replace(regex, '');
+        }
+    }
+    return newComment;
+};
 
-/* flow-uncovered-block */
-const extraPermGithub: Octokit = new octokit.GitHub(process.env['ADMIN_PERMISSION_TOKEN']);
-const context: Context = octokit.context;
-/* end flow-uncovered-block */
-const ownerAndRepo = {owner: context.issue.owner, repo: context.issue.repo};
-
-const updatePullRequestComment = async (
-    comment: Octokit$IssuesListCommentsResponseItem,
-    body: string,
+/**
+ * @desc Looks at the existing comment and takes out any lines that match the name
+ * of a person who has commented #removeme. Then, if there are still usernames in the
+ * remainder of the comment, it will update the comment, otherwise it will delete it.
+ *
+ * @param comment - Octokit Comment
+ * @param removedJustNames - List of people who have commented #removeme
+ */
+const updateOrDeletePRComment = async (
+    newComment: string,
+    commentID: number,
+    removedJustNames: Array<string>,
 ) => {
-    if (body) {
+    // look for any usernames or team slugs in the remainder of the comment
+    const keepComment = newComment.match(/@([A-Za-z]*\/)?\S*/g);
+
+    if (keepComment) {
         await extraPermGithub.issues.updateComment({
             ...ownerAndRepo,
-            comment_id: comment.id,
-            body: body, // flow-uncovered-line
+            comment_id: commentID,
+            body: newComment, // flow-uncovered-line
         });
     } else {
         await extraPermGithub.issues.deleteComment({
             ...ownerAndRepo,
-            comment_id: comment.id,
+            comment_id: commentID,
         });
     }
 };
@@ -57,13 +60,10 @@ export const runOnComment = async () => {
     } = parseExistingComments<Octokit$IssuesListCommentsResponseItem>(existingComments);
 
     if (megaComment) {
-        let newComment: string = megaComment.body;
-        for (const justName of removedJustNames) {
-            const regex = new RegExp(`^@${justName}.*$\n`, 'gm');
-            newComment = newComment.replace(regex, '');
-        }
-
-        const keepComment = newComment.match(/@([A-Za-z]*\/)?\S*/g);
-        await updatePullRequestComment(megaComment, keepComment ? newComment : '');
+        const newComment = makeNewComment(megaComment.body, removedJustNames);
+        await updateOrDeletePRComment(newComment, megaComment.id, removedJustNames);
     }
 };
+
+// exported for testing
+export const __makeNewComment = makeNewComment;
