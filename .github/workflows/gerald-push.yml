@@ -5,6 +5,7 @@ name: Gerald - Notify on Push
       - master
       - develop
       - main
+      - debug
 jobs:
   gerald:
     runs-on: ubuntu-latest
