@@ -29,6 +29,7 @@ import {
     MATCH_GIT_DIFF_FILE_NAME,
     MATCH_GIT_DIFF_FILE_SEPERATOR,
 } from './constants';
+import {ownerAndRepo, context, extraPermGithub} from './setup';
 
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
@@ -73,6 +74,30 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
         }
         return line;
     });
+};
+
+/**
+ * @desc If any of the usernames in removedJustNames are reviewers, we should also
+ * remove them as a reviewer.
+ *
+ * @param removedJustNames - Just the usernames (not including @) of the people
+ * who have requeseted to be removed.
+ */
+export const maybeRemoveReviewRequests = async (removedJustNames: Array<string>) => {
+    const {data: reviewRequests} = await extraPermGithub.pulls.listReviewRequests({
+        ...ownerAndRepo,
+        pull_number: context.issue.number,
+    });
+    const toRemove = reviewRequests.users
+        .filter(user => removedJustNames.includes(user.login))
+        .map(user => user.login);
+    if (toRemove.length) {
+        await extraPermGithub.pulls.deleteReviewRequest({
+            ...ownerAndRepo,
+            pull_number: context.issue.number,
+            reviewers: toRemove,
+        });
+    }
 };
 
 /**
