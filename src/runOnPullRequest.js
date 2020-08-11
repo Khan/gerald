@@ -9,6 +9,7 @@ import {
     parseExistingComments,
     getFilteredLists,
     makeCommentBody,
+    maybeRemoveReviewRequests,
 } from './utils';
 import {execCmd} from './execCmd';
 import {ownerAndRepo, context, extraPermGithub} from './setup';
@@ -100,6 +101,7 @@ export const runOnPullRequest = async () => {
         removedJustNames,
     );
 
+    await maybeRemoveReviewRequests(removedJustNames);
     await extraPermGithub.pulls.createReviewRequest({
         ...ownerAndRepo,
         pull_number: context.issue.number,
