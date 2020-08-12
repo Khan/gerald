@@ -349,7 +349,7 @@ describe('get filtered lists', () => {
 describe('parse existing comments', () => {
     it('should work', () => {
         const gerald = {
-            user: {login: 'khan-actions-bot'},
+            user: {login: 'not-khan-actions-bot'},
             body: `# Gerald:
 
             ## Notified:

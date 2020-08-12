@@ -404,7 +404,7 @@ export const getFilteredLists = (
 
 /**
  * @desc Parse existing comments on the pull request to get the comments that
- * denote reviewers, required revieweres, and notifiees. Also find all the
+ * denote reviewers, required reviewers, and notifiees. Also find all the
  * #removeme comments to figure out who shouldn't be readded on the pull request.
  * @param existingComments - List of existing Github comments.
  */
@@ -416,14 +416,14 @@ export const parseExistingComments = <
     megaComment: ?T,
     removedJustNames: string[],
 } => {
-    const actionBotComments: T[] = [];
+    const geraldComments: T[] = [];
     const removedJustNames: string[] = [];
     let megaComment: ?T;
 
     existingComments.data.map(cmnt => {
-        // only look at comments made by github-actions[bot] for <required> reviewers / notified comments
-        if (cmnt.user.login === 'khan-actions-bot') {
-            actionBotComments.push(cmnt);
+        // only look at comments that start with # Gerald: for <required> reviewers / notified comments
+        if (cmnt.body.match(MATCH_GERALD_COMMENT_HEADER_REGEX)) {
+            geraldComments.push(cmnt);
         } else {
             const removeMeMatch = cmnt.body.match(MATCH_REMOVEME_TAG_REGEX);
             if (removeMeMatch) {
@@ -432,7 +432,7 @@ export const parseExistingComments = <
         }
     });
 
-    actionBotComments.forEach(comment => {
+    geraldComments.forEach(comment => {
         const megaCommentMatch = comment.body.match(MATCH_GERALD_COMMENT_HEADER_REGEX);
         if (megaCommentMatch) {
             megaComment = comment;
