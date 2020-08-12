@@ -1,6 +1,10 @@
 // @flow
 
-import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from '@octokit/rest';
+import {
+    type Octokit,
+    type Octokit$IssuesListCommentsResponseItem,
+    type Octokit$Response,
+} from '@octokit/rest';
 import fs from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
@@ -73,6 +77,33 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
         }
         return line;
     });
+};
+
+/**
+ * @desc If any of the usernames in removedJustNames are reviewers, we should also
+ * remove them as a reviewer.
+ *
+ * @param removedJustNames - Just the usernames (not including @) of the people
+ * who have requeseted to be removed.
+ * @param params - The owner, repo, and pull_number parameters for Octokit requests.
+ * They can't be imported, because that would make this file really difficult to test.
+ * @param githubClient - The Octokit client that we can make calls on. We also can't import this.
+ */
+export const maybeRemoveReviewRequests = async (
+    removedJustNames: Array<string>,
+    params: {owner: string, repo: string, pull_number: number},
+    githubClient: Octokit,
+) => {
+    const {data: reviewRequests} = await githubClient.pulls.listReviewRequests({...params});
+    const toRemove = reviewRequests.users
+        .filter(user => removedJustNames.includes(user.login))
+        .map(user => user.login);
+    if (toRemove.length) {
+        await githubClient.pulls.deleteReviewRequest({
+            ...params,
+            reviewers: toRemove,
+        });
+    }
 };
 
 /**
