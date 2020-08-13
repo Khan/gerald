@@ -72,9 +72,18 @@ jest.mock('../execCmd.js', () => ({
     ...jest.requireActual('../execCmd.js'),
     execCmd: async (cmd: string, args: string[]) => {
         return await new Promise((res, rej) => {
-            const string = `src/runOnPush.js
+            let string = '';
+            switch (args[1]) {
+                case 'suite3-commit2...suite3-commit3':
+                    string = `src/gerald.js
+.github/workflows/build.yml`;
+                    break;
+                default:
+                    string = `src/runOnPush.js
 src/gerald.js
 .github/workflows/build.yml`;
+                    break;
+            }
             process.nextTick(() => res(string));
         });
     },
@@ -88,9 +97,9 @@ jest.mock('../utils.js', () => ({
     getFileDiffs: async (diffString: string) => {
         // we're going to fake these diffs to force these commits to match a rule
         switch (diffString) {
-            case 'suite2-commit3...suite2-commit4':
-            case 'suite3-commit1...suite3-commit2':
-            case 'suite4-commit1...suite4-commit2':
+            case 'suite2-commit1...suite2-commit5':
+            case 'suite3-commit1...suite3-commit3':
+            case 'suite4-commit1...suite4-commit3':
                 return {'src/runOnPush.js': '+ this line was added'};
             default:
                 return {};
