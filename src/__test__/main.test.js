@@ -1,4 +1,4 @@
-// // @flow
+// @flow
 
 import {__makeCommitComment, runPush, __extraPermGithub} from '../runOnPush';
 import {readFileSync} from '../fs';
@@ -88,9 +88,11 @@ jest.mock('../utils.js', () => ({
     getFileDiffs: async (diffString: string) => {
         // we're going to fake these diffs to force these commits to match a rule
         switch (diffString) {
+            case 'suite2-commit1...suite2-commit5':
             case 'suite2-commit3...suite2-commit4':
-            case 'suite3-commit1...suite3-commit2':
-            case 'suite4-commit1...suite4-commit2':
+            case 'suite3-commit1...suite3-commit3':
+            case 'suite4-commit1...suite4-commit3':
+            case 'suite4-commit2...suite4-commit3':
                 return {'src/runOnPush.js': '+ this line was added'};
             default:
                 return {};
