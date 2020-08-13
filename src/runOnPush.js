@@ -89,5 +89,3 @@ export type __TestCommit = {
 
 export const __makeCommitComment = makeCommitComment;
 export const __extraPermGithub = extraPermGithub;
-
-//ok this will be reverted
