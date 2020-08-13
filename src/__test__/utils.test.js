@@ -487,3 +487,28 @@ describe('test that makeCommentBody makes a nicely-formatted string', () => {
         `);
     });
 });
+
+describe('test file content matching', () => {
+    it('should work', () => {
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+
+[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+"/this is a key string/"        @yipstanley     --match-contents
+        `,
+        );
+        const fileContents = {
+            'src/runOnPush.js': `something something something
+
+this is a key string that we're matching for
+
+other things here`,
+        };
+        const notified = getNotified([], {}, fileContents, 'push');
+
+        expect(notified).toEqual({'@yipstanley': ['src/runOnPush.js']});
+    });
+});

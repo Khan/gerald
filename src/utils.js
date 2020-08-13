@@ -33,7 +33,6 @@ import {
     MATCH_GIT_DIFF_FILE_NAME,
     MATCH_GIT_DIFF_FILE_SEPERATOR,
 } from './constants';
-import {ownerAndRepo, context, extraPermGithub} from './setup';
 
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
@@ -287,8 +286,6 @@ export const getNotified = (
             const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
             const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
             const againstFileContents = rule.match(/--match-contents\s*$/);
-            console.log(rule);
-            console.log(againstFileContents);
             if (!untrimmedPattern || !names) {
                 continue;
             }
