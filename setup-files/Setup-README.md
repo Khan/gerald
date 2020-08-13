@@ -16,3 +16,9 @@ This file is intended to help you set up [Gerald](github.com/Khan/gerald) on an 
 2. Copy the `NOTIFIED` and `REVIEWERS` files to the `.github` folder.
 3. Add rules to the `NOTIFIED` and `REVIEWERS` files. Refer to the [`Gerald-README.md`](./Gerald-README.md) document for more info on adding rules.
 4. Highly recommended: copy `Gerald-README.md` and `Setup-README.md` into your repository to have these files handy.
+
+## (Optional) Setting up Gerald-Tester
+
+1. Open `~/.bashrc` in any editor.
+2. Add the line `export PATH="$HOME/<PATH TO CURRENT WORKING DIRECTORY>/bin:$PATH"`.
+3. Reopen your terminal. You should now be able to use `git gerald-tester`.
