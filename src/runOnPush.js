@@ -48,11 +48,19 @@ export const runPush = async (usedContext: Context) => {
                     '--name-only',
                 ])
             ).split('\n');
+            const thisDiff = await getFileDiffs(`${prevCommit}...${commitData.data.sha}`);
 
             // get the squashed diffs of the files that were changed in this commit
             const fileDiffs = {};
             for (const file of filesChanged) {
-                fileDiffs[file] = squashedDiffs[file];
+                if (thisDiff[file] && squashedDiffs[file]) {
+                    const diffByLines = thisDiff[file].split('\n');
+                    const squashedDiffByLines = squashedDiffs[file].split('\n');
+                    const committedAndSquashedDiff = diffByLines.filter(line =>
+                        squashedDiffByLines.includes(line),
+                    );
+                    fileDiffs[file] = committedAndSquashedDiff;
+                }
             }
             const notified = getNotified(filesChanged, fileDiffs, PUSH);
 
