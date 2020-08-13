@@ -7,6 +7,7 @@ Examples:
 
 # This rule will request @owner1 for review on changes to all files. This rule will also request @owner2 for a blocking review.
 **/*                @owner1 @owner2!
+#testing
 
 # This rule will request @owner1 and @Org/team1 for review on changes to all .js files
 **/*.js             @owner1 @Org/team1
