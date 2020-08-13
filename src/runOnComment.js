@@ -67,3 +67,5 @@ export const runOnComment = async () => {
 
 // exported for testing
 export const __makeNewComment = makeNewComment;
+
+// TEST - won't be reverted!
