@@ -265,6 +265,7 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
 export const getNotified = (
     filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
+    fileContents: {[string]: string, ...},
     on: Section,
     __testContent: ?string = undefined,
 ): NameToFiles => {
@@ -285,6 +286,7 @@ export const getNotified = (
             }
             const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
             const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
+            const againstFileContents = rule.match(/--match-contents\S*$/);
             if (!untrimmedPattern || !names) {
                 continue;
             }
@@ -294,8 +296,9 @@ export const getNotified = (
             // handle dealing with regex
             if (pattern.startsWith('"') && pattern.endsWith('"')) {
                 const regex = turnPatternIntoRegex(pattern);
+                const objToUse = againstFileContents ? fileContents : fileDiffs;
                 for (const name of names) {
-                    maybeAddIfMatch(regex, name, fileDiffs, notified);
+                    maybeAddIfMatch(regex, name, objToUse, notified);
                 }
             }
             // handle dealing with glob matches
@@ -325,6 +328,7 @@ export const getNotified = (
 export const getReviewers = (
     filesChanged: string[],
     fileDiffs: {[string]: string, ...},
+    fileContents: {[string]: string, ...},
     issuer: string,
 ): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
     const buf = readFileSync(REVIEWERS_FILE, 'utf-8');
@@ -349,6 +353,7 @@ export const getReviewers = (
         }
         const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
         const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
+        const againstFileContents = rule.match(/--match-contents\S*$/);
         if (!untrimmedPattern || !names) {
             continue;
         }
@@ -358,6 +363,7 @@ export const getReviewers = (
         // handle dealing with regex
         if (pattern.startsWith('"') && pattern.endsWith('"')) {
             const regex = turnPatternIntoRegex(pattern);
+            const objToUse = againstFileContents ? fileContents : fileDiffs;
 
             for (const name of names) {
                 const {username, justName, isRequired} = parseUsername(name);
@@ -367,7 +373,7 @@ export const getReviewers = (
                 }
 
                 const correctBin = isRequired ? requiredReviewers : reviewers;
-                maybeAddIfMatch(regex, username, fileDiffs, correctBin);
+                maybeAddIfMatch(regex, username, objToUse, correctBin);
             }
         } else {
             const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
@@ -494,6 +500,17 @@ export const getFileDiffs = async (diffString: string): {[string]: string, ...} 
     }
 
     return fileToDiff;
+};
+
+export const getFileContents = async (diffString: string) => {
+    const filesChanged = (await execCmd('git', ['diff', diffString, '--name-only'])).split('\n');
+    const fileToContents: {[string]: string, ...} = {};
+    for (const file of filesChanged) {
+        const fileContents = readFileSync(file, 'utf-8');
+
+        fileToContents[file] = fileContents;
+    }
+    return fileToContents;
 };
 
 export const __maybeAddIfMatch = maybeAddIfMatch;
