@@ -1,6 +1,6 @@
 // @flow
 
-// this will be reverted asd
+// this will be reverted why
 
 import {getNotified, getFileDiffs, getFileContents} from './utils';
 import {execCmd} from './execCmd';
