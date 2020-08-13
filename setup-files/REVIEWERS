@@ -12,6 +12,7 @@ Examples:
 
 # This rule will request @owner1 and @owner2 for review on changes to all files in the src/ directory. It will not match files in nested directories, such as src/about/about.js
 src/*               @owner1 @owner2
+#testing
 
 # This rule will request @owner1 and @owner2 for review on changes to all files in the src/ directory, recursively. In contrast to the rule above, it WILL match src/about/about.js
 src/**              @owner1 @owner2
