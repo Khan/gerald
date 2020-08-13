@@ -286,7 +286,9 @@ export const getNotified = (
             }
             const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
             const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
-            const againstFileContents = rule.match(/--match-contents\S*$/);
+            const againstFileContents = rule.match(/--match-contents\s*$/);
+            console.log(rule);
+            console.log(againstFileContents);
             if (!untrimmedPattern || !names) {
                 continue;
             }
@@ -353,7 +355,7 @@ export const getReviewers = (
         }
         const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
         const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
-        const againstFileContents = rule.match(/--match-contents\S*$/);
+        const againstFileContents = rule.match(/--match-contents\s*$/);
         if (!untrimmedPattern || !names) {
             continue;
         }
