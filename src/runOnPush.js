@@ -36,7 +36,8 @@ export const runPush = async (usedContext: Context) => {
 
         // commits with >1 parent are merge commits. we want to ignore those
         // we also want to ignore commits that have been verified.
-        if (commitData.data.parents.length === 1 && !commit.verification.verified) {
+        const verified = commit.verification && commit.verification.verified;
+        if (commitData.data.parents.length === 1 && !verified) {
             const filesChanged = (
                 await execCmd('git', [
                     'diff',
