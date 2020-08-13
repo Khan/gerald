@@ -63,9 +63,6 @@ export const runPush = async (usedContext: Context) => {
                     const committedAndSquashedDiff = diffByLines.filter(line =>
                         squashedDiffByLines.includes(line),
                     );
-                    console.log(diffByLines);
-                    console.log(squashedDiffByLines);
-                    console.log(committedAndSquashedDiff);
                     fileDiffs[file] = committedAndSquashedDiff.join('\n');
                 }
             }
