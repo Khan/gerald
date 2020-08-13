@@ -2,7 +2,7 @@
 
 // this will be reverted
 
-import {getNotified, getFileDiffs} from './utils';
+import {getNotified, getFileDiffs, getFileContents} from './utils';
 import {execCmd} from './execCmd';
 import {ownerAndRepo, extraPermGithub, type Context} from './setup';
 import {PUSH, GERALD_COMMIT_COMMENT_HEADER} from './constants';
@@ -32,7 +32,7 @@ export const runPush = async (usedContext: Context) => {
 
     // we only want to look at the squashed diff for each file
     const squashedDiffs = await getFileDiffs(`${prevCommit}...${usedContext.payload.after}`);
-    const fileContents = await getFileDiffs(`${prevCommit}...${usedContext.payload.after}`);
+    const fileContents = await getFileContents(`${prevCommit}...${usedContext.payload.after}`);
 
     // loop through each commit in the push
     for (const commit of usedContext.payload.commits) {
