@@ -60,4 +60,4 @@ There are three ways to match for files in a directory.
 
 ## Testing Gerald Rules
 
-If you have [Khan's custom command line tools](https://github.com/Khan/our-lovely-cli) installed, you can test out a Gerald rule by running `git gerald-tester --glob` or `git gerald-tester --regex`. Doing so will prompt you for a Glob pattern or Regular Expression, based on the flag you passed in, allowing you to test out patterns before adding them to the Gerald files.
+If you've set up the [`git gerald-tester` command](./Setup-README.md), you can test out a Gerald rule by running `git gerald-tester --glob` or `git gerald-tester --regex`. Doing so will prompt you for a Glob pattern or Regular Expression, based on the flag you passed in, allowing you to test out patterns before adding them to the Gerald files.
