@@ -19,6 +19,6 @@ This file is intended to help you set up [Gerald](github.com/Khan/gerald) on an 
 
 ## (Optional) Setting up Gerald-Tester
 
-1. Open `~/.bashrc` in any editor.
+1. Open `~/.profile` in any editor.
 2. Add the line `export PATH="$HOME/<PATH TO CURRENT WORKING DIRECTORY>/bin:$PATH"`.
 3. Reopen your terminal. You should now be able to use `git gerald-tester`.
