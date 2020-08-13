@@ -453,15 +453,9 @@ export const parseExistingComments = <
     let megaComment: ?T;
 
     existingComments.data.map(cmnt => {
-<<<<<<< HEAD
-        // only look at comments made by github-actions[bot] for <required> reviewers / notified comments
-        if (cmnt.body.match(/^# Gerald:/)) {
-            actionBotComments.push(cmnt);
-=======
         // only look at comments that start with # Gerald: for <required> reviewers / notified comments
         if (cmnt.body.match(MATCH_GERALD_COMMENT_HEADER_REGEX)) {
             geraldComments.push(cmnt);
->>>>>>> b549f8dbda762c905d81da34319d95a6903d2ead
         } else {
             const removeMeMatch = cmnt.body.match(MATCH_REMOVEME_TAG_REGEX);
             if (removeMeMatch) {
