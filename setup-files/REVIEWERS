@@ -3,6 +3,7 @@
 Be sure to read through https://khanacademy.atlassian.net/wiki/spaces/FRONTEND/pages/598278672/Gerald+Documentation before adding any rules!
 
 Examples:
+#testing
 
 # This rule will request @owner1 for review on changes to all files. This rule will also request @owner2 for a blocking review.
 **/*                @owner1 @owner2!
