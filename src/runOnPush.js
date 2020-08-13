@@ -26,8 +26,12 @@ const makeCommitComment = async (
 };
 
 export const runPush = async (usedContext: Context) => {
-    // loop through each commit in the push
     let prevCommit = usedContext.payload.before;
+
+    // we only want to look at the squashed diff for each file
+    const squashedDiffs = await getFileDiffs(`${prevCommit}...${usedContext.payload.after}`);
+
+    // loop through each commit in the push
     for (const commit of usedContext.payload.commits) {
         const commitData = await extraPermGithub.git.getCommit({
             ...ownerAndRepo,
@@ -44,7 +48,23 @@ export const runPush = async (usedContext: Context) => {
                     '--name-only',
                 ])
             ).split('\n');
-            const fileDiffs = await getFileDiffs(`${prevCommit}...${commitData.data.sha}`);
+            const thisDiff = await getFileDiffs(`${prevCommit}...${commitData.data.sha}`);
+
+            // get the squashed diffs of the files that were changed in this commit
+            const fileDiffs: {[string]: string, ...} = {};
+            for (const file of filesChanged) {
+                if (thisDiff[file] && squashedDiffs[file]) {
+                    // get all the diff lines in *this* commit and *all* commits
+                    const diffByLines = thisDiff[file].split('\n');
+                    const squashedDiffByLines = squashedDiffs[file].split('\n');
+
+                    // only run the regex on the diff lines that are both in *this* commit and all commits
+                    const committedAndSquashedDiff = diffByLines.filter(line =>
+                        squashedDiffByLines.includes(line),
+                    );
+                    fileDiffs[file] = committedAndSquashedDiff.join('\n');
+                }
+            }
             const notified = getNotified(filesChanged, fileDiffs, PUSH);
 
             await makeCommitComment(notified, commitData.data.sha);

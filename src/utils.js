@@ -1,6 +1,10 @@
 // @flow
 
-import {type Octokit$IssuesListCommentsResponseItem, type Octokit$Response} from '@octokit/rest';
+import {
+    type Octokit,
+    type Octokit$IssuesListCommentsResponseItem,
+    type Octokit$Response,
+} from '@octokit/rest';
 import fs from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
@@ -82,19 +86,22 @@ const filterIgnoreFiles = (fileContents: string): Array<string> => {
  *
  * @param removedJustNames - Just the usernames (not including @) of the people
  * who have requeseted to be removed.
+ * @param params - The owner, repo, and pull_number parameters for Octokit requests.
+ * They can't be imported, because that would make this file really difficult to test.
+ * @param githubClient - The Octokit client that we can make calls on. We also can't import this.
  */
-export const maybeRemoveReviewRequests = async (removedJustNames: Array<string>) => {
-    const {data: reviewRequests} = await extraPermGithub.pulls.listReviewRequests({
-        ...ownerAndRepo,
-        pull_number: context.issue.number,
-    });
+export const maybeRemoveReviewRequests = async (
+    removedJustNames: Array<string>,
+    params: {owner: string, repo: string, pull_number: number},
+    githubClient: Octokit,
+) => {
+    const {data: reviewRequests} = await githubClient.pulls.listReviewRequests({...params});
     const toRemove = reviewRequests.users
         .filter(user => removedJustNames.includes(user.login))
         .map(user => user.login);
     if (toRemove.length) {
-        await extraPermGithub.pulls.deleteReviewRequest({
-            ...ownerAndRepo,
-            pull_number: context.issue.number,
+        await githubClient.pulls.deleteReviewRequest({
+            ...params,
             reviewers: toRemove,
         });
     }
@@ -429,7 +436,7 @@ export const getFilteredLists = (
 
 /**
  * @desc Parse existing comments on the pull request to get the comments that
- * denote reviewers, required revieweres, and notifiees. Also find all the
+ * denote reviewers, required reviewers, and notifiees. Also find all the
  * #removeme comments to figure out who shouldn't be readded on the pull request.
  * @param existingComments - List of existing Github comments.
  */
@@ -441,14 +448,20 @@ export const parseExistingComments = <
     megaComment: ?T,
     removedJustNames: string[],
 } => {
-    const actionBotComments: T[] = [];
+    const geraldComments: T[] = [];
     const removedJustNames: string[] = [];
     let megaComment: ?T;
 
     existingComments.data.map(cmnt => {
+<<<<<<< HEAD
         // only look at comments made by github-actions[bot] for <required> reviewers / notified comments
         if (cmnt.body.match(/^# Gerald:/)) {
             actionBotComments.push(cmnt);
+=======
+        // only look at comments that start with # Gerald: for <required> reviewers / notified comments
+        if (cmnt.body.match(MATCH_GERALD_COMMENT_HEADER_REGEX)) {
+            geraldComments.push(cmnt);
+>>>>>>> b549f8dbda762c905d81da34319d95a6903d2ead
         } else {
             const removeMeMatch = cmnt.body.match(MATCH_REMOVEME_TAG_REGEX);
             if (removeMeMatch) {
@@ -457,7 +470,7 @@ export const parseExistingComments = <
         }
     });
 
-    actionBotComments.forEach(comment => {
+    geraldComments.forEach(comment => {
         const megaCommentMatch = comment.body.match(MATCH_GERALD_COMMENT_HEADER_REGEX);
         if (megaCommentMatch) {
             megaComment = comment;
