@@ -1,5 +1,7 @@
 // @flow
 
+// this will be reverted
+
 import {getNotified, getFileDiffs} from './utils';
 import {execCmd} from './execCmd';
 import {ownerAndRepo, extraPermGithub, type Context} from './setup';
