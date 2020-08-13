@@ -54,8 +54,11 @@ export const runPush = async (usedContext: Context) => {
             const fileDiffs = {};
             for (const file of filesChanged) {
                 if (thisDiff[file] && squashedDiffs[file]) {
+                    // get all the diff lines in *this* commit and *all* commits
                     const diffByLines = thisDiff[file].split('\n');
                     const squashedDiffByLines = squashedDiffs[file].split('\n');
+
+                    // only run the regex on the diff lines that are both in *this* commit and all commits
                     const committedAndSquashedDiff = diffByLines.filter(line =>
                         squashedDiffByLines.includes(line),
                     );
