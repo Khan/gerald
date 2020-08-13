@@ -506,9 +506,13 @@ export const getFileContents = async (diffString: string) => {
     const filesChanged = (await execCmd('git', ['diff', diffString, '--name-only'])).split('\n');
     const fileToContents: {[string]: string, ...} = {};
     for (const file of filesChanged) {
-        const fileContents = readFileSync(file, 'utf-8');
+        console.log(file);
+        if (fs.existsSync(file)) {
+            const fileContents = readFileSync(file, 'utf-8');
+            console.log(fileContents);
 
-        fileToContents[file] = fileContents;
+            fileToContents[file] = fileContents;
+        }
     }
     return fileToContents;
 };
