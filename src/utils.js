@@ -32,6 +32,7 @@ import {
     MATCH_GERALD_COMMENT_HEADER_REGEX,
     MATCH_GIT_DIFF_FILE_NAME,
     MATCH_GIT_DIFF_FILE_SEPERATOR,
+    MATCH_USE_FILE_CONTENTS_REGEX,
 } from './constants';
 
 type Section = 'pull_request' | 'push';
@@ -258,12 +259,14 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
  * unique person to notify and the files that they are being notified for.
  * @param filesChanged - List of changed files.
  * @param filesDiffs - Map of changed files to their diffs.
+ * @param fileContents - Map of changed files to their full contents.
  * @param on - Which section of the NOTIFIED file are we looking at, the 'pull_request' section or the 'push' section?
  * @param __testContent - For testing, mimicks .github/NOTIFIED content.
  */
 export const getNotified = (
     filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
+    fileContents: {[string]: string, ...},
     on: Section,
     __testContent: ?string = undefined,
 ): NameToFiles => {
@@ -284,6 +287,7 @@ export const getNotified = (
             }
             const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
             const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
+            const againstFileContents = rule.match(MATCH_USE_FILE_CONTENTS_REGEX);
             if (!untrimmedPattern || !names) {
                 continue;
             }
@@ -293,8 +297,9 @@ export const getNotified = (
             // handle dealing with regex
             if (pattern.startsWith('"') && pattern.endsWith('"')) {
                 const regex = turnPatternIntoRegex(pattern);
+                const objToUse = againstFileContents ? fileContents : fileDiffs;
                 for (const name of names) {
-                    maybeAddIfMatch(regex, name, fileDiffs, notified);
+                    maybeAddIfMatch(regex, name, objToUse, notified);
                 }
             }
             // handle dealing with glob matches
@@ -318,12 +323,14 @@ export const getNotified = (
  * unique person to notify and the files that they wanted to be reviewers of.
  * @param filesChanged - List of changed files.
  * @param filesDiffs - Map of changed files to their diffs.
+ * @param fileContents - Map of changed files to their full contents.
  * @param issuer - The person making the pull request should not be a reviewer.
  * @param __testContent - For testing, mimicks .github/REVIEWERS content.
  */
 export const getReviewers = (
     filesChanged: string[],
     fileDiffs: {[string]: string, ...},
+    fileContents: {[string]: string, ...},
     issuer: string,
 ): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
     const buf = readFileSync(REVIEWERS_FILE, 'utf-8');
@@ -348,6 +355,7 @@ export const getReviewers = (
         }
         const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
         const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
+        const againstFileContents = rule.match(MATCH_USE_FILE_CONTENTS_REGEX);
         if (!untrimmedPattern || !names) {
             continue;
         }
@@ -357,6 +365,7 @@ export const getReviewers = (
         // handle dealing with regex
         if (pattern.startsWith('"') && pattern.endsWith('"')) {
             const regex = turnPatternIntoRegex(pattern);
+            const objToUse = againstFileContents ? fileContents : fileDiffs;
 
             for (const name of names) {
                 const {username, justName, isRequired} = parseUsername(name);
@@ -366,7 +375,7 @@ export const getReviewers = (
                 }
 
                 const correctBin = isRequired ? requiredReviewers : reviewers;
-                maybeAddIfMatch(regex, username, fileDiffs, correctBin);
+                maybeAddIfMatch(regex, username, objToUse, correctBin);
             }
         } else {
             const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
@@ -493,6 +502,23 @@ export const getFileDiffs = async (diffString: string): {[string]: string, ...} 
     }
 
     return fileToDiff;
+};
+
+/**
+ * @desc Gets the full contents of the files changed.
+ * @param diffString - git diff < diffString>
+ */
+export const getFileContents = async (diffString: string) => {
+    const filesChanged = (await execCmd('git', ['diff', diffString, '--name-only'])).split('\n');
+    const fileToContents: {[string]: string, ...} = {};
+
+    for (const file of filesChanged) {
+        if (fs.existsSync(file)) {
+            const fileContents = readFileSync(file, 'utf-8');
+            fileToContents[file] = fileContents;
+        }
+    }
+    return fileToContents;
 };
 
 export const __maybeAddIfMatch = maybeAddIfMatch;

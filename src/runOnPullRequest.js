@@ -10,6 +10,7 @@ import {
     getFilteredLists,
     makeCommentBody,
     maybeRemoveReviewRequests,
+    getFileContents,
 } from './utils';
 import {execCmd} from './execCmd';
 import {ownerAndRepo, context, extraPermGithub} from './setup';
@@ -74,12 +75,14 @@ export const runOnPullRequest = async () => {
     ).split('\n');
     // get the actual diff between the head of this branch adn the origin of the base branch, split by files
     const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
+    const fileContents = await getFileContents('origin/' + context.payload.pull_request.base.ref);
 
     // figure out who to notify and request reviews from
-    const notified = getNotified(filesChanged, fileDiffs, PULL_REQUEST);
+    const notified = getNotified(filesChanged, fileDiffs, fileContents, PULL_REQUEST);
     const {reviewers, requiredReviewers} = getReviewers(
         filesChanged,
         fileDiffs,
+        fileContents,
         context.payload.pull_request.user.login,
     );
 
