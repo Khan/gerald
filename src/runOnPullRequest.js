@@ -146,3 +146,5 @@ export const runOnPullRequest = async () => {
 
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
+
+// testing
