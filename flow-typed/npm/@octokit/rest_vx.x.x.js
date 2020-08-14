@@ -23479,6 +23479,10 @@ declare module '@octokit/rest' {
         Octokit$TeamsListMembersResponseItem,
     >;
 
+    declare type Octokit$TeamsListMembersInOrgResponse = Array<
+        Octokit$TeamsListMembersResponseItem,
+    >;
+
     declare type Octokit$TeamsListPendingInvitationsResponse = Array<
         Octokit$TeamsListPendingInvitationsResponseItem,
     >;

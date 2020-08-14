@@ -70,7 +70,7 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
         ...ownerAndRepo,
         pull_number: context.issue.number,
     });
-    const alreadyReviewed = reviews.map(review => review.user.login);
+    const alreadyReviewed: Array<string> = reviews.map(review => review.user.login);
 
     // unfulfilled reviewers = everyone who hasn't reviewed
     const unfulfilledReviewers = reviewers.filter(reviewer => !alreadyReviewed.includes(reviewer));
