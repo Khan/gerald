@@ -5,6 +5,8 @@ import {execCmd} from './execCmd';
 import {ownerAndRepo, extraPermGithub, type Context} from './setup';
 import {PUSH, GERALD_COMMIT_COMMENT_HEADER} from './constants';
 
+// this diff shouldn't match any regexes
+
 const makeCommitComment = async (
     peopleToFiles: {[string]: Array<string>, ...},
     commitSHA: string,
