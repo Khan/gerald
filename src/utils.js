@@ -32,6 +32,7 @@ import {
     MATCH_GERALD_COMMENT_HEADER_REGEX,
     MATCH_GIT_DIFF_FILE_NAME,
     MATCH_GIT_DIFF_FILE_SEPERATOR,
+    MATCH_USE_FILE_CONTENTS_REGEX,
 } from './constants';
 
 type Section = 'pull_request' | 'push';
@@ -258,6 +259,7 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
  * unique person to notify and the files that they are being notified for.
  * @param filesChanged - List of changed files.
  * @param filesDiffs - Map of changed files to their diffs.
+ * @param fileContents - Map of changed files to their full contents.
  * @param on - Which section of the NOTIFIED file are we looking at, the 'pull_request' section or the 'push' section?
  * @param __testContent - For testing, mimicks .github/NOTIFIED content.
  */
@@ -285,7 +287,7 @@ export const getNotified = (
             }
             const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
             const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
-            const againstFileContents = rule.match(/--match-contents\s*$/);
+            const againstFileContents = rule.match(MATCH_USE_FILE_CONTENTS_REGEX);
             if (!untrimmedPattern || !names) {
                 continue;
             }
@@ -321,6 +323,7 @@ export const getNotified = (
  * unique person to notify and the files that they wanted to be reviewers of.
  * @param filesChanged - List of changed files.
  * @param filesDiffs - Map of changed files to their diffs.
+ * @param fileContents - Map of changed files to their full contents.
  * @param issuer - The person making the pull request should not be a reviewer.
  * @param __testContent - For testing, mimicks .github/REVIEWERS content.
  */
@@ -352,7 +355,7 @@ export const getReviewers = (
         }
         const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
         const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
-        const againstFileContents = rule.match(/--match-contents\s*$/);
+        const againstFileContents = rule.match(MATCH_USE_FILE_CONTENTS_REGEX);
         if (!untrimmedPattern || !names) {
             continue;
         }
