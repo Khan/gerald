@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+require('@babel/register')({
+    presets: [require.resolve('metro-react-native-babel-preset')],
+    ignore: ['node_modules'],
+    configFile: false, // Needed so as to not collide w configs in other repos
+});
+require('../gerald-tester/tester.js');

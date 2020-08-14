@@ -14,10 +14,10 @@ jobs:
           ref: '${{ github.ref }}'
           # GitHub Actions doesn't allow us to take the length of github.event.commits, so we have to pass the array into node and take the length there.
           # We add one to the length because we want to get the diff between the last commit and the commit before the first commit.
-          fetch-depth: '$(node -e "console.log(${{ github.event.commits }}.length + 1")'
+          fetch-depth: '$(node -e "${{ github.event.commits }}.length + 1")'
       - name: Run Gerald
         uses: Khan/gerald@main
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          ADMIN_PERMISSION_TOKEN: '${{ secrets.GERALD_SECRET }}'
+          ADMIN_PERMISSION_TOKEN: '${{ secrets.GERALD_ACCESS_TOKEN }}'
           EVENT: 'push'
