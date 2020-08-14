@@ -4,22 +4,9 @@ This file is intended to help you set up [Gerald](github.com/Khan/gerald) on an 
 
 ## Prerequisite Setup
 
-<<<<<<< HEAD
 * In order for Gerald to manage pull requests & reviewers and make comments, it needs there to be a [secret](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository) named `GERALD_ACCESS_TOKEN` that contains a [personal access token](https://github.com/settings/tokens/new) with the "repo" [scope](https://docs.github.com/en/developers/apps/scopes-for-oauth-apps) (or "public_repo" if you're not on a private repository).
 
 * To take advantage of Gerald's Required Reviewers functionality, ensure that you have [OLC tools](github.com/Khan/our-lovely-cli) set up. If OLC tools are not set up, required reviewers will function no differently than reviewers, but Gerald is still usable.
-=======
-Ensure that you have set up your GitHub repository with a
-[secret authentication token](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository)
-named `GERALD_SECRET` that has access to view teams, comment on commit messages and pull requests,
-and make review requests. (Note: If you already have a secret authentication token with the proper
-permissions set up, you can change `GERALD_SECRET` to the name of your token in `gerald-push.yml`,
-`gerald-pr.yml`, and `gerald-comment.yml`, after you've copied them into your repo.)
-
-To take advantage of Gerald's Required Reviewers functionality, ensure that you have
-[OLC tools](github.com/Khan/our-lovely-cli) set up. If OLC tools are not set up, required reviewers
-will function no differently than reviewers, but Gerald is still usable.
->>>>>>> 09f80b2cd2a9e468a24eed29cc009addb75c7632
 
 * Make a `.github/workflows/` folder if it doesn't already exist in your repository.
 
