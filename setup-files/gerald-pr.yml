@@ -17,5 +17,5 @@ jobs:
         uses: Khan/gerald@main
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          ADMIN_PERMISSION_TOKEN: '${{ secrets.GERALD_SECRET }}'
+          ADMIN_PERMISSION_TOKEN: '${{ secrets.GERALD_ACCESS_TOKEN }}'
           EVENT: 'pull_request'
