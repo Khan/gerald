@@ -65,14 +65,15 @@ const updatePullRequestComment = async (
 };
 
 const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array<string>) => {
+    // figure out who has already reviewed
     const {data: reviews} = await extraPermGithub.pulls.listReviews({
         ...ownerAndRepo,
         pull_number: context.issue.number,
     });
+    const alreadyReviewed: Array<string> = reviews.map(review => review.user.login);
 
-    const reviewed = reviews.map(review => review.user.login);
-
-    const unfulfilledReviewers = reviewers.filter(reviewer => !reviewed.includes(reviewer));
+    // unfulfilled reviewers = everyone who hasn't reviewed
+    const unfulfilledReviewers = reviewers.filter(reviewer => !alreadyReviewed.includes(reviewer));
     const unfulfilledTeams = teamReviewers;
 
     for (const team of teamReviewers) {
@@ -81,7 +82,9 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
             team_slug: team,
         });
         const members = membership.map(member => member.login);
-        for (const reviewer of reviewed) {
+
+        // if a requested team has a review from a member, consider it fulfilled
+        for (const reviewer of alreadyReviewed) {
             if (members.includes(reviewer)) {
                 unfulfilledTeams.splice(unfulfilledTeams.indexOf(team), 1);
                 break;

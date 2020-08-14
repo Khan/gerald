@@ -49,7 +49,10 @@ export const makeCommentBody = (
         let body = `### ${sectionHeader}`;
         names.forEach((person: string) => {
             const files = peopleToFiles[person];
-            body += `${person} for changes to \`${files.join('`, `')}\`\n\n`;
+            const filesText = files.join('`, `');
+            // escape @ symbols in our files
+            const escapedFilesText = filesText.replace(/@/g, '%40@');
+            body += `${person} for changes to \`${escapedFilesText}\`\n\n`;
         });
         return body;
     }
