@@ -40,6 +40,13 @@ type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
 type NameToFiles = {[name: string]: string[], ...};
 type CommentHeaders = 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n';
 
+/**
+ * @desc Make the comment body for each of the Gerald sections.
+ *
+ * @param peopleToFiles - List of people being notified / requested for review and
+ * the files they are being notified for / reviewing.
+ * @param sectionHeader - What part of the Gerald comment are we making a section for?
+ */
 export const makeCommentBody = (
     peopleToFiles: {[string]: Array<string>, ...},
     sectionHeader: CommentHeaders,
@@ -521,6 +528,7 @@ export const getFileContents = async (diffString: string) => {
     return fileToContents;
 };
 
+// exported for testing
 export const __maybeAddIfMatch = maybeAddIfMatch;
 export const __turnPatternIntoRegex = turnPatternIntoRegex;
 export const __parseUsername = parseUsername;

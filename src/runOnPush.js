@@ -77,6 +77,7 @@ export const runPush = async (usedContext: Context) => {
     }
 };
 
+// exported for testing
 export type __TestCommit = {
     author: '__testAuthor',
     comment_count: -1,

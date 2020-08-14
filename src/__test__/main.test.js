@@ -37,8 +37,8 @@ jest.mock('@actions/github', () => ({
             git: {
                 /**
                  * For these tests, we're going to overload the getCommit command
-                 * to retreive both commits and comments. The __testGetComment function
-                 * imported from ../runOnPush.js will prepend the commit SHAs with the text
+                 * to retreive both commits and comments. The makeTestCommit function
+                 * used in this file will prepend the commit SHAs with the text
                  * 'comment'. This is because there's not really another easy existing function
                  * to hook into that can be called in runOnPush.js without throwing flow errors
                  */
@@ -81,7 +81,7 @@ src/gerald.js
 }));
 
 /**
- * Mock getFileDifss to return a diff for commit 13 just to test that RegEx still works.
+ * Mock getFileDifss to return a diff for certain calls to getFileDiffs just to test that RegEx still works.
  */
 jest.mock('../utils.js', () => ({
     ...jest.requireActual('../utils.js'),
