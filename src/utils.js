@@ -285,7 +285,7 @@ export const getNotified = (
             }
             const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
             const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
-            const againstFileContents = rule.match(/--match-contents\S*$/);
+            const againstFileContents = rule.match(/--match-contents\s*$/);
             if (!untrimmedPattern || !names) {
                 continue;
             }
@@ -352,7 +352,7 @@ export const getReviewers = (
         }
         const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
         const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
-        const againstFileContents = rule.match(/--match-contents\S*$/);
+        const againstFileContents = rule.match(/--match-contents\s*$/);
         if (!untrimmedPattern || !names) {
             continue;
         }
@@ -501,13 +501,19 @@ export const getFileDiffs = async (diffString: string): {[string]: string, ...} 
     return fileToDiff;
 };
 
+/**
+ * @desc Gets the full contents of the files changed.
+ * @param diffString - git diff < diffString>
+ */
 export const getFileContents = async (diffString: string) => {
     const filesChanged = (await execCmd('git', ['diff', diffString, '--name-only'])).split('\n');
     const fileToContents: {[string]: string, ...} = {};
-    for (const file of filesChanged) {
-        const fileContents = readFileSync(file, 'utf-8');
 
-        fileToContents[file] = fileContents;
+    for (const file of filesChanged) {
+        if (fs.existsSync(file)) {
+            const fileContents = readFileSync(file, 'utf-8');
+            fileToContents[file] = fileContents;
+        }
     }
     return fileToContents;
 };
