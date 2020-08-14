@@ -485,7 +485,7 @@ describe('test that makeCommentBody makes a nicely-formatted string', () => {
 
         expect(result).toMatchInlineSnapshot(`
             "### Reviewers:
-            @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`, \`flow-typed/npm/\\\\@octokit/rest_vx.x.x.js\`
+            @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`, \`flow-typed/npm/%40@octokit/rest_vx.x.x.js\`
 
             @Khan/frontend-infra for changes to \`src/runOnPush.js\`, \`.geraldignore\`
 

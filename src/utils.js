@@ -51,7 +51,7 @@ export const makeCommentBody = (
             const files = peopleToFiles[person];
             const filesText = files.join('`, `');
             // escape @ symbols in our files
-            const escapedFilesText = filesText.replace(/@/g, '\\@');
+            const escapedFilesText = filesText.replace(/@/g, '%40@');
             body += `${person} for changes to \`${escapedFilesText}\`\n\n`;
         });
         return body;
