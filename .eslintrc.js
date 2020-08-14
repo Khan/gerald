@@ -101,7 +101,7 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['src/gerald.js', 'src/execCmd.js', 'src/setup.js', 'bin/git-gerald-tester'],
+            files: ['src/gerald.js', 'src/execCmd.js', 'src/setup.js'],
             rules: {
                 'import/no-commonjs': 'off',
             },
