@@ -183,13 +183,13 @@ describe('get notified', () => {
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        expect(await getNotified(filesChanged, fileDiffs, 'pull_request')).toEqual({
+        expect(await getNotified(filesChanged, fileDiffs, {}, 'pull_request')).toEqual({
             '@yipstanley': ['src/execCmd.js', 'src/runOnPush.js'],
             '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
             '@testperson': ['yaml.yml'],
         });
 
-        expect(await getNotified(filesChanged, fileDiffs, 'push')).toEqual({
+        expect(await getNotified(filesChanged, fileDiffs, {}, 'push')).toEqual({
             '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
         });
     });
@@ -212,13 +212,15 @@ describe('get notified', () => {
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        expect(await getNotified(filesChanged, fileDiffs, 'pull_request', notifiedFile)).toEqual({
+        expect(
+            await getNotified(filesChanged, fileDiffs, {}, 'pull_request', notifiedFile),
+        ).toEqual({
             '@yipstanley': ['src/execCmd.js', 'src/runOnPush.js'],
             '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
             '@testperson': ['yaml.yml'],
         });
 
-        expect(await getNotified(filesChanged, fileDiffs, 'push', notifiedFile)).toEqual({
+        expect(await getNotified(filesChanged, fileDiffs, {}, 'push', notifiedFile)).toEqual({
             '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
         });
     });
@@ -240,7 +242,12 @@ describe('get reviewers', () => {
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
+        const {requiredReviewers, reviewers} = getReviewers(
+            filesChanged,
+            fileDiffs,
+            {},
+            'yipstanley',
+        );
         expect(reviewers).toEqual({
             '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
             '@testperson': ['yaml.yml'],
@@ -265,7 +272,12 @@ describe('get reviewers', () => {
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
+        const {requiredReviewers, reviewers} = getReviewers(
+            filesChanged,
+            fileDiffs,
+            {},
+            'yipstanley',
+        );
         expect(reviewers).toEqual({
             '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
             '@testperson': ['yaml.yml'],
@@ -333,8 +345,13 @@ describe('get filtered lists', () => {
         ];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        const {requiredReviewers, reviewers} = getReviewers(filesChanged, fileDiffs, 'yipstanley');
-        const notified = getNotified(filesChanged, fileDiffs, 'pull_request');
+        const {requiredReviewers, reviewers} = getReviewers(
+            filesChanged,
+            fileDiffs,
+            {},
+            'yipstanley',
+        );
+        const notified = getNotified(filesChanged, fileDiffs, {}, 'pull_request');
         const {actualReviewers, teamReviewers} = getFilteredLists(
             reviewers,
             requiredReviewers,
