@@ -12,7 +12,7 @@
  * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
-
+// to revert
 import * as http from 'http';
 declare module '@octokit/rest' {
     declare type Octokit$json = any;
