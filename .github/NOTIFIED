@@ -36,7 +36,7 @@ Regex Examples:
 
 # This rule will notify @owner1 on changes that include the word "gerald"
 # "/gerald/ig"                @owner1
-
+#testing
 # This rule will notify @owner1 on changes that *add* the word "gerald"
 # "/^\+.*gerald/igm"          @owner1
 
