@@ -343,12 +343,18 @@ export const getReviewers = (
     fileContents: {[string]: string, ...},
     issuer: string,
 ): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
+    console.log('getting reviewers');
+
     const buf = readFileSync(REVIEWERS_FILE, 'utf-8');
     const section = getCorrectSection(buf, REVIEWERS, PULL_REQUEST);
 
     if (!section) {
         return {reviewers: {}, requiredReviewers: {}};
     }
+
+    console.log('fileschanged and issuer');
+    console.log(filesChanged);
+    console.log(issuer);
 
     const matches = section[0].match(MATCH_NON_COMMENT_LINES_REGEX); // ignore newline comments
     const reviewers: {[string]: Array<string>, ...} = {};
@@ -391,6 +397,12 @@ export const getReviewers = (
             const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
+            console.log('globbing');
+            console.log(pattern);
+            console.log(rule);
+            console.log(matchedFiles);
+            console.log(intersection);
+
             if (intersection.length) {
                 for (const name of names) {
                     // don't add yourself as a reviewer
@@ -401,6 +413,13 @@ export const getReviewers = (
 
                     const correctBin = isRequired ? requiredReviewers : reviewers;
                     pushOrSetToBin(correctBin, username, intersection);
+
+                    console.log('pushOrSetToBin');
+                    console.log(correctBin);
+                    console.log(reviewers);
+                    console.log(requiredReviewers);
+                    console.log(username);
+                    console.log(justName);
                 }
             }
         }

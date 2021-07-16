@@ -140,6 +140,11 @@ export const runOnPullRequest = async () => {
         removedJustNames,
     );
 
+    console.log('actually making the request');
+    console.log(actualReviewers);
+    console.log(teamReviewers);
+    console.log(notified);
+
     await maybeRemoveReviewRequests(
         removedJustNames,
         {...ownerAndRepo, pull_number: context.issue.number},

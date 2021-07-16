@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dist": "ncc build src/pr-notify.js",
+    "build": "babel src/ -d js/",
+    "dist": "ncc build js/gerald.js",
     "format": "prettier-eslint --write --config .prettierrc '**/*.js'",
     "format-files": "prettier-eslint --write --config .prettierrc",
     "lint": "eslint .",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.10.4",
+    "@vercel/ncc": "^0.29.0",
     "actions-workflow-tools": "Khan/actions-workflow-tools",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.1.0",
