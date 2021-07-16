@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "babel src/ -d js/",
+    "build": "babel src/ -d js/ && npm run dist",
     "dist": "ncc build js/gerald.js",
     "format": "prettier-eslint --write --config .prettierrc '**/*.js'",
     "format-files": "prettier-eslint --write --config .prettierrc",

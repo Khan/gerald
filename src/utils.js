@@ -352,9 +352,8 @@ export const getReviewers = (
         return {reviewers: {}, requiredReviewers: {}};
     }
 
-    console.log('fileschanged and issuer');
+    console.log('files changed');
     console.log(filesChanged);
-    console.log(issuer);
 
     const matches = section[0].match(MATCH_NON_COMMENT_LINES_REGEX); // ignore newline comments
     const reviewers: {[string]: Array<string>, ...} = {};
