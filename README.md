@@ -8,4 +8,4 @@ Gerald is intended to help developers keep track of changes to their code. At it
 
 ## Usage
 
-To use Gerald in your repository, please read through the [Setup guide](./setup-files/Setup-README.md) and continue on to read through the [Usage guide](./setup-files/Gerald-README.md)
+To use Gerald in your repository, please read through the [Setup guide](./setup-files/Setup-README.md) and continue on to read through the [Usage guide](./setup-files/Gerald-README.md).
