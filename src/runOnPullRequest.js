@@ -127,8 +127,10 @@ export const runOnPullRequest = async () => {
         ...ownerAndRepo,
         issue_number: context.issue.number,
     });
-    const {megaComment, removedJustNames} =
-        parseExistingComments<Octokit$IssuesListCommentsResponseItem>(existingComments);
+    const {
+        megaComment,
+        removedJustNames,
+    } = parseExistingComments<Octokit$IssuesListCommentsResponseItem>(existingComments);
 
     // filter out anyone that has commented #removeme
     const {actualReviewers, teamReviewers} = getFilteredLists(
