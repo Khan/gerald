@@ -5,7 +5,7 @@
     "format": "prettier-eslint --write --config .prettierrc '**/*.js'",
     "format-files": "prettier-eslint --write --config .prettierrc",
     "lint": "eslint .",
-    "test": "jest",
+    "test": "jest src/",
     "test:all": "env JIRA_TESTS=1 jest",
     "flow": "flow"
   },
