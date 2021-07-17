@@ -37,7 +37,7 @@ export const MATCH_COMMENT_HEADER_REGEX = /^### (Reviewers:|Required reviewers:|
 
 // Gerald Files Regexes
 export const MATCH_REGEX_REGEX = /^"\/(.*?)\/([a-z]*)"$/;
-export const MATCH_PATTERN_REGEX = /(.(?!  @))*/;
+export const MATCH_PATTERN_REGEX = /(.(?! +@))*./;
 export const MATCH_USERNAME_OR_TEAM_REGEX = /@([A-Za-z]*\/)?\S*/g;
 export const MATCH_NON_COMMENT_LINES_REGEX = /^[^\#\n].*/gm;
 export const MATCH_PULL_REQUEST_SECTION_HEADER_REGEX = /\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm;

@@ -1,10 +1,11 @@
 {
   "scripts": {
-    "dist": "ncc build src/pr-notify.js",
+    "build": "babel src/ -d js/ && npm run dist",
+    "dist": "ncc build js/gerald.js",
     "format": "prettier-eslint --write --config .prettierrc '**/*.js'",
     "format-files": "prettier-eslint --write --config .prettierrc",
     "lint": "eslint .",
-    "test": "jest",
+    "test": "jest src/",
     "test:all": "env JIRA_TESTS=1 jest",
     "flow": "flow"
   },
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.10.4",
+    "@vercel/ncc": "^0.29.0",
     "actions-workflow-tools": "Khan/actions-workflow-tools",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.1.0",
