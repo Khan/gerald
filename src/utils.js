@@ -397,8 +397,7 @@ export const getReviewers = (
             const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
             console.log('globbing');
-            console.log(process.cwd());
-            console.log(geraldIgnore);
+            console.log(names);
             console.log(pattern);
             console.log(matchedFiles);
             console.log(intersection);
