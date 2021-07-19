@@ -380,7 +380,7 @@ export const getReviewers = (
             for (const name of names) {
                 const {username, justName, isRequired} = parseUsername(name);
                 // don't add yourself as a reviewer
-                if (justName === issuer) {
+                if (username === issuer) {
                     continue;
                 }
 
