@@ -286,6 +286,60 @@ describe('get reviewers', () => {
             '@githubUser': ['.github/workflows/build.yml'],
         });
     });
+
+    it('should work with single space separation between pattern and name', () => {
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
+*                   @userName
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+.github/** @githubUser!
+"/test/ig" @testperson`,
+        );
+        const filesChanged = ['.github/workflows/build.yml'];
+        const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
+
+        const {requiredReviewers, reviewers} = getReviewers(
+            filesChanged,
+            fileDiffs,
+            {},
+            'yipstanley',
+        );
+        expect(reviewers).toEqual({
+            '@testperson': ['yaml.yml'],
+        });
+        expect(requiredReviewers).toEqual({
+            '@githubUser': ['.github/workflows/build.yml'],
+        });
+    });
+
+    it('should work with a tab space between pattern and name', () => {
+        _mock(readFileSync).mockImplementation(
+            () => `# comment
+*                   @userName
+
+[ON PULL REQUEST] (DO NOT DELETE THIS LINE)
+
+.github/**  @githubUser!
+"/test/ig"  @testperson`,
+        );
+        const filesChanged = ['.github/workflows/build.yml'];
+        const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
+
+        const {requiredReviewers, reviewers} = getReviewers(
+            filesChanged,
+            fileDiffs,
+            {},
+            'yipstanley',
+        );
+        expect(reviewers).toEqual({
+            '@testperson': ['yaml.yml'],
+        });
+        expect(requiredReviewers).toEqual({
+            '@githubUser': ['.github/workflows/build.yml'],
+        });
+    });
 });
 
 describe('get correct section', () => {

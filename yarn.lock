@@ -1282,6 +1282,11 @@
   dependencies:
     eslint-visitor-keys "^1.1.0"
 
+"@vercel/ncc@^0.29.0":
+  version "0.29.0"
+  resolved "https://registry.yarnpkg.com/@vercel/ncc/-/ncc-0.29.0.tgz#ac23fc23f1593b05c72360108bcf6d849d2f317a"
+  integrity sha512-p+sB835wOSDdgm2mgFgSOcXJF84AqZ+vBEnnGS0sm8veA92Hia7sqH0qEnqeFilPl+cXtxbdh2er+WdlfbVCZA==
+
 abab@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.3.tgz#623e2075e02eb2d3f2475e49f99c91846467907a"
