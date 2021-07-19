@@ -259,7 +259,7 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
     else if (file === NOTIFIED) {
         sectionRegexp = MATCH_JUST_PUSH_SECTION_REGEX;
     } else {
-        throw new Error('The REVIEWERS file does not have a \'push\' section.');
+        throw new Error("The REVIEWERS file does not have a 'push' section.");
     }
     return rawFile.match(sectionRegexp);
 };
@@ -465,8 +465,9 @@ export const getFilteredLists = (
  * #removeme comments to figure out who shouldn't be readded on the pull request.
  * @param existingComments - List of existing Github comments.
  */
-export const parseExistingComments = <T: {|user: {|login: string|}, body: string|} | Octokit$IssuesListCommentsResponseItem,
-    >(
+export const parseExistingComments = <
+    T: {|user: {|login: string|}, body: string|} | Octokit$IssuesListCommentsResponseItem,
+>(
     existingComments: Octokit$Response<T[]> | {data: T[]},
 ): {
     megaComment: ?T,
