@@ -67,7 +67,13 @@ export const runPush = async (usedContext: Context) => {
                     fileDiffs[file] = committedAndSquashedDiff.join('\n');
                 }
             }
-            const notified = getNotified(filesChanged, fileDiffs, fileContents, usedContext.actor, PUSH);
+            const notified = getNotified(
+                filesChanged,
+                fileDiffs,
+                fileContents,
+                usedContext.actor,
+                PUSH,
+            );
 
             await makeCommitComment(notified, commitData.data.sha);
         }

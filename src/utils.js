@@ -311,7 +311,7 @@ export const getNotified = (
                 const regex = turnPatternIntoRegex(pattern);
                 const objToUse = againstFileContents ? fileContents : fileDiffs;
                 for (const name of names) {
-                    if (name !== author) {
+                    if (parseUsername(name).justName !== author) {
                         maybeAddIfMatch(regex, name, objToUse, notified);
                     }
                 }
@@ -323,7 +323,7 @@ export const getNotified = (
 
                 if (intersection.length) {
                     for (const name of names) {
-                        if (name !== author) {
+                        if (parseUsername(name).justName !== author) {
                             pushOrSetToBin(notified, name, intersection);
                         }
                     }
