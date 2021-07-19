@@ -5,11 +5,7 @@ existing repository.
 
 ## Prerequisite Setup
 
-* In order for Gerald to manage pull requests & reviewers and make comments, it
-needs there to be a [secret](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets-for-a-repository)
-named `GERALD_ACCESS_TOKEN` that contains a [personal access token](https://github.com/settings/tokens/new)
-with the "repo" [scope](https://docs.github.com/en/developers/apps/scopes-for-oauth-apps)
-(or "public_repo" if you're not on a private repository).
+* In order for Gerald to manage pull requests & reviewers and make comments, you need to give Write access to the `@Khan/khan-actions-bot` team for the repo. When viewing the repo in Github you can achieve this by clicking Settings > Manage access > Invite teams or people > Typing `@Khan/khan-actions-bot` then giving that team write access.
 
 * To take advantage of Gerald's Required Reviewers functionality, ensure that
 you have [OLC tools](github.com/Khan/our-lovely-cli) set up. If OLC tools are
