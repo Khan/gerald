@@ -259,7 +259,7 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
     else if (file === NOTIFIED) {
         sectionRegexp = MATCH_JUST_PUSH_SECTION_REGEX;
     } else {
-        throw new Error("The REVIEWERS file does not have a 'push' section.");
+        throw new Error('The REVIEWERS file does not have a \'push\' section.');
     }
     return rawFile.match(sectionRegexp);
 };
@@ -268,8 +268,9 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
  * @desc Parse .github/NOTIFIED and return an object where each entry is a
  * unique person to notify and the files that they are being notified for.
  * @param filesChanged - List of changed files.
- * @param filesDiffs - Map of changed files to their diffs.
+ * @param fileDiffs - Map of changed files to their diffs.
  * @param fileContents - Map of changed files to their full contents.
+ * @param author - The author of the commits/pull-request
  * @param on - Which section of the NOTIFIED file are we looking at, the 'pull_request' section or the 'push' section?
  * @param __testContent - For testing, mimicks .github/NOTIFIED content.
  */
@@ -277,6 +278,7 @@ export const getNotified = (
     filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
     fileContents: {[string]: string, ...},
+    author: string,
     on: Section,
     __testContent: ?string = undefined,
 ): NameToFiles => {
@@ -309,7 +311,9 @@ export const getNotified = (
                 const regex = turnPatternIntoRegex(pattern);
                 const objToUse = againstFileContents ? fileContents : fileDiffs;
                 for (const name of names) {
-                    maybeAddIfMatch(regex, name, objToUse, notified);
+                    if (name !== author) {
+                        maybeAddIfMatch(regex, name, objToUse, notified);
+                    }
                 }
             }
             // handle dealing with glob matches
@@ -319,12 +323,15 @@ export const getNotified = (
 
                 if (intersection.length) {
                     for (const name of names) {
-                        pushOrSetToBin(notified, name, intersection);
+                        if (name !== author) {
+                            pushOrSetToBin(notified, name, intersection);
+                        }
                     }
                 }
             }
         }
     }
+
     return notified;
 };
 
@@ -332,7 +339,7 @@ export const getNotified = (
  * @desc Parse .github/REVIEWERS and return an object where each entry is a
  * unique person to notify and the files that they wanted to be reviewers of.
  * @param filesChanged - List of changed files.
- * @param filesDiffs - Map of changed files to their diffs.
+ * @param fileDiffs - Map of changed files to their diffs.
  * @param fileContents - Map of changed files to their full contents.
  * @param issuer - The person making the pull request should not be a reviewer.
  * @param __testContent - For testing, mimicks .github/REVIEWERS content.
@@ -380,7 +387,7 @@ export const getReviewers = (
             for (const name of names) {
                 const {username, justName, isRequired} = parseUsername(name);
                 // don't add yourself as a reviewer
-                if (username === issuer) {
+                if (justName === issuer) {
                     continue;
                 }
 
@@ -458,9 +465,8 @@ export const getFilteredLists = (
  * #removeme comments to figure out who shouldn't be readded on the pull request.
  * @param existingComments - List of existing Github comments.
  */
-export const parseExistingComments = <
-    T: {|user: {|login: string|}, body: string|} | Octokit$IssuesListCommentsResponseItem,
->(
+export const parseExistingComments = <T: {|user: {|login: string|}, body: string|} | Octokit$IssuesListCommentsResponseItem,
+    >(
     existingComments: Octokit$Response<T[]> | {data: T[]},
 ): {
     megaComment: ?T,
