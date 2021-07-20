@@ -268,8 +268,9 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
  * @desc Parse .github/NOTIFIED and return an object where each entry is a
  * unique person to notify and the files that they are being notified for.
  * @param filesChanged - List of changed files.
- * @param filesDiffs - Map of changed files to their diffs.
+ * @param fileDiffs - Map of changed files to their diffs.
  * @param fileContents - Map of changed files to their full contents.
+ * @param author - The author of the commits/pull-request
  * @param on - Which section of the NOTIFIED file are we looking at, the 'pull_request' section or the 'push' section?
  * @param __testContent - For testing, mimicks .github/NOTIFIED content.
  */
@@ -277,6 +278,7 @@ export const getNotified = (
     filesChanged: Array<string>,
     fileDiffs: {[string]: string, ...},
     fileContents: {[string]: string, ...},
+    author: string,
     on: Section,
     __testContent: ?string = undefined,
 ): NameToFiles => {
@@ -309,7 +311,9 @@ export const getNotified = (
                 const regex = turnPatternIntoRegex(pattern);
                 const objToUse = againstFileContents ? fileContents : fileDiffs;
                 for (const name of names) {
-                    maybeAddIfMatch(regex, name, objToUse, notified);
+                    if (parseUsername(name).justName !== author) {
+                        maybeAddIfMatch(regex, name, objToUse, notified);
+                    }
                 }
             }
             // handle dealing with glob matches
@@ -319,12 +323,15 @@ export const getNotified = (
 
                 if (intersection.length) {
                     for (const name of names) {
-                        pushOrSetToBin(notified, name, intersection);
+                        if (parseUsername(name).justName !== author) {
+                            pushOrSetToBin(notified, name, intersection);
+                        }
                     }
                 }
             }
         }
     }
+
     return notified;
 };
 
@@ -332,7 +339,7 @@ export const getNotified = (
  * @desc Parse .github/REVIEWERS and return an object where each entry is a
  * unique person to notify and the files that they wanted to be reviewers of.
  * @param filesChanged - List of changed files.
- * @param filesDiffs - Map of changed files to their diffs.
+ * @param fileDiffs - Map of changed files to their diffs.
  * @param fileContents - Map of changed files to their full contents.
  * @param issuer - The person making the pull request should not be a reviewer.
  * @param __testContent - For testing, mimicks .github/REVIEWERS content.
