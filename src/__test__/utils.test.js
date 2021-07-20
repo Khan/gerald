@@ -172,8 +172,9 @@ describe('get notified', () => {
 
 .github/**          @githubUser
 **/*.js             @yipstanley @githubUser
-"/test/ig"          @testperson
-# *                 @otherperson
+"/test/ig"          @testPerson
+"/test/ig"          @testAuthor
+# *                 @otherPerson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
@@ -183,13 +184,15 @@ describe('get notified', () => {
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
-        expect(await getNotified(filesChanged, fileDiffs, {}, 'pull_request')).toEqual({
+        expect(
+            await getNotified(filesChanged, fileDiffs, {}, 'testAuthor', 'pull_request'),
+        ).toEqual({
             '@yipstanley': ['src/execCmd.js', 'src/runOnPush.js'],
             '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
-            '@testperson': ['yaml.yml'],
+            '@testPerson': ['yaml.yml'],
         });
 
-        expect(await getNotified(filesChanged, fileDiffs, {}, 'push')).toEqual({
+        expect(await getNotified(filesChanged, fileDiffs, {}, 'testAuthor', 'push')).toEqual({
             '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
         });
     });
@@ -202,8 +205,9 @@ describe('get notified', () => {
 
 .github/**          @githubUser # Gerald is more powerful than this edge case
 **/*.js             @yipstanley @githubUser # inline comments are no problem for the one
-"/test/ig"          @testperson # Mr. Gerald will ignore you now
-# *                 @otherperson
+"/test/ig"          @testPerson # Mr. Gerald will ignore you now
+"/test/ig"          @testAuthor # Mr. Gerald will ignore you too
+# *                 @otherPerson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
@@ -213,14 +217,23 @@ describe('get notified', () => {
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
 
         expect(
-            await getNotified(filesChanged, fileDiffs, {}, 'pull_request', notifiedFile),
+            await getNotified(
+                filesChanged,
+                fileDiffs,
+                {},
+                'testAuthor',
+                'pull_request',
+                notifiedFile,
+            ),
         ).toEqual({
             '@yipstanley': ['src/execCmd.js', 'src/runOnPush.js'],
             '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
-            '@testperson': ['yaml.yml'],
+            '@testPerson': ['yaml.yml'],
         });
 
-        expect(await getNotified(filesChanged, fileDiffs, {}, 'push', notifiedFile)).toEqual({
+        expect(
+            await getNotified(filesChanged, fileDiffs, {}, '__testUser', 'push', notifiedFile),
+        ).toEqual({
             '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
         });
     });
@@ -236,8 +249,8 @@ describe('get reviewers', () => {
 
 .github/**          @githubUser!
 **/*.js             @yipstanley! @githubUser
-"/test/ig"          @testperson
-# *                 @otherperson`,
+"/test/ig"          @testPerson
+# *                 @otherPerson`,
         );
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
@@ -250,7 +263,7 @@ describe('get reviewers', () => {
         );
         expect(reviewers).toEqual({
             '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
-            '@testperson': ['yaml.yml'],
+            '@testPerson': ['yaml.yml'],
         });
         expect(requiredReviewers).toEqual({
             '@githubUser': ['.github/workflows/build.yml'],
@@ -266,8 +279,8 @@ describe('get reviewers', () => {
 
 .github/**          @githubUser! # ah yes, the edge case of inline comments
 **/*.js             @yipstanley! @githubUser # these comments shan't bother Gerald, though
-"/test/ig"          @testperson # nope nope it should still work!
-# *                 @otherperson`,
+"/test/ig"          @testPerson # nope nope it should still work!
+# *                 @otherPerson`,
         );
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
@@ -280,7 +293,7 @@ describe('get reviewers', () => {
         );
         expect(reviewers).toEqual({
             '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
-            '@testperson': ['yaml.yml'],
+            '@testPerson': ['yaml.yml'],
         });
         expect(requiredReviewers).toEqual({
             '@githubUser': ['.github/workflows/build.yml'],
@@ -295,7 +308,7 @@ describe('get reviewers', () => {
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/** @githubUser!
-"/test/ig" @testperson`,
+"/test/ig" @testPerson`,
         );
         const filesChanged = ['.github/workflows/build.yml'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
@@ -307,7 +320,7 @@ describe('get reviewers', () => {
             'yipstanley',
         );
         expect(reviewers).toEqual({
-            '@testperson': ['yaml.yml'],
+            '@testPerson': ['yaml.yml'],
         });
         expect(requiredReviewers).toEqual({
             '@githubUser': ['.github/workflows/build.yml'],
@@ -322,7 +335,7 @@ describe('get reviewers', () => {
 [ON PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 .github/**  @githubUser!
-"/test/ig"  @testperson`,
+"/test/ig"  @testPerson`,
         );
         const filesChanged = ['.github/workflows/build.yml'];
         const fileDiffs = {'yaml.yml': 'this is a function that has added this test line'};
@@ -334,7 +347,7 @@ describe('get reviewers', () => {
             'yipstanley',
         );
         expect(reviewers).toEqual({
-            '@testperson': ['yaml.yml'],
+            '@testPerson': ['yaml.yml'],
         });
         expect(requiredReviewers).toEqual({
             '@githubUser': ['.github/workflows/build.yml'],
@@ -387,8 +400,8 @@ describe('get filtered lists', () => {
 
 .github/**          @githubUser!
 **/*.js             @yipstanley! @githubUser @Org/Slug-name
-"/test/ig"          @testperson
-# *                 @otherperson
+"/test/ig"          @testPerson
+# *                 @otherPerson
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)`,
         );
@@ -405,12 +418,12 @@ describe('get filtered lists', () => {
             {},
             'yipstanley',
         );
-        const notified = getNotified(filesChanged, fileDiffs, {}, 'pull_request');
+        const notified = getNotified(filesChanged, fileDiffs, {}, 'yipstanley', 'pull_request');
         const {actualReviewers, teamReviewers} = getFilteredLists(
             reviewers,
             requiredReviewers,
             notified,
-            ['yipstanley', 'testperson'],
+            ['yipstanley', 'testPerson'],
         );
         expect(actualReviewers).toEqual(expect.arrayContaining(['githubUser']));
         expect(teamReviewers).toEqual(expect.arrayContaining(['Slug-name']));
