@@ -101,6 +101,7 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
 };
 
 export const runOnPullRequest = async () => {
+    // three dots (...) needed to only get files on HEAD and not base
     const asymmetricBaseStr = `origin/${context.payload.pull_request.base.ref}...`;
     // get the files changed between the head of this branch and the origin of the base branch
     const filesChanged = (await execCmd('git', ['diff', asymmetricBaseStr, '--name-only'])).split(
