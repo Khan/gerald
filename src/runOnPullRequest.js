@@ -105,7 +105,7 @@ export const runOnPullRequest = async () => {
     const filesChanged = (
         await execCmd('git', [
             'diff',
-            'origin/' + context.payload.pull_request.base.ref,
+            `origin/${context.payload.pull_request.base.ref}...`,
             '--name-only',
         ])
     ).split('\n');
