@@ -101,15 +101,17 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
 };
 
 export const runOnPullRequest = async () => {
-    // three dots (...) needed to only get files on HEAD and not base
-    const asymmetricBaseStr = `origin/${context.payload.pull_request.base.ref}...`;
     // get the files changed between the head of this branch and the origin of the base branch
-    const filesChanged = (await execCmd('git', ['diff', asymmetricBaseStr, '--name-only'])).split(
-        '\n',
-    );
-    // get the actual diff between the head of this branch and the origin of the base branch, split by files
-    const fileDiffs = await getFileDiffs(asymmetricBaseStr);
-    const fileContents = await getFileContents(asymmetricBaseStr);
+    const filesChanged = (
+        await execCmd('git', [
+            'diff',
+            'origin/' + context.payload.pull_request.base.ref,
+            '--name-only',
+        ])
+    ).split('\n');
+    // get the actual diff between the head of this branch adn the origin of the base branch, split by files
+    const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
+    const fileContents = await getFileContents('origin/' + context.payload.pull_request.base.ref);
 
     // figure out who to notify and request reviews from
     const notified = getNotified(
