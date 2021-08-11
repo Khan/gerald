@@ -1,7 +1,6 @@
 // @flow
 
 import {type Octokit$IssuesListCommentsResponseItem} from '@octokit/rest';
-import gitChangedFiles from 'actions-utils/git-changed-files';
 
 import {
     getReviewers,
@@ -102,10 +101,13 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
 
 export const runOnPullRequest = async () => {
     // get the files changed between the head of this branch and the origin of the base branch
-    const filesChanged = await gitChangedFiles(
-        context.payload.pull_request.base.ref,
-        process.cwd(),
-    );
+    if (!process.env.ALL_CHANGED_FILES) {
+        throw new Error(
+            `no ALL_CHANGED_FILES variable found; it must be set up before gerald runs!`,
+        );
+    }
+    const filesChanged /*: Array<string> */ = JSON.parse(process.env.ALL_CHANGED_FILES); // flow-uncovered-line
+
     // get the actual diff between the head of this branch adn the origin of the base branch, split by files
     const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
     const fileContents = await getFileContents('origin/' + context.payload.pull_request.base.ref);
