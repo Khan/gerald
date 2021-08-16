@@ -38,7 +38,7 @@ import {
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
 type NameToFiles = {[name: string]: string[], ...};
-type CommentHeaders = 'Reviewers:\n' | 'Required reviewers:\n' | 'Notified:\n';
+type CommentHeaders = 'Reviewers' | 'Required Reviewers' | 'Notified';
 
 /**
  * @desc Make the comment body for each of the Gerald sections.
@@ -53,14 +53,15 @@ export const makeCommentBody = (
 ) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (names.length) {
-        let body = `### ${sectionHeader}`;
+        let body = `<details>\n<summary><b>${sectionHeader}</b></summary>\n\n`;
         names.forEach((person: string) => {
             const files = peopleToFiles[person];
             const filesText = files.join('`, `');
             // escape @ symbols in our files
             const escapedFilesText = filesText.replace(/@/g, '%40@');
-            body += `${person} for changes to \`${escapedFilesText}\`\n\n`;
+            body += `* ${person} for changes to \`${escapedFilesText}\`\n`;
         });
+        body += `</details>\n\n`;
         return body;
     }
     return '';

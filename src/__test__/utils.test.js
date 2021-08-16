@@ -548,13 +548,15 @@ describe('test that makeCommentBody makes a nicely-formatted string', () => {
             '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
         };
 
-        const result = await makeCommentBody(peopleToFiles, 'Reviewers:\n');
+        const result = await makeCommentBody(peopleToFiles, 'Reviewers');
 
         expect(result).toMatchInlineSnapshot(`
-            "### Reviewers:
-            @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`, \`flow-typed/npm/%40@octokit/rest_vx.x.x.js\`
+            "<details>
+            <summary><b>Reviewers</b></summary>
 
-            @Khan/frontend-infra for changes to \`src/runOnPush.js\`, \`.geraldignore\`
+            * @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`, \`flow-typed/npm/%40@octokit/rest_vx.x.x.js\`
+            * @Khan/frontend-infra for changes to \`src/runOnPush.js\`, \`.geraldignore\`
+            </details>
 
             "
         `);
