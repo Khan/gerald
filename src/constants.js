@@ -18,10 +18,10 @@ export const REVIEWERS = 'REVIEWERS';
 export const COMMENT_SYMBOL = '#';
 
 // Gerald Comment Headers and Footers
-export const GERALD_COMMENT_HEADER = '# Gerald:\n\n';
-export const GERALD_COMMENT_NOTIFIED_HEADER = 'Notified:\n';
-export const GERALD_COMMENT_REVIEWERS_HEADER = 'Reviewers:\n';
-export const GERALD_COMMENT_REQ_REVIEWERS_HEADER = 'Required reviewers:\n';
+export const GERALD_COMMENT_HEADER = '# Gerald\n\n';
+export const GERALD_COMMENT_NOTIFIED_HEADER = 'Notified';
+export const GERALD_COMMENT_REVIEWERS_HEADER = 'Reviewers';
+export const GERALD_COMMENT_REQ_REVIEWERS_HEADER = 'Required Reviewers';
 export const GERALD_COMMENT_FOOTER =
     "\n__________________________________________________________________________________________________________________________________\n_Don't want to be involved in this pull request? Comment `#removeme` and we won't notify you of further changes._";
 export const GERALD_COMMIT_COMMENT_HEADER = 'Notify of Push Without Pull Request\n\n';
