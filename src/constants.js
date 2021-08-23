@@ -32,8 +32,8 @@ export const MATCH_GIT_DIFF_FILE_SEPERATOR = /^diff --git /m;
 
 // Gerald Comment Regexes
 export const MATCH_REMOVEME_TAG_REGEX = /\#removeme/i;
-export const MATCH_GERALD_COMMENT_HEADER_REGEX = /^# Gerald:/;
-export const MATCH_COMMENT_HEADER_REGEX = /^### (Reviewers:|Required reviewers:|Notified:)$/m;
+export const MATCH_GERALD_COMMENT_HEADER_REGEX = /^# Gerald/;
+export const MATCH_COMMENT_HEADER_REGEX = /^<summary><b>(Reviewers|Required Reviewers|Notified)<\/b><\/summary>$/m;
 
 // Gerald Files Regexes
 export const MATCH_REGEX_REGEX = /^"\/(.*?)\/([a-z]*)"$/;
