@@ -479,7 +479,7 @@ export const parseExistingComments = <
     let megaComment: ?T;
 
     existingComments.data.map(cmnt => {
-        // only look at comments that start with # Gerald: for <required> reviewers / notified comments
+        // only look at comments that start with # Gerald for <required> reviewers / notified comments
         if (cmnt.body.match(MATCH_GERALD_COMMENT_HEADER_REGEX)) {
             geraldComments.push(cmnt);
         } else {
