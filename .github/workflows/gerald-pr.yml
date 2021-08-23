@@ -24,7 +24,7 @@ jobs:
         with:
           ref: '${{ github.head_ref }}'
       - name: Run Gerald
-        uses: Khan/gerald@main
+        uses: Khan/gerald@05a3c2ca815344a3c96d6a63b25af8982e9b7f45
         if: ${{ github.event.pull_request.draft == false }}
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
