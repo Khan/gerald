@@ -7,14 +7,14 @@ name: Gerald - Notify on Push
       - main
 jobs:
   gerald:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v2
         with:
           ref: '${{ github.ref }}'
           # GitHub Actions doesn't allow us to take the length of github.event.commits, so we have to pass the array into node and take the length there.
           # We add one to the length because we want to get the diff between the last commit and the commit before the first commit.
-          fetch-depth: '$(node -e "console.log(${{ github.event.commits }}.length + 1")'
+          fetch-depth: '$(node -e "console.log(${{ github.event.commits }}.length + 1)")'
       - name: Run Gerald
         uses: Khan/gerald@main
         env:
