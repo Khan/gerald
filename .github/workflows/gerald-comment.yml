@@ -3,7 +3,7 @@ name: Gerald - Check Comments
   issue_comment
 jobs:
   gerald:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Run Gerald
         uses: Khan/gerald@main

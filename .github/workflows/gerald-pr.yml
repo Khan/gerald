@@ -10,7 +10,7 @@ name: Gerald - Notify and Request Reviewers On Pull Request
 
 jobs:
   gerald:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Get All Changed Files
         uses: jaredly/get-changed-files@absolute
