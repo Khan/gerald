@@ -37,8 +37,8 @@ const updatePullRequestComment = async (
 ) => {
     let body: string = GERALD_COMMENT_HEADER;
     body += makeCommentBody(notifyees, GERALD_COMMENT_NOTIFIED_HEADER);
-    body += makeCommentBody(reviewers, GERALD_COMMENT_REVIEWERS_HEADER);
-    body += makeCommentBody(requiredReviewers, GERALD_COMMENT_REQ_REVIEWERS_HEADER);
+    body += makeCommentBody(reviewers, GERALD_COMMENT_REVIEWERS_HEADER, true);
+    body += makeCommentBody(requiredReviewers, GERALD_COMMENT_REQ_REVIEWERS_HEADER, true);
     if (body.match(MATCH_COMMENT_HEADER_REGEX)) {
         body += GERALD_COMMENT_FOOTER;
 

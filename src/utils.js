@@ -50,6 +50,7 @@ type CommentHeaders = 'Reviewers' | 'Required Reviewers' | 'Notified';
 export const makeCommentBody = (
     peopleToFiles: {[string]: Array<string>, ...},
     sectionHeader: CommentHeaders,
+    commentPerson: boolean = false,
 ) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (names.length) {
@@ -59,6 +60,8 @@ export const makeCommentBody = (
             const filesText = files.join('`, `');
             // escape @ symbols in our files
             const escapedFilesText = filesText.replace(/@/g, '%40@');
+            // If we're turning the person into a comment, we need to escape the @ symbol
+            person = commentPerson ? person.replace(/@/g, '%40@') : person;
             body += `* ${person} for changes to \`${escapedFilesText}\`\n`;
         });
         body += `</details>\n\n`;
