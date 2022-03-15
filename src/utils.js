@@ -47,18 +47,26 @@ type CommentHeaders = 'Reviewers' | 'Required Reviewers' | 'Notified';
  * the files they are being notified for / reviewing.
  * @param sectionHeader - What part of the Gerald comment are we making a section for?
  */
-export const makeCommentBody = (
+export const makeCommentBody = ({
+    peopleToFiles,
+    header,
+    tagPerson,
+}: {
     peopleToFiles: {[string]: Array<string>, ...},
-    sectionHeader: CommentHeaders,
-) => {
+    header: CommentHeaders,
+    tagPerson: boolean,
+}) => {
     const names: string[] = Object.keys(peopleToFiles);
     if (names.length) {
-        let body = `<details>\n<summary><b>${sectionHeader}</b></summary>\n\n`;
+        let body = `<details>\n<summary><b>${header}</b></summary>\n\n`;
         names.forEach((person: string) => {
             const files = peopleToFiles[person];
             const filesText = files.join('`, `');
             // escape @ symbols in our files
             const escapedFilesText = filesText.replace(/@/g, '%40@');
+            // If we're tagging the person then we don't turn it into an
+            // escaped code string.
+            person = tagPerson ? person : `\`${person}\``;
             body += `* ${person} for changes to \`${escapedFilesText}\`\n`;
         });
         body += `</details>\n\n`;

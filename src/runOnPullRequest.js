@@ -36,9 +36,21 @@ const updatePullRequestComment = async (
     requiredReviewers: {[string]: Array<string>, ...},
 ) => {
     let body: string = GERALD_COMMENT_HEADER;
-    body += makeCommentBody(notifyees, GERALD_COMMENT_NOTIFIED_HEADER);
-    body += makeCommentBody(reviewers, GERALD_COMMENT_REVIEWERS_HEADER);
-    body += makeCommentBody(requiredReviewers, GERALD_COMMENT_REQ_REVIEWERS_HEADER);
+    body += makeCommentBody({
+        peopleToFiles: notifyees,
+        header: GERALD_COMMENT_NOTIFIED_HEADER,
+        tagPerson: true,
+    });
+    body += makeCommentBody({
+        peopleToFiles: reviewers,
+        header: GERALD_COMMENT_REVIEWERS_HEADER,
+        tagPerson: false,
+    });
+    body += makeCommentBody({
+        peopleToFiles: requiredReviewers,
+        header: GERALD_COMMENT_REQ_REVIEWERS_HEADER,
+        tagPerson: false,
+    });
     if (body.match(MATCH_COMMENT_HEADER_REGEX)) {
         body += GERALD_COMMENT_FOOTER;
 
