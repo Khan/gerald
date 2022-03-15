@@ -548,7 +548,7 @@ describe('test that makeCommentBody makes a nicely-formatted string', () => {
             '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
         };
 
-        const result = await makeCommentBody(peopleToFiles, 'Reviewers');
+        const result = await makeCommentBody({peopleToFiles, header: 'Reviewers', tagPerson: true});
 
         expect(result).toMatchInlineSnapshot(`
             "<details>
@@ -572,7 +572,11 @@ describe('test that makeCommentBody makes a nicely-formatted string', () => {
             '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
         };
 
-        const result = await makeCommentBody(peopleToFiles, 'Reviewers', true);
+        const result = await makeCommentBody({
+            peopleToFiles,
+            header: 'Reviewers',
+            tagPerson: false,
+        });
 
         expect(result).toMatchInlineSnapshot(`
             "<details>
