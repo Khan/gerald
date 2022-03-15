@@ -561,4 +561,28 @@ describe('test that makeCommentBody makes a nicely-formatted string', () => {
             "
         `);
     });
+
+    it('should comment out reviewers', async () => {
+        const peopleToFiles = {
+            '@yipstanley': [
+                'src/runOnPush.js',
+                '.github/workflows/build.yml',
+                'flow-typed/npm/@octokit/rest_vx.x.x.js',
+            ],
+            '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
+        };
+
+        const result = await makeCommentBody(peopleToFiles, 'Reviewers', true);
+
+        expect(result).toMatchInlineSnapshot(`
+            "<details>
+            <summary><b>Reviewers</b></summary>
+
+            * \`@yipstanley\` for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`, \`flow-typed/npm/%40@octokit/rest_vx.x.x.js\`
+            * \`@Khan/frontend-infra\` for changes to \`src/runOnPush.js\`, \`.geraldignore\`
+            </details>
+
+            "
+        `);
+    });
 });

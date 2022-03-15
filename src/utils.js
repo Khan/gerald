@@ -60,8 +60,9 @@ export const makeCommentBody = (
             const filesText = files.join('`, `');
             // escape @ symbols in our files
             const escapedFilesText = filesText.replace(/@/g, '%40@');
-            // If we're turning the person into a comment, we need to escape the @ symbol
-            person = commentPerson ? person.replace(/@/g, '%40@') : person;
+            // If we're turning the person into a comment, we need to
+            // wrap the name in a <code> tag.
+            person = commentPerson ? `\`${person}\`` : person;
             body += `* ${person} for changes to \`${escapedFilesText}\`\n`;
         });
         body += `</details>\n\n`;
