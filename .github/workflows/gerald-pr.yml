@@ -31,7 +31,7 @@ jobs:
         with:
           ref: '${{ github.head_ref }}'
       - name: Run Gerald
-        uses: Khan/gerald@4cb3fb5
+        uses: Khan/gerald@4cb3fb549f7c4234e25bbaf0ed546e696d709dd8
         if: ${{ github.event.pull_request.draft == false }}
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
