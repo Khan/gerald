@@ -23,7 +23,10 @@ export type Context =
     | {|
           issue: {|owner: '__TESTING__', repo: '__TESTING__', number: -1|},
           payload: {|
-              pull_request: {|base: {|ref: '__TESTING__', sha: '__TESTING__'|}, user: {|login: '__testUser'|}|},
+              pull_request: {|
+                  base: {|ref: '__TESTING__', sha: '__TESTING__'|},
+                  user: {|login: '__testUser'|},
+              |},
               before: string,
               after: string,
               commits: Array<{
