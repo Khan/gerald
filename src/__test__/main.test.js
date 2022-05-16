@@ -148,7 +148,7 @@ describe('test that the mock works', () => {
         const context = {
             issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
             payload: {
-                pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
+                pull_request: {base: {ref: '__TESTING__', sha: '__TESTING__'}, user: {login: '__testUser'}},
                 before: 'suite1-commit1',
                 after: 'suite1-commit2',
                 commits: [makeTestCommit('suite1-commit2', 'test')],
@@ -194,7 +194,7 @@ describe('test simple working case', () => {
         const context = {
             issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
             payload: {
-                pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
+                pull_request: {base: {ref: '__TESTING__', sha: '__TESTING__'}, user: {login: '__testUser'}},
                 before: 'suite2-commit1',
                 after: 'suite2-commit5',
                 commits: [
@@ -238,7 +238,7 @@ describe("test that changes on a merge commit don't notify people", () => {
         const context = {
             issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
             payload: {
-                pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
+                pull_request: {base: {ref: '__TESTING__', sha: '__TESTING__'}, user: {login: '__testUser'}},
                 before: 'suite3-commit1',
                 after: 'suite3-commit3',
                 commits: [
@@ -277,7 +277,7 @@ describe('test that changes to verified commits dont notify people', () => {
         const context = {
             issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
             payload: {
-                pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
+                pull_request: {base: {ref: '__TESTING__', sha: '__TESTING__'}, user: {login: '__testUser'}},
                 before: 'suite4-commit1',
                 after: 'suite4-commit3',
                 commits: [
