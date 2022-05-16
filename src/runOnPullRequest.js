@@ -121,8 +121,8 @@ export const runOnPullRequest = async () => {
     const filesChanged /*: Array<string> */ = JSON.parse(process.env.ALL_CHANGED_FILES); // flow-uncovered-line
 
     // get the actual diff between the head of this branch adn the origin of the base branch, split by files
-    const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
-    const fileContents = await getFileContents('origin/' + context.payload.pull_request.base.ref);
+    const fileDiffs = await getFileDiffs(context.payload.pull_request.base.sha);
+    const fileContents = await getFileContents(context.payload.pull_request.base.sha);
 
     // figure out who to notify and request reviews from
     const notified = getNotified(
