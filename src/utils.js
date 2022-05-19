@@ -5,7 +5,7 @@ import {
     type Octokit$IssuesListCommentsResponseItem,
     type Octokit$Response,
 } from '@octokit/rest';
-import fs from 'fs';
+import fs, {existsSync} from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
 import {readFileSync} from './fs';
@@ -282,6 +282,9 @@ export const getNotified = (
     on: Section,
     __testContent: ?string = undefined,
 ): NameToFiles => {
+    if (!existsSync(NOTIFIED_FILE)) {
+        return {};
+    }
     const buf = readFileSync(NOTIFIED_FILE, 'utf-8');
     const section = getCorrectSection(buf, NOTIFIED, on);
     if (!section) {
