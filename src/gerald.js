@@ -11,16 +11,24 @@ const {runOnPullRequest} = require('./runOnPullRequest.js');
 const {context} = require('./setup');
 const {PULL_REQUEST, ENV_EVENT, COMMENT} = require('./constants');
 
-try {
-    if (process.env[ENV_EVENT] === PULL_REQUEST) {
-        runOnPullRequest();
-    } else if (process.env[ENV_EVENT] === COMMENT) {
-        runOnComment();
-    } else {
-        runPush(context);
+const run = async () => {
+    try {
+        if (process.env[ENV_EVENT] === PULL_REQUEST) {
+            await runOnPullRequest();
+        } else if (process.env[ENV_EVENT] === COMMENT) {
+            await runOnComment();
+        } else {
+            await runPush(context);
+        }
+        /* flow-uncovered-block */
+    } catch (error) {
+        core.setFailed(error.message);
+        /* end flow-uncovered-block */
     }
-    /* flow-uncovered-block */
-} catch (error) {
+};
+
+/* flow-uncovered-block */
+run().catch(error => {
     core.setFailed(error.message);
-    /* end flow-uncovered-block */
-}
+});
+/* end flow-uncovered-block */
