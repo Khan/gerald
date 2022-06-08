@@ -9,6 +9,8 @@ name: Gerald - Notify and Request Reviewers On Pull Request
     types: [opened, synchronize, reopened, ready_for_review, edited]
 jobs:
   gerald:
+    # Don't re-run if only the title or body changes
+    if: "github.event.action != 'edited' || github.event.changes.base != null"
     runs-on: ubuntu-latest
     steps:
       - uses: Khan/actions@gerald-pr-v0
