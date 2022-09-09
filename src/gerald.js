@@ -22,13 +22,13 @@ const run = async () => {
         }
         /* flow-uncovered-block */
     } catch (error) {
-        core.setFailed(error.message);
+        core.setFailed(error.toString());
         /* end flow-uncovered-block */
     }
 };
 
 /* flow-uncovered-block */
 run().catch(error => {
-    core.setFailed(error.message);
+    core.setFailed(error.toString());
 });
 /* end flow-uncovered-block */

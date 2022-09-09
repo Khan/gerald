@@ -87,6 +87,20 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
     const unfulfilledReviewers = reviewers.filter(reviewer => !alreadyReviewed.includes(reviewer));
     const unfulfilledTeams = teamReviewers;
 
+    // First validate all listed teams exist (we can hit this if a Github team
+    // is renamed but the `.github/REVIEWERS` file is not updated).
+    const currentTeams = await extraPermGithub.teams.list({org: ownerAndRepo.owner});
+    const missingTeams = teamReviewers.filter(
+        slug => !currentTeams.data.includes(t => t.slug === slug),
+    );
+    if (missingTeams.length > 0) {
+        throw new Error(
+            'Cannot create review requests. ' +
+                'The following Github team slugs are invalid:' +
+                missingTeams.join(', '),
+        );
+    }
+
     for (const team of teamReviewers) {
         const {data: membership} = await extraPermGithub.teams.listMembersInOrg({
             org: ownerAndRepo.owner,
