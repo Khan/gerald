@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "babel src/ -d js/ && npm run dist",
+    "build": "rm -rf js && babel src/*.js -d js/ && npm run dist",
     "dist": "ncc build js/gerald.js",
     "format": "prettier-eslint --write --config .prettierrc '**/*.js'",
     "format-files": "prettier-eslint --write --config .prettierrc",
@@ -15,6 +15,7 @@
     "@actions/github": "^5.1.1",
     "@babel/core": "^7.10.4",
     "@babel/register": "^7.10.4",
+    "@octokit/rest": "^19.0.5",
     "actions-utils": "Khan/actions-utils#v1.3.1",
     "fast-glob": "^3.2.4"
   },
