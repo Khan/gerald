@@ -10,9 +10,9 @@
     "flow": "flow"
   },
   "dependencies": {
-    "@actions/core": "^1.2.4",
-    "@actions/exec": "^1.0.4",
-    "@actions/github": "2.1.1",
+    "@actions/core": "^1.10.0",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^5.1.1",
     "@babel/core": "^7.10.4",
     "@babel/register": "^7.10.4",
     "actions-utils": "Khan/actions-utils#v1.3.1",
