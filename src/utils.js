@@ -120,7 +120,7 @@ export const maybeRemoveReviewRequests = async (
         .filter(user => removedJustNames.includes(user.login))
         .map(user => user.login);
     if (toRemove.length) {
-        await githubClient.pulls.deleteReviewRequest({
+        await githubClient.pulls.removeRequestedReviewers({
             ...params,
             reviewers: toRemove,
         });

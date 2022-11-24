@@ -102,7 +102,7 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
         }
     }
 
-    await extraPermGithub.pulls.createReviewRequest({
+    await extraPermGithub.pulls.requestReviewers({
         ...ownerAndRepo,
         pull_number: context.issue.number,
         reviewers: unfulfilledReviewers,
