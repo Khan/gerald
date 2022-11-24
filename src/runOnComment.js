@@ -1,6 +1,5 @@
 // @flow
-
-import {type Octokit$IssuesListCommentsResponseItem} from '@octokit/rest';
+type Octokit$IssuesListCommentsResponseItem = $FlowFixMe;
 
 import {parseExistingComments} from './utils';
 import {ownerAndRepo, context, extraPermGithub} from './setup';

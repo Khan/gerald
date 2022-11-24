@@ -2,9 +2,10 @@
 
 import {
     type Octokit,
-    type Octokit$PullsListResponseItem,
-    type Octokit$PullsListCommitsResponseItemCommit,
 } from '@octokit/rest';
+
+type Octokit$PullsListResponseItem = $FlowFixMe;
+type Octokit$PullsListCommitsResponseItemCommit = $FlowFixMe;
 
 import {ENV_ADMIN_TOKEN} from './constants';
 
@@ -43,7 +44,7 @@ export type Context =
 const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
-export const extraPermGithub: Octokit = octokit.getOctokit(process.env[ENV_ADMIN_TOKEN]);
+export const extraPermGithub: Octokit = octokit.getOctokit(process.env[ENV_ADMIN_TOKEN]).rest;
 export const context: Context = octokit.context;
 /* end flow-uncovered-block */
 export let ownerAndRepo = {owner: '__TESTING__', repo: '__TESTING__'};
