@@ -43,7 +43,7 @@ export type Context =
 const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
-export const extraPermGithub: Octokit = new octokit.GitHub(process.env[ENV_ADMIN_TOKEN]);
+export const extraPermGithub: Octokit = octokit.getOctokit(process.env[ENV_ADMIN_TOKEN]);
 export const context: Context = octokit.context;
 /* end flow-uncovered-block */
 export let ownerAndRepo = {owner: '__TESTING__', repo: '__TESTING__'};

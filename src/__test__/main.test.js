@@ -15,7 +15,7 @@ jest.mock('../fs.js', () => ({
  */
 jest.mock('@actions/github', () => ({
     ...jest.requireActual('@actions/github'),
-    GitHub: (auth: string) => {
+    getOctokit: (auth: string) => {
         const commits: {[sha: string]: {data: {sha: string, parents: {length: number}}}, ...} = {
             'suite1-commit1': {data: {sha: 'suite1-commit1', parents: {length: 1}}},
             'suite1-commit2': {data: {sha: 'suite1-commit2', parents: {length: 1}}},
