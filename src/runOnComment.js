@@ -35,13 +35,13 @@ const updateOrDeletePRComment = async (
     const keepComment = newComment.match(/@([A-Za-z]*\/)?\S*/g);
 
     if (keepComment) {
-        await extraPermGithub.rest.issues.updateComment({
+        await extraPermGithub.issues.updateComment({
             ...ownerAndRepo,
             comment_id: commentID,
             body: newComment, // flow-uncovered-line
         });
     } else {
-        await extraPermGithub.rest.issues.deleteComment({
+        await extraPermGithub.issues.deleteComment({
             ...ownerAndRepo,
             comment_id: commentID,
         });
@@ -49,7 +49,7 @@ const updateOrDeletePRComment = async (
 };
 
 export const runOnComment = async () => {
-    const existingComments = await extraPermGithub.rest.issues.listComments({
+    const existingComments = await extraPermGithub.issues.listComments({
         ...ownerAndRepo,
         issue_number: context.issue.number,
     });

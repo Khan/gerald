@@ -44,7 +44,7 @@ export type Context =
 const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
-export const extraPermGithub: Octokit = octokit.getOctokit(process.env[ENV_ADMIN_TOKEN]);
+export const extraPermGithub: Octokit = octokit.getOctokit(process.env[ENV_ADMIN_TOKEN]).rest;
 
 // Need some debug info on the API.
 console.log(JSON.stringify(Object.keys(extraPermGithub), null, 2));
