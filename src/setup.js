@@ -45,10 +45,6 @@ const octokit = require('@actions/github'); //flow-uncovered-line
 
 /* flow-uncovered-block */
 export const extraPermGithub: Octokit = octokit.getOctokit(process.env[ENV_ADMIN_TOKEN]).rest;
-
-// Need some debug info on the API.
-console.log(JSON.stringify(Object.keys(extraPermGithub.pulls), null, 2));
-
 export const context: Context = octokit.context;
 /* end flow-uncovered-block */
 export let ownerAndRepo = {owner: '__TESTING__', repo: '__TESTING__'};
