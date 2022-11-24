@@ -78903,7 +78903,7 @@ module.exports = baseAssign;
 /* 809 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-Object.defineProperty(exports,"__esModule",{value:true});exports.ownerAndRepo=exports.context=exports.extraPermGithub=void 0;var _constants=__webpack_require__(961);var octokit=__webpack_require__(938);var extraPermGithub=octokit.getOctokit(process.env[_constants.ENV_ADMIN_TOKEN]).rest;exports.extraPermGithub=extraPermGithub;console.log(JSON.stringify(Object.keys(extraPermGithub.pulls),null,2));var context=octokit.context;exports.context=context;var ownerAndRepo={owner:'__TESTING__',repo:'__TESTING__'};exports.ownerAndRepo=ownerAndRepo;if(process.env[_constants.ENV_ADMIN_TOKEN]){exports.ownerAndRepo=ownerAndRepo={owner:context.issue.owner,repo:context.issue.repo};}
+Object.defineProperty(exports,"__esModule",{value:true});exports.ownerAndRepo=exports.context=exports.extraPermGithub=void 0;var _constants=__webpack_require__(961);var octokit=__webpack_require__(938);var extraPermGithub=octokit.getOctokit(process.env[_constants.ENV_ADMIN_TOKEN]).rest;exports.extraPermGithub=extraPermGithub;var context=octokit.context;exports.context=context;var ownerAndRepo={owner:'__TESTING__',repo:'__TESTING__'};exports.ownerAndRepo=ownerAndRepo;if(process.env[_constants.ENV_ADMIN_TOKEN]){exports.ownerAndRepo=ownerAndRepo={owner:context.issue.owner,repo:context.issue.repo};}
 
 /***/ }),
 /* 810 */,
