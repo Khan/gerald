@@ -115,7 +115,7 @@ export const maybeRemoveReviewRequests = async (
     params: {owner: string, repo: string, pull_number: number},
     githubClient: Octokit,
 ) => {
-    const {data: reviewRequests} = await githubClient.pulls.listReviewRequests({...params});
+    const {data: reviewRequests} = await githubClient.pulls.listRequestedReviewers({...params});
     const toRemove = reviewRequests.users
         .filter(user => removedJustNames.includes(user.login))
         .map(user => user.login);
