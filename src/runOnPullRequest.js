@@ -54,20 +54,20 @@ const updatePullRequestComment = async (
         body += GERALD_COMMENT_FOOTER;
 
         if (comment) {
-            await extraPermGithub.issues.updateComment({
+            await extraPermGithub.rest.issues.updateComment({
                 ...ownerAndRepo,
                 comment_id: comment.id,
                 body: body, // flow-uncovered-line
             });
         } else {
-            await extraPermGithub.issues.createComment({
+            await extraPermGithub.rest.issues.createComment({
                 ...ownerAndRepo,
                 issue_number: context.issue.number,
                 body: body, // flow-uncovered-line
             });
         }
     } else if (comment) {
-        await extraPermGithub.issues.deleteComment({
+        await extraPermGithub.rest.issues.deleteComment({
             ...ownerAndRepo,
             comment_id: comment.id,
         });
@@ -139,7 +139,7 @@ export const runOnPullRequest = async () => {
     );
 
     // find any #removeme or existing khan-actions-bot comments
-    const existingComments = await extraPermGithub.issues.listComments({
+    const existingComments = await extraPermGithub.rest.issues.listComments({
         ...ownerAndRepo,
         issue_number: context.issue.number,
     });
