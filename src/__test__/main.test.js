@@ -33,7 +33,7 @@ jest.mock('@actions/github', () => ({
             'suite5-commit1': {data: {sha: 'suite5-commit1', parents: {length: 1}}},
         };
         const comments: {[sha: string]: string, ...} = {};
-        return {
+        const restAPI = {
             git: {
                 /**
                  * For these tests, we're going to overload the getCommit command
@@ -61,6 +61,7 @@ jest.mock('@actions/github', () => ({
                 },
             },
         };
+        return {rest: restAPI};
     },
 }));
 
@@ -145,7 +146,7 @@ const getComment = async (commitSHA: string) => {
 
 describe('test that the mock works', () => {
     it('should work', async () => {
-        const context = {
+        const context: $FlowFixMe = {
             issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
             payload: {
                 pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
@@ -191,7 +192,7 @@ describe('test that the mock works', () => {
 
 describe('test simple working case', () => {
     it('should work', async () => {
-        const context = {
+        const context: $FlowFixMe = {
             issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
             payload: {
                 pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
@@ -235,7 +236,7 @@ src/**              @yipstanley
 
 describe("test that changes on a merge commit don't notify people", () => {
     it('should not make comments', async () => {
-        const context = {
+        const context: $FlowFixMe = {
             issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
             payload: {
                 pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},
@@ -274,7 +275,7 @@ describe("test that changes on a merge commit don't notify people", () => {
 
 describe('test that changes to verified commits dont notify people', () => {
     it('should not make comments', async () => {
-        const context = {
+        const context: $FlowFixMe = {
             issue: {owner: '__TESTING__', repo: '__TESTING__', number: -1},
             payload: {
                 pull_request: {base: {ref: '__TESTING__'}, user: {login: '__testUser'}},

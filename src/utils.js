@@ -2,11 +2,12 @@
 
 import {
     type Octokit,
-    type Octokit$IssuesListCommentsResponseItem,
-    type Octokit$Response,
 } from '@octokit/rest';
 import fs, {existsSync} from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
+
+type Octokit$IssuesListCommentsResponseItem = $FlowFixMe;
+type Octokit$Response<T> = $FlowFixMe;
 
 import {readFileSync} from './fs';
 import {execCmd} from './execCmd';
