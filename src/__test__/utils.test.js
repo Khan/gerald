@@ -40,7 +40,7 @@ export const testFn = () => {
 
 /* flow-uncovered-block */
 jest.mock('../fs.js', () => ({
-    readFileSync: jest.fn(),
+    readFileSync: jest.fn().mockReturnValue(""),
 }));
 
 jest.mock('../execCmd.js', () => ({
