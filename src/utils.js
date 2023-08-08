@@ -136,11 +136,11 @@ export const maybeRemoveReviewRequests = async (
 const getGeraldIgnore = (): Array<string> => {
     const ignore = [];
     if (fs.existsSync(GERALD_IGNORE_FILE)) {
-        const geraldIgnore = filterIgnoreFiles(fs.readFileSync(GERALD_IGNORE_FILE, 'utf-8'));
+        const geraldIgnore = filterIgnoreFiles(readFileSync(GERALD_IGNORE_FILE, 'utf-8'));
         ignore.push(...geraldIgnore);
     }
     if (fs.existsSync(GIT_IGNORE_FILE)) {
-        const gitIgnore = filterIgnoreFiles(fs.readFileSync(GIT_IGNORE_FILE, 'utf-8'));
+        const gitIgnore = filterIgnoreFiles(readFileSync(GIT_IGNORE_FILE, 'utf-8'));
         for (const line of gitIgnore) {
             if (!ignore.includes(line)) {
                 ignore.push(line);

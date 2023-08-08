@@ -24,5 +24,10 @@ export const readFileSync = (
         | 'binary'
         | 'hex',
 ) => {
-    return fs.readFileSync(path, options);
+    try {
+        return fs.readFileSync(path, options);
+    } catch (e) {
+        console.error("Error reading file:", path);
+        return "";
+    }
 };
