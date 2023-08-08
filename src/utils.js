@@ -1,8 +1,6 @@
 // @flow
 
-import {
-    type Octokit,
-} from '@octokit/rest';
+import {type Octokit} from '@octokit/rest';
 import fs, {existsSync} from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 

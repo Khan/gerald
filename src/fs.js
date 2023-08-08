@@ -27,7 +27,7 @@ export const readFileSync = (
     try {
         return fs.readFileSync(path, options);
     } catch (e) {
-        console.error("Error reading file:", path);
-        return "";
+        console.error('Error reading file:', path);
+        return '';
     }
 };

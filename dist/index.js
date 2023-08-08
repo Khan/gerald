@@ -54,7 +54,7 @@ var _interopRequireDefault=__nccwpck_require__(93298);Object.defineProperty(expo
 /***/ 88821:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var _interopRequireDefault=__nccwpck_require__(93298);Object.defineProperty(exports, "__esModule", ({value:true}));exports.readFileSync=void 0;var _fs=_interopRequireDefault(__nccwpck_require__(35747));var readFileSync=function readFileSync(path,options){try{return _fs.default.readFileSync(path,options);}catch(e){console.error("Error reading file:",path);return"";}};exports.readFileSync=readFileSync;
+var _interopRequireDefault=__nccwpck_require__(93298);Object.defineProperty(exports, "__esModule", ({value:true}));exports.readFileSync=void 0;var _fs=_interopRequireDefault(__nccwpck_require__(35747));var readFileSync=function readFileSync(path,options){try{return _fs.default.readFileSync(path,options);}catch(e){console.error('Error reading file:',path);return'';}};exports.readFileSync=readFileSync;
 
 /***/ }),
 

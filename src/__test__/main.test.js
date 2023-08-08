@@ -6,7 +6,7 @@ import {readFileSync} from '../fs';
 /* flow-uncovered-block */
 // mock fs.js readFileSync so that we can provide different implementations in tests
 jest.mock('../fs.js', () => ({
-    readFileSync: jest.fn().mockReturnValue(""),
+    readFileSync: jest.fn().mockReturnValue(''),
 }));
 
 /*
