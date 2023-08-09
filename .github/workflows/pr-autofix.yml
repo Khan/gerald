@@ -14,8 +14,7 @@ jobs:
         name: get the repo
       - uses: actions/setup-node@v3
         with:
-          node-version:
-            - 16.x
+          node-version: 16.x
       - name: "\U0001F53C Finished setup [checkout]"
         run: echo "Finished setting it up"
       - id: paths__github_workflow_templates_
