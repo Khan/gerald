@@ -8,8 +8,16 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor != 'khan-actions-bot'
     steps:
+      - name: "\U0001F53D Start setup [checkout]"
+        run: echo "Setting something up"
       - uses: actions/checkout@v1
-        name: '▶️ Setup checkout: get the repo'
+        name: get the repo
+      - uses: actions/setup-node@v3
+        with:
+          node-version:
+            - 16.x
+      - name: "\U0001F53C Finished setup [checkout]"
+        run: echo "Finished setting it up"
       - id: paths__github_workflow_templates_
         name: 'Check paths: .github/workflow-templates/**'
         run: >-

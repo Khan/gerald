@@ -5,6 +5,7 @@ import fs, {existsSync} from 'fs';
 import fg from 'fast-glob'; // flow-uncovered-line
 
 type Octokit$IssuesListCommentsResponseItem = $FlowFixMe;
+// eslint-ignore-next-line
 type Octokit$Response<T> = $FlowFixMe;
 
 import {readFileSync} from './fs';
