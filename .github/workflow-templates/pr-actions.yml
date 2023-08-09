@@ -45,11 +45,3 @@ jobs:
           flow-bin: ./node_modules/.bin/flow
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run flow coverage
-        uses: Khan/flow-coverage-action@master
-        setup: yarn
-        with:
-          flow-bin: ./node_modules/.bin/flow
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
