@@ -3,6 +3,9 @@ setup:
   checkout:
   - uses: actions/checkout@v1
     name: get the repo
+  - uses: actions/setup-node@v3
+    with:
+      node-version: "16.x"
   yarn:
     setup: checkout
     steps:

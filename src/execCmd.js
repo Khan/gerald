@@ -20,6 +20,8 @@ export const execCmd = async (cmd: string, args: string[]): Promise<string> => {
         stderr: data => {
             error += data.toString();
         },
+        // This can be quite large in some cases, so we don't want to print it out.
+        silent: true,
     };
     await exec.exec(cmd, args, options);
     if (error) {

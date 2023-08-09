@@ -22,7 +22,10 @@ const run = async () => {
         }
         /* flow-uncovered-block */
     } catch (error) {
-        core.setFailed(error.message);
+        // NOTE(john): We could use core.setFailed here, but it means that
+        // Gerald fails sometimes in ways that are confusing to the user.
+        // Instead we print out the error for further debugging.
+        console.error(error);
         /* end flow-uncovered-block */
     }
 };
