@@ -168,10 +168,12 @@ const maybeAddIfMatch = (
     name: string,
     fileDiffs: {[string]: string, ...},
     nameToFilesObj: NameToFiles,
+    filesChanged: Array<string> = [],
 ): void => {
     for (const file of Object.keys(fileDiffs)) {
         const diff = fileDiffs[file];
-        if (pattern.test(diff)) {
+        // Only test the file if it's in the list of files that have changed.
+        if (filesChanged.includes(file) && pattern.test(diff)) {
             if (nameToFilesObj[name]) {
                 if (!nameToFilesObj[name].includes(file)) {
                     nameToFilesObj[name].push(file);
@@ -323,7 +325,7 @@ export const getNotified = (
                 const objToUse = againstFileContents ? fileContents : fileDiffs;
                 for (const name of names) {
                     if (parseUsername(name).justName !== author) {
-                        maybeAddIfMatch(regex, name, objToUse, notified);
+                        maybeAddIfMatch(regex, name, objToUse, notified, filesChanged);
                     }
                 }
             }
@@ -403,7 +405,7 @@ export const getReviewers = (
                 }
 
                 const correctBin = isRequired ? requiredReviewers : reviewers;
-                maybeAddIfMatch(regex, username, objToUse, correctBin);
+                maybeAddIfMatch(regex, username, objToUse, correctBin, filesChanged);
             }
         } else {
             const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
