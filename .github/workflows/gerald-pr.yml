@@ -7,7 +7,11 @@ name: Gerald - Notify and Request Reviewers On Pull Request
     # We also add "edited" to re-check when the base branch
     # is changed.
     types: [opened, synchronize, reopened, ready_for_review, edited]
-
+# When a new revision is pushed to a PR, cancel all in-progress CI runs for that
+# PR. See https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   gerald:
     # Don't re-run if only the title or body changes
