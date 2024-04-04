@@ -1,0 +1,17 @@
+name: 'Checkout and setup'
+description: 'Checkout repo, setup node, and install dependencies'
+
+runs:
+  using: composite
+  steps:
+    - name: checkout the repo
+      uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20.x"
+
+    - name: Install dependencies
+      shell: bash
+      run: yarn
