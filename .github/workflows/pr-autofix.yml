@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor != 'khan-actions-bot'
     steps:
-      - name: "\U0001F53D Start setup [checkout]"
+      - name: "Checkout repo, setup Node.js, install deps"
         uses: ./.github/actions/checkout
 
       - id: paths_src_

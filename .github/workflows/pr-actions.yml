@@ -6,7 +6,7 @@ jobs:
   lint_and_unit:
     runs-on: ubuntu-latest
     steps:
-      - name: "\U0001F53D Start setup [checkout]"
+      - name: "Checkout repo, setup Node.js, install deps"
         uses: ./.github/actions/checkout
 
       - name: Run jest coverage
