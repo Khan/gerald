@@ -1,5 +1,5 @@
 name: Lint and Unit Test
-on:
+'on':
   - pull_request
 
 jobs:
@@ -11,6 +11,13 @@ jobs:
 
       - name: Setup Node.js, install deps
         uses: ./.github/actions/setup
+
+      - name: Run jest tests
+        uses: Khan/jest-action@master
+        with:
+          jest-bin: ./node_modules/.bin/jest
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
 
       - name: Run jest coverage
         uses: Khan/jest-coverage-action@master
