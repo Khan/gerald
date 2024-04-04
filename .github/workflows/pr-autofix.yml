@@ -7,8 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor != 'khan-actions-bot'
     steps:
-      - name: "Checkout repo, setup Node.js, install deps"
-        uses: ./.github/actions/checkout
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js, install deps
+        uses: ./.github/actions/setup
 
       - id: paths_src_
         name: 'Check paths: src/**'

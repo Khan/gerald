@@ -6,8 +6,11 @@ jobs:
   lint_and_unit:
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout repo, setup Node.js, install deps"
-        uses: ./.github/actions/checkout
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js, install deps
+        uses: ./.github/actions/setup
 
       - name: Run jest coverage
         uses: Khan/jest-coverage-action@master
