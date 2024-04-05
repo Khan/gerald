@@ -17,8 +17,6 @@ jobs:
       - name: Setup Node.js, install deps
         uses: ./.github/actions/setup
 
-      - run: sudo npm i -g @zeit/ncc
-
       - name: Build dist folder
         run: yarn run build
 
