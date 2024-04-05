@@ -13,35 +13,28 @@ jobs:
       - name: Setup Node.js, install deps
         uses: ./.github/actions/setup
 
-      - id: paths_src_
-        name: 'Check paths: src/**'
-        run: >-
-          BASE=${GITHUB_BASE_REF:-HEAD~1}
+      - name: Get All Changed Files
+        uses: Khan/actions@get-changed-files-v2
+        id: changed
+        with:
+          directories: src/
 
-          if [[ -n $(git diff --name-only refs/remotes/origin/$BASE --relative |
-          grep '^src/.*$') ]]
-
-          then
-
-          echo "::set-output name=changed::true"
-
-          exit 0
-
-          fi
-
-          echo "::set-output name=changed::false"
-
-          exit 0
+      - id: changed-js
+        name: Find .js changed files
+        uses: Khan/actions@filter-files-v1
+        if: always()
+        with:
+          changed-files: ${{ steps.changed.outputs.files }}
+          extensions: '.js'
 
       - name: Run prettier
-        run: >-
-          node ./node_modules/actions-utils/list-changed-files.js | grep
-          '.*\.js$' | xargs npm run -s format-files
+        if: steps.changed-js.outputs.filtered != '[]'
+        run: echo '${{ steps.changed-js.outputs.filtered }}' | jq -r .[] | xargs yarn run format-files
 
       - name: Rebuild our "dist" file
+        if: steps.changed.outputs.files != '[]'
         run: yarn build
-        if: steps.paths_src_.outputs.changed == 'true'
 
-      - uses: Khan/autofix-commit-action@master
+      - uses: Khan/autofix-commit-action@main
         env:
           GITHUB_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
