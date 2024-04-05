@@ -42,6 +42,6 @@ jobs:
         run: yarn build
         if: steps.paths_src_.outputs.changed == 'true'
 
-      - uses: Khan/autofix-commit-action@master
+      - uses: Khan/autofix-commit-action@main
         env:
           GITHUB_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
