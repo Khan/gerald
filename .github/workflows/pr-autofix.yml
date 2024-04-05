@@ -28,11 +28,11 @@ jobs:
           extensions: '.js'
 
       - name: Run prettier
-        if: steps.changed-js.outputs.filtered != ''
-        run: yarn run format-files ${{ steps.changed-js.outputs.filtered }}
+        if: steps.changed-js.outputs.filtered != '[]'
+        run: echo '${{ steps.changed-js.outputs.filtered }}' | jq -r .[] | xargs yarn run format-files
 
       - name: Rebuild our "dist" file
-        if: steps.changed.outputs.files != ''
+        if: steps.changed.outputs.files != '[]'
         run: yarn build
 
       - uses: Khan/autofix-commit-action@main
