@@ -1,7 +1,7 @@
 name: 'Gerald Action'
 description: 'Notify and Request Reviewers on Pull Request'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
   icon: check-circle

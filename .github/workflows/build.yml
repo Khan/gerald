@@ -11,18 +11,17 @@ jobs:
   build_index:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js, install deps
+        uses: ./.github/actions/setup
+
       - run: sudo npm i -g @zeit/ncc
-      - run: yarn
-        name: "Setting up Yarn"
-      - run: yarn global add
-      - run: npx babel src --out-dir js
-        name: Transpile flow to javascript
-      - run: ncc build js/gerald.js
-        name: Build dist folder
+
+      - name: Build dist folder
+        run: yarn run build
+
       - name: Commit files
         run: |
           echo ${{ github.ref }}
@@ -30,6 +29,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git commit -m "Automated build push" -a | exit 0
+
       - name: Push changes
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/debug'
         uses: ad-m/github-push-action@master
