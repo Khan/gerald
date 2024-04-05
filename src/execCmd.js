@@ -4,7 +4,7 @@ const exec = require('@actions/exec'); //flow-uncovered-line
 
 /**
  * @desc Asynchronously calls @actions/exec to execute a command.
- * @param cmd - Command that we are calling.
+ * @param cmd - The command that we are calling.
  * @param args - List of arguments to call with the command.
  * @throws if the command errors.
  */
