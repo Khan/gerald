@@ -124,7 +124,7 @@ const makeReviewRequests = async (
             if (members.includes(reviewer)) {
                 unfulfilledTeams.splice(unfulfilledTeams.indexOf(team), 1);
                 console.log(
-                    `Not adding team ${team} to the review request list as member ${reviewer} has already reviewed.`,
+                    `Not adding team ${team} to the review-request list as team member ${reviewer} has already reviewed.`,
                 );
                 break;
             }
