@@ -74,16 +74,39 @@ const updatePullRequestComment = async (
     }
 };
 
-const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array<string>) => {
+const makeReviewRequests = async (
+    reviewers: Array<string>,
+    teamReviewers: Array<string>,
+    issuer: string,
+) => {
     // figure out who has already reviewed
     const {data: reviews} = await extraPermGithub.pulls.listReviews({
         ...ownerAndRepo,
         pull_number: context.issue.number,
     });
+
+    // List of any folks who have already reviewed, in any capacity, to be filtered out of the unfulfilled reviewers list
     const alreadyReviewed: Array<string> = reviews.map(review => review.user.login);
 
     // unfulfilled reviewers = everyone who hasn't reviewed
     const unfulfilledReviewers = reviewers.filter(reviewer => !alreadyReviewed.includes(reviewer));
+
+    console.log(
+        `Not adding ${alreadyReviewed.join(', ')} to the review request list as ` +
+            `they have already reviewed.`,
+    );
+
+    // List of any folks who have reviewed meaningfully (approved or requested changes), to determine if the
+    // team reviewing has been fulfilled. Also, don't count the issuer, as they can add comments to their
+    // own PR, and be in the team.
+    const meaningfullyReviewed = reviews
+        .filter(
+            review =>
+                (review.state === 'APPROVED' || review.state === 'CHANGES_REQUESTED') &&
+                review.user.login !== issuer,
+        )
+        .map(review => review.user.login);
+
     const unfulfilledTeams = teamReviewers;
 
     for (const team of teamReviewers) {
@@ -93,13 +116,16 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
         });
         const members = membership.map(member => member.login);
 
-        // // if a requested team has a review from a member, consider it fulfilled
-        // for (const reviewer of alreadyReviewed) {
-        //     if (members.includes(reviewer)) {
-        //         unfulfilledTeams.splice(unfulfilledTeams.indexOf(team), 1);
-        //         break;
-        //     }
-        // }
+        // if a requested team has a review from a member, consider it fulfilled
+        for (const reviewer of meaningfullyReviewed) {
+            if (members.includes(reviewer)) {
+                unfulfilledTeams.splice(unfulfilledTeams.indexOf(team), 1);
+                console.log(
+                    `Not adding team ${team} to the review request list as member ${reviewer} has already reviewed.`,
+                );
+                break;
+            }
+        }
     }
 
     await extraPermGithub.pulls.requestReviewers({
@@ -161,7 +187,12 @@ export const runOnPullRequest = async () => {
         {...ownerAndRepo, pull_number: context.issue.number},
         extraPermGithub,
     );
-    await makeReviewRequests(actualReviewers, teamReviewers);
+
+    await makeReviewRequests(
+        actualReviewers,
+        teamReviewers,
+        context.payload.pull_request.user.login,
+    );
 
     await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
 };
