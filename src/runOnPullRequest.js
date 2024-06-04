@@ -91,10 +91,13 @@ const makeReviewRequests = async (
     // unfulfilled reviewers = everyone who hasn't reviewed
     const unfulfilledReviewers = reviewers.filter(reviewer => !alreadyReviewed.includes(reviewer));
 
-    console.log(
-        `Not adding ${alreadyReviewed.join(', ')} to the review request list as ` +
-            `they have already reviewed.`,
-    );
+    if (reviewers.length > unfulfilledReviewers.length) {
+        console.log(
+            `Not adding ` +
+                `${reviewers.filter(r => !unfulfilledReviewers.includes(r)).join(', ')} ` +
+                `to the review request list as they have already reviewed.`,
+        );
+    }
 
     // List of any folks who have reviewed meaningfully (approved or requested changes), to determine if the
     // team reviewing has been fulfilled. Also, don't count the issuer, as they can add comments to their
