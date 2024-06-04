@@ -93,13 +93,13 @@ const makeReviewRequests = async (reviewers: Array<string>, teamReviewers: Array
         });
         const members = membership.map(member => member.login);
 
-        // if a requested team has a review from a member, consider it fulfilled
-        for (const reviewer of alreadyReviewed) {
-            if (members.includes(reviewer)) {
-                unfulfilledTeams.splice(unfulfilledTeams.indexOf(team), 1);
-                break;
-            }
-        }
+        // // if a requested team has a review from a member, consider it fulfilled
+        // for (const reviewer of alreadyReviewed) {
+        //     if (members.includes(reviewer)) {
+        //         unfulfilledTeams.splice(unfulfilledTeams.indexOf(team), 1);
+        //         break;
+        //     }
+        // }
     }
 
     await extraPermGithub.pulls.requestReviewers({
