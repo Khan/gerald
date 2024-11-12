@@ -4,8 +4,7 @@ import {getNotified, getFileDiffs, getFileContents} from './utils';
 import {execCmd} from './execCmd';
 import {ownerAndRepo, extraPermGithub, type Context} from './setup';
 import {PUSH, GERALD_COMMIT_COMMENT_HEADER} from './constants';
-
-type NameToLabelToFiles = {[name: string]: {[label: string]: string[], ...}, ...};
+import type {NameToLabelToFiles} from './utils';
 
 const makeCommitComment = async (peopleToLabelToFiles: NameToLabelToFiles, commitSHA: string) => {
     const names: string[] = Object.keys(peopleToLabelToFiles);

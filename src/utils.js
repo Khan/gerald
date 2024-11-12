@@ -36,8 +36,9 @@ import {
 
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
-type NameToLabelToFiles = {[name: string]: {[label: string]: string[], ...}, ...};
 type CommentHeaders = 'Reviewers' | 'Required Reviewers' | 'Notified';
+
+export type NameToLabelToFiles = {[name: string]: {[label: string]: string[], ...}, ...};
 
 /**
  * @desc Make the comment body for each of the Gerald sections.

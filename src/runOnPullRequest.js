@@ -21,8 +21,7 @@ import {
     GERALD_COMMENT_REVIEWERS_HEADER,
     MATCH_COMMENT_HEADER_REGEX,
 } from './constants';
-
-type NameToLabelToFiles = {[name: string]: {[label: string]: string[], ...}, ...};
+import type {NameToLabelToFiles} from './utils';
 
 /**
  * @desc Helper function to update, delete, or create a comment
