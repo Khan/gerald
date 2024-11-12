@@ -34,6 +34,11 @@ These files support typical [glob functionality](https://www.npmjs.com/package/f
 In addition to glob patterns, Gerald rules also support Regular Expressions. Regular Expressions will be tested against the `diff` of a file. Regular Expressions should be surrounded with double quotes.
 `"/^find me!$/ig" @<username or Organization/team-slug>`
 
+### Labels
+
+Your file and diff patterns can be prepended with a label.  When that happens, the label is included in the notification that is added in the pull request.  This makes it easier to understand why you have been notified (or added as a reviewer) to a PR.
+`mylabel: "/^find me!$/ig" @<username or Organization/team-slug>`
+
 ## On Pull Request vs. On Push Without Pull Request
 
 In `.github/REVIEWERS`, all rules are run when a pull request is created, because only pull requests can have reviewers. In `.github/NOTIFIED`, rules under the `[ON PULL REQUEST]` section will be run when a pull request is made. Rules under the `[ON PUSH WITHOUT PULL REQUEST]` section will be run whenever someone pushes directly to a list of protected branches. By default, that list is `master`, `main`, and `develop`.
