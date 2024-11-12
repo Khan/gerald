@@ -36,7 +36,7 @@ import {
 
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
-type NameToFiles = {[name: string]: string[], ...};
+type NameAndLabelToFiles = {[nameAndLabel: string]: string[], ...};
 type CommentHeaders = 'Reviewers' | 'Required Reviewers' | 'Notified';
 
 /**
@@ -165,21 +165,21 @@ const globOptions = {
  */
 const maybeAddIfMatch = (
     pattern: RegExp,
-    name: string,
+    nameAndLabel: string,
     fileDiffs: {[string]: string, ...},
-    nameToFilesObj: NameToFiles,
+    nameAndLabelToFilesObj: NameAndLabelToFiles,
     filesChanged: Array<string> = [],
 ): void => {
     for (const file of Object.keys(fileDiffs)) {
         const diff = fileDiffs[file];
         // Only test the file if it's in the list of files that have changed.
         if (filesChanged.includes(file) && pattern.test(diff)) {
-            if (nameToFilesObj[name]) {
-                if (!nameToFilesObj[name].includes(file)) {
-                    nameToFilesObj[name].push(file);
+            if (nameAndLabelToFilesObj[nameAndLabel]) {
+                if (!nameAndLabelToFilesObj[nameAndLabel].includes(file)) {
+                    nameAndLabelToFilesObj[nameAndLabel].push(file);
                 }
             } else {
-                nameToFilesObj[name] = [file];
+                nameAndLabelToFilesObj[nameAndLabel] = [file];
             }
         }
     }
@@ -226,15 +226,19 @@ const parseUsername = (
  * @param username - The key that determines where to check for / push files.
  * @param files - The list of files to push.
  */
-const pushOrSetToBin = (bin: NameToFiles, username: string, files: Array<string>): void => {
-    if (bin[username]) {
+const pushOrSetToBin = (
+    bin: NameAndLabelToFiles,
+    usernameAndLabel: string,
+    files: Array<string>,
+): void => {
+    if (bin[usernameAndLabel]) {
         for (const file of files) {
-            if (!bin[username].includes(file)) {
-                bin[username].push(file);
+            if (!bin[usernameAndLabel].includes(file)) {
+                bin[usernameAndLabel].push(file);
             }
         }
     } else {
-        bin[username] = files;
+        bin[usernameAndLabel] = files;
     }
 };
 
@@ -274,6 +278,10 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
     return rawFile.match(sectionRegexp);
 };
 
+const nameAndLabel = (name: string, label: string): string => {
+    return label ? `${name} (${label})` : name;
+};
+
 /**
  * @desc Parse .github/NOTIFIED and return an object where each entry is a
  * unique person to notify and the files that they are being notified for.
@@ -291,7 +299,7 @@ export const getNotified = (
     author: string,
     on: Section,
     __testContent: ?string = undefined,
-): NameToFiles => {
+): NameAndLabelToFiles => {
     if (!existsSync(NOTIFIED_FILE)) {
         return {};
     }
@@ -301,44 +309,54 @@ export const getNotified = (
         return {};
     }
 
-    const matches = section[0].match(/^[^\#\n].*/gm); // ignore newline comments
-    const notified: NameToFiles = {};
-    if (matches) {
-        for (const match of matches) {
-            let rule = match;
-            // ignore inline comments
-            if (match.includes(COMMENT_SYMBOL)) {
-                rule = match.split(COMMENT_SYMBOL)[0].trim();
-            }
-            const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
-            const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
-            const againstFileContents = rule.match(MATCH_USE_FILE_CONTENTS_REGEX);
-            if (!untrimmedPattern || !names) {
-                continue;
-            }
+    const matches = section[0].match(/^[^#\n]+/gm);
+    if (!matches) {
+        return {};
+    }
 
-            const pattern = untrimmedPattern[0].trim();
+    const notified: NameAndLabelToFiles = {};
+    for (const match of matches) {
+        if (!match || !match.trim()) {
+            continue;
+        }
+        const rule = match.trim();
+        const untrimmedPattern = rule.match(MATCH_PATTERN_REGEX);
+        const names = rule.match(MATCH_USERNAME_OR_TEAM_REGEX);
+        const againstFileContents = rule.match(MATCH_USE_FILE_CONTENTS_REGEX);
+        if (!untrimmedPattern || !names) {
+            continue;
+        }
 
-            // handle dealing with regex
-            if (pattern.startsWith('"') && pattern.endsWith('"')) {
-                const regex = turnPatternIntoRegex(pattern);
-                const objToUse = againstFileContents ? fileContents : fileDiffs;
-                for (const name of names) {
-                    if (parseUsername(name).justName !== author) {
-                        maybeAddIfMatch(regex, name, objToUse, notified, filesChanged);
-                    }
+        // TODO(csilvers): also keep track of the line-number the
+        // label is on, and make label an href to that line in github.
+        const label = untrimmedPattern[1];
+        const pattern = untrimmedPattern[2].trim();
+
+        // handle dealing with regex
+        if (pattern.startsWith('"') && pattern.endsWith('"')) {
+            const regex = turnPatternIntoRegex(pattern);
+            const objToUse = againstFileContents ? fileContents : fileDiffs;
+            for (const name of names) {
+                if (parseUsername(name).justName !== author) {
+                    maybeAddIfMatch(
+                        regex,
+                        nameAndLabel(name, label),
+                        objToUse,
+                        notified,
+                        filesChanged,
+                    );
                 }
             }
-            // handle dealing with glob matches
-            else {
-                const matchedFiles: Array<string> = fg.sync(pattern, globOptions); // flow-uncovered-line
-                const intersection = matchedFiles.filter(file => filesChanged.includes(file));
+        }
+        // handle dealing with glob matches
+        else {
+            const matchedFiles: Array<string> = fg.sync(pattern, globOptions); // flow-uncovered-line
+            const intersection = matchedFiles.filter(file => filesChanged.includes(file));
 
-                if (intersection.length) {
-                    for (const name of names) {
-                        if (parseUsername(name).justName !== author) {
-                            pushOrSetToBin(notified, name, intersection);
-                        }
+            if (intersection.length) {
+                for (const name of names) {
+                    if (parseUsername(name).justName !== author) {
+                        pushOrSetToBin(notified, nameAndLabel(name, label), intersection);
                     }
                 }
             }
@@ -362,7 +380,7 @@ export const getReviewers = (
     fileDiffs: {[string]: string, ...},
     fileContents: {[string]: string, ...},
     issuer: string,
-): {reviewers: NameToFiles, requiredReviewers: NameToFiles} => {
+): {reviewers: NameAndLabelToFiles, requiredReviewers: NameAndLabelToFiles} => {
     const buf = readFileSync(REVIEWERS_FILE, 'utf-8');
     const section = getCorrectSection(buf, REVIEWERS, PULL_REQUEST);
 
@@ -390,7 +408,8 @@ export const getReviewers = (
             continue;
         }
 
-        const pattern = untrimmedPattern[0].trim();
+        const label = untrimmedPattern[1];
+        const pattern = untrimmedPattern[2].trim();
 
         // handle dealing with regex
         if (pattern.startsWith('"') && pattern.endsWith('"')) {
@@ -405,7 +424,13 @@ export const getReviewers = (
                 }
 
                 const correctBin = isRequired ? requiredReviewers : reviewers;
-                maybeAddIfMatch(regex, username, objToUse, correctBin, filesChanged);
+                maybeAddIfMatch(
+                    regex,
+                    nameAndLabel(username, label),
+                    objToUse,
+                    correctBin,
+                    filesChanged,
+                );
             }
         } else {
             const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
@@ -420,7 +445,7 @@ export const getReviewers = (
                     }
 
                     const correctBin = isRequired ? requiredReviewers : reviewers;
-                    pushOrSetToBin(correctBin, username, intersection);
+                    pushOrSetToBin(correctBin, nameAndLabel(username, label), intersection);
                 }
             }
         }
@@ -438,9 +463,9 @@ export const getReviewers = (
  * @param removedJustNames - List of people who have commented #removeme
  */
 export const getFilteredLists = (
-    reviewers: NameToFiles,
-    requiredReviewers: NameToFiles,
-    notified: NameToFiles,
+    reviewers: NameAndLabelToFiles,
+    requiredReviewers: NameAndLabelToFiles,
+    notified: NameAndLabelToFiles,
     removedJustNames: Array<string>,
 ): {actualReviewers: Array<string>, teamReviewers: Array<string>} => {
     for (const justName of removedJustNames) {

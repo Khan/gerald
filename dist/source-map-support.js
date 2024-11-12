@@ -1,10 +1,10 @@
 /******/ (() => {
     // webpackBootstrap
-    /******/ var __webpack_modules__ = {
+    /******/ const __webpack_modules__ = {
         /***/ 18: /***/ module => {
-            var toString = Object.prototype.toString;
+            const toString = Object.prototype.toString;
 
-            var isModern =
+            const isModern =
                 typeof Buffer.alloc === 'function' &&
                 typeof Buffer.allocUnsafe === 'function' &&
                 typeof Buffer.from === 'function';
@@ -16,7 +16,7 @@
             function fromArrayBuffer(obj, byteOffset, length) {
                 byteOffset >>>= 0;
 
-                var maxLength = obj.byteLength - byteOffset;
+                const maxLength = obj.byteLength - byteOffset;
 
                 if (maxLength < 0) {
                     throw new RangeError("'offset' is out of bounds");
@@ -78,9 +78,9 @@
              * http://opensource.org/licenses/BSD-3-Clause
              */
 
-            var util = __nccwpck_require__(932);
-            var has = Object.prototype.hasOwnProperty;
-            var hasNativeMap = typeof Map !== 'undefined';
+            const util = __nccwpck_require__(932);
+            const has = Object.prototype.hasOwnProperty;
+            const hasNativeMap = typeof Map !== 'undefined';
 
             /**
              * A data structure which is a combination of an array and a set. Adding a new
@@ -97,8 +97,8 @@
              * Static method for creating ArraySet instances from an existing array.
              */
             ArraySet.fromArray = function ArraySet_fromArray(aArray, aAllowDuplicates) {
-                var set = new ArraySet();
-                for (var i = 0, len = aArray.length; i < len; i++) {
+                const set = new ArraySet();
+                for (let i = 0, len = aArray.length; i < len; i++) {
                     set.add(aArray[i], aAllowDuplicates);
                 }
                 return set;
@@ -120,9 +120,9 @@
              * @param String aStr
              */
             ArraySet.prototype.add = function ArraySet_add(aStr, aAllowDuplicates) {
-                var sStr = hasNativeMap ? aStr : util.toSetString(aStr);
-                var isDuplicate = hasNativeMap ? this.has(aStr) : has.call(this._set, sStr);
-                var idx = this._array.length;
+                const sStr = hasNativeMap ? aStr : util.toSetString(aStr);
+                const isDuplicate = hasNativeMap ? this.has(aStr) : has.call(this._set, sStr);
+                const idx = this._array.length;
                 if (!isDuplicate || aAllowDuplicates) {
                     this._array.push(aStr);
                 }
@@ -144,7 +144,7 @@
                 if (hasNativeMap) {
                     return this._set.has(aStr);
                 } else {
-                    var sStr = util.toSetString(aStr);
+                    const sStr = util.toSetString(aStr);
                     return has.call(this._set, sStr);
                 }
             };
@@ -156,12 +156,12 @@
              */
             ArraySet.prototype.indexOf = function ArraySet_indexOf(aStr) {
                 if (hasNativeMap) {
-                    var idx = this._set.get(aStr);
+                    const idx = this._set.get(aStr);
                     if (idx >= 0) {
                         return idx;
                     }
                 } else {
-                    var sStr = util.toSetString(aStr);
+                    const sStr = util.toSetString(aStr);
                     if (has.call(this._set, sStr)) {
                         return this._set[sStr];
                     }
@@ -234,7 +234,7 @@
              * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
              */
 
-            var base64 = __nccwpck_require__(158);
+            const base64 = __nccwpck_require__(158);
 
             // A single base 64 digit can contain 6 bits of data. For the base 64 variable
             // length quantities we use in the source map spec, the first bit is the sign,
@@ -248,16 +248,16 @@
             //   V    V
             //   101011
 
-            var VLQ_BASE_SHIFT = 5;
+            const VLQ_BASE_SHIFT = 5;
 
             // binary: 100000
-            var VLQ_BASE = 1 << VLQ_BASE_SHIFT;
+            const VLQ_BASE = 1 << VLQ_BASE_SHIFT;
 
             // binary: 011111
-            var VLQ_BASE_MASK = VLQ_BASE - 1;
+            const VLQ_BASE_MASK = VLQ_BASE - 1;
 
             // binary: 100000
-            var VLQ_CONTINUATION_BIT = VLQ_BASE;
+            const VLQ_CONTINUATION_BIT = VLQ_BASE;
 
             /**
              * Converts from a two-complement value to a value where the sign bit is
@@ -276,8 +276,8 @@
              *   4 (100 binary) becomes 2, 5 (101 binary) becomes -2
              */
             function fromVLQSigned(aValue) {
-                var isNegative = (aValue & 1) === 1;
-                var shifted = aValue >> 1;
+                const isNegative = (aValue & 1) === 1;
+                const shifted = aValue >> 1;
                 return isNegative ? -shifted : shifted;
             }
 
@@ -285,10 +285,10 @@
              * Returns the base 64 VLQ encoded value.
              */
             exports.encode = function base64VLQ_encode(aValue) {
-                var encoded = '';
-                var digit;
+                let encoded = '';
+                let digit;
 
-                var vlq = toVLQSigned(aValue);
+                let vlq = toVLQSigned(aValue);
 
                 do {
                     digit = vlq & VLQ_BASE_MASK;
@@ -309,10 +309,11 @@
              * value and the rest of the string via the out parameter.
              */
             exports.decode = function base64VLQ_decode(aStr, aIndex, aOutParam) {
-                var strLen = aStr.length;
-                var result = 0;
-                var shift = 0;
-                var continuation, digit;
+                const strLen = aStr.length;
+                let result = 0;
+                let shift = 0;
+                let continuation;
+                let digit;
 
                 do {
                     if (aIndex >= strLen) {
@@ -345,7 +346,7 @@
              * http://opensource.org/licenses/BSD-3-Clause
              */
 
-            var intToCharMap = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split(
+            const intToCharMap = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split(
                 '',
             );
 
@@ -364,20 +365,20 @@
              * failure.
              */
             exports.decode = function (charCode) {
-                var bigA = 65; // 'A'
-                var bigZ = 90; // 'Z'
+                const bigA = 65; // 'A'
+                const bigZ = 90; // 'Z'
 
-                var littleA = 97; // 'a'
-                var littleZ = 122; // 'z'
+                const littleA = 97; // 'a'
+                const littleZ = 122; // 'z'
 
-                var zero = 48; // '0'
-                var nine = 57; // '9'
+                const zero = 48; // '0'
+                const nine = 57; // '9'
 
-                var plus = 43; // '+'
-                var slash = 47; // '/'
+                const plus = 43; // '+'
+                const slash = 47; // '/'
 
-                var littleOffset = 26;
-                var numberOffset = 52;
+                const littleOffset = 26;
+                const numberOffset = 52;
 
                 // 0 - 25: ABCDEFGHIJKLMNOPQRSTUVWXYZ
                 if (bigA <= charCode && charCode <= bigZ) {
@@ -445,8 +446,8 @@
                 //
                 //   3. We did not find the exact element, and there is no next-closest
                 //      element than the one we are searching for, so we return -1.
-                var mid = Math.floor((aHigh - aLow) / 2) + aLow;
-                var cmp = aCompare(aNeedle, aHaystack[mid], true);
+                const mid = Math.floor((aHigh - aLow) / 2) + aLow;
+                const cmp = aCompare(aNeedle, aHaystack[mid], true);
                 if (cmp === 0) {
                     // Found the element we are looking for.
                     return mid;
@@ -503,7 +504,7 @@
                     return -1;
                 }
 
-                var index = recursiveSearch(
+                let index = recursiveSearch(
                     -1,
                     aHaystack.length,
                     aNeedle,
@@ -539,7 +540,7 @@
              * http://opensource.org/licenses/BSD-3-Clause
              */
 
-            var util = __nccwpck_require__(932);
+            const util = __nccwpck_require__(932);
 
             /**
              * Determine whether mappingB is after mappingA with respect to generated
@@ -547,10 +548,10 @@
              */
             function generatedPositionAfter(mappingA, mappingB) {
                 // Optimized for most common case
-                var lineA = mappingA.generatedLine;
-                var lineB = mappingB.generatedLine;
-                var columnA = mappingA.generatedColumn;
-                var columnB = mappingB.generatedColumn;
+                const lineA = mappingA.generatedLine;
+                const lineB = mappingB.generatedLine;
+                const columnA = mappingA.generatedColumn;
+                const columnB = mappingB.generatedColumn;
                 return (
                     lineB > lineA ||
                     (lineB == lineA && columnB >= columnA) ||
@@ -649,7 +650,7 @@
              *        The index of the second item.
              */
             function swap(ary, x, y) {
-                var temp = ary[x];
+                const temp = ary[x];
                 ary[x] = ary[y];
                 ary[y] = temp;
             }
@@ -695,11 +696,11 @@
 
                     // Always choose a random pivot so that an input array which is reverse
                     // sorted does not cause O(n^2) running time.
-                    var pivotIndex = randomIntInRange(p, r);
-                    var i = p - 1;
+                    const pivotIndex = randomIntInRange(p, r);
+                    let i = p - 1;
 
                     swap(ary, pivotIndex, r);
-                    var pivot = ary[r];
+                    const pivot = ary[r];
 
                     // Immediately after `j` is incremented in this loop, the following hold
                     // true:
@@ -715,7 +716,7 @@
                     }
 
                     swap(ary, i + 1, j);
-                    var q = i + 1;
+                    const q = i + 1;
 
                     // (2) Recurse on each half.
 
@@ -740,7 +741,7 @@
         },
 
         /***/ 359: /***/ (__unused_webpack_module, exports, __nccwpck_require__) => {
-            var __webpack_unused_export__;
+            let __webpack_unused_export__;
             /* -*- Mode: js; js-indent-level: 2; -*- */
             /*
              * Copyright 2011 Mozilla Foundation and contributors
@@ -748,14 +749,14 @@
              * http://opensource.org/licenses/BSD-3-Clause
              */
 
-            var util = __nccwpck_require__(932);
-            var binarySearch = __nccwpck_require__(385);
-            var ArraySet = __nccwpck_require__(458) /* .ArraySet */.I;
-            var base64VLQ = __nccwpck_require__(777);
-            var quickSort = __nccwpck_require__(245) /* .quickSort */.U;
+            const util = __nccwpck_require__(932);
+            const binarySearch = __nccwpck_require__(385);
+            const ArraySet = __nccwpck_require__(458) /* .ArraySet */.I;
+            const base64VLQ = __nccwpck_require__(777);
+            const quickSort = __nccwpck_require__(245) /* .quickSort */.U;
 
             function SourceMapConsumer(aSourceMap, aSourceMapURL) {
-                var sourceMap = aSourceMap;
+                let sourceMap = aSourceMap;
                 if (typeof aSourceMap === 'string') {
                     sourceMap = util.parseSourceMapInput(aSourceMap);
                 }
@@ -834,7 +835,7 @@
                 aStr,
                 index,
             ) {
-                var c = aStr.charAt(index);
+                const c = aStr.charAt(index);
                 return c === ';' || c === ',';
             };
 
@@ -877,10 +878,10 @@
                 aContext,
                 aOrder,
             ) {
-                var context = aContext || null;
-                var order = aOrder || SourceMapConsumer.GENERATED_ORDER;
+                const context = aContext || null;
+                const order = aOrder || SourceMapConsumer.GENERATED_ORDER;
 
-                var mappings;
+                let mappings;
                 switch (order) {
                     case SourceMapConsumer.GENERATED_ORDER:
                         mappings = this._generatedMappings;
@@ -892,10 +893,10 @@
                         throw new Error('Unknown order of iteration.');
                 }
 
-                var sourceRoot = this.sourceRoot;
+                const sourceRoot = this.sourceRoot;
                 mappings
                     .map(function (mapping) {
-                        var source =
+                        let source =
                             mapping.source === null ? null : this._sources.at(mapping.source);
                         source = util.computeSourceURL(sourceRoot, source, this._sourceMapURL);
                         return {
@@ -935,13 +936,13 @@
             SourceMapConsumer.prototype.allGeneratedPositionsFor = function SourceMapConsumer_allGeneratedPositionsFor(
                 aArgs,
             ) {
-                var line = util.getArg(aArgs, 'line');
+                const line = util.getArg(aArgs, 'line');
 
                 // When there is no exact match, BasicSourceMapConsumer.prototype._findMapping
                 // returns the index of the closest mapping less than the needle. By
                 // setting needle.originalColumn to 0, we thus find the last mapping for
                 // the given line, provided such a mapping exists.
-                var needle = {
+                const needle = {
                     source: util.getArg(aArgs, 'source'),
                     originalLine: line,
                     originalColumn: util.getArg(aArgs, 'column', 0),
@@ -952,9 +953,9 @@
                     return [];
                 }
 
-                var mappings = [];
+                const mappings = [];
 
-                var index = this._findMapping(
+                let index = this._findMapping(
                     needle,
                     this._originalMappings,
                     'originalLine',
@@ -963,10 +964,10 @@
                     binarySearch.LEAST_UPPER_BOUND,
                 );
                 if (index >= 0) {
-                    var mapping = this._originalMappings[index];
+                    let mapping = this._originalMappings[index];
 
                     if (aArgs.column === undefined) {
-                        var originalLine = mapping.originalLine;
+                        const originalLine = mapping.originalLine;
 
                         // Iterate until either we run out of mappings, or we run into
                         // a mapping for a different line than the one we found. Since
@@ -982,7 +983,7 @@
                             mapping = this._originalMappings[++index];
                         }
                     } else {
-                        var originalColumn = mapping.originalColumn;
+                        const originalColumn = mapping.originalColumn;
 
                         // Iterate until either we run out of mappings, or we run into
                         // a mapping for a different line than the one we were searching for.
@@ -1044,20 +1045,20 @@
              * [0]: https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit?pli=1#
              */
             function BasicSourceMapConsumer(aSourceMap, aSourceMapURL) {
-                var sourceMap = aSourceMap;
+                let sourceMap = aSourceMap;
                 if (typeof aSourceMap === 'string') {
                     sourceMap = util.parseSourceMapInput(aSourceMap);
                 }
 
-                var version = util.getArg(sourceMap, 'version');
-                var sources = util.getArg(sourceMap, 'sources');
+                const version = util.getArg(sourceMap, 'version');
+                let sources = util.getArg(sourceMap, 'sources');
                 // Sass 3.3 leaves out the 'names' array, so we deviate from the spec (which
                 // requires the array) to play nice here.
-                var names = util.getArg(sourceMap, 'names', []);
-                var sourceRoot = util.getArg(sourceMap, 'sourceRoot', null);
-                var sourcesContent = util.getArg(sourceMap, 'sourcesContent', null);
-                var mappings = util.getArg(sourceMap, 'mappings');
-                var file = util.getArg(sourceMap, 'file', null);
+                const names = util.getArg(sourceMap, 'names', []);
+                let sourceRoot = util.getArg(sourceMap, 'sourceRoot', null);
+                const sourcesContent = util.getArg(sourceMap, 'sourcesContent', null);
+                const mappings = util.getArg(sourceMap, 'mappings');
+                const file = util.getArg(sourceMap, 'file', null);
 
                 // Once again, Sass deviates from the spec and supplies the version as a
                 // string rather than a number, so we use loose equality checking here.
@@ -1111,7 +1112,7 @@
              * found.
              */
             BasicSourceMapConsumer.prototype._findSourceIndex = function (aSource) {
-                var relativeSource = aSource;
+                let relativeSource = aSource;
                 if (this.sourceRoot != null) {
                     relativeSource = util.relative(this.sourceRoot, relativeSource);
                 }
@@ -1122,7 +1123,7 @@
 
                 // Maybe aSource is an absolute URL as returned by |sources|.  In
                 // this case we can't simply undo the transform.
-                var i;
+                let i;
                 for (i = 0; i < this._absoluteSources.length; ++i) {
                     if (this._absoluteSources[i] == aSource) {
                         return i;
@@ -1145,10 +1146,10 @@
                 aSourceMap,
                 aSourceMapURL,
             ) {
-                var smc = Object.create(BasicSourceMapConsumer.prototype);
+                const smc = Object.create(BasicSourceMapConsumer.prototype);
 
-                var names = (smc._names = ArraySet.fromArray(aSourceMap._names.toArray(), true));
-                var sources = (smc._sources = ArraySet.fromArray(
+                const names = (smc._names = ArraySet.fromArray(aSourceMap._names.toArray(), true));
+                const sources = (smc._sources = ArraySet.fromArray(
                     aSourceMap._sources.toArray(),
                     true,
                 ));
@@ -1168,13 +1169,13 @@
                 // a copy of the entry or else bad things happen. Shared mutable state
                 // strikes again! See github issue #191.
 
-                var generatedMappings = aSourceMap._mappings.toArray().slice();
-                var destGeneratedMappings = (smc.__generatedMappings = []);
-                var destOriginalMappings = (smc.__originalMappings = []);
+                const generatedMappings = aSourceMap._mappings.toArray().slice();
+                const destGeneratedMappings = (smc.__generatedMappings = []);
+                const destOriginalMappings = (smc.__originalMappings = []);
 
-                for (var i = 0, length = generatedMappings.length; i < length; i++) {
-                    var srcMapping = generatedMappings[i];
-                    var destMapping = new Mapping();
+                for (let i = 0, length = generatedMappings.length; i < length; i++) {
+                    const srcMapping = generatedMappings[i];
+                    const destMapping = new Mapping();
                     destMapping.generatedLine = srcMapping.generatedLine;
                     destMapping.generatedColumn = srcMapping.generatedColumn;
 
@@ -1233,19 +1234,23 @@
                 aStr,
                 aSourceRoot,
             ) {
-                var generatedLine = 1;
-                var previousGeneratedColumn = 0;
-                var previousOriginalLine = 0;
-                var previousOriginalColumn = 0;
-                var previousSource = 0;
-                var previousName = 0;
-                var length = aStr.length;
-                var index = 0;
-                var cachedSegments = {};
-                var temp = {};
-                var originalMappings = [];
-                var generatedMappings = [];
-                var mapping, str, segment, end, value;
+                let generatedLine = 1;
+                let previousGeneratedColumn = 0;
+                let previousOriginalLine = 0;
+                let previousOriginalColumn = 0;
+                let previousSource = 0;
+                let previousName = 0;
+                const length = aStr.length;
+                let index = 0;
+                const cachedSegments = {};
+                const temp = {};
+                const originalMappings = [];
+                const generatedMappings = [];
+                let mapping;
+                let str;
+                let segment;
+                let end;
+                let value;
 
                 while (index < length) {
                     if (aStr.charAt(index) === ';') {
@@ -1369,15 +1374,15 @@
              * inclusive.
              */
             BasicSourceMapConsumer.prototype.computeColumnSpans = function SourceMapConsumer_computeColumnSpans() {
-                for (var index = 0; index < this._generatedMappings.length; ++index) {
-                    var mapping = this._generatedMappings[index];
+                for (let index = 0; index < this._generatedMappings.length; ++index) {
+                    const mapping = this._generatedMappings[index];
 
                     // Mappings do not contain a field for the last generated columnt. We
                     // can come up with an optimistic estimate, however, by assuming that
                     // mappings are contiguous (i.e. given two consecutive mappings, the
                     // first mapping ends where the second one starts).
                     if (index + 1 < this._generatedMappings.length) {
-                        var nextMapping = this._generatedMappings[index + 1];
+                        const nextMapping = this._generatedMappings[index + 1];
 
                         if (mapping.generatedLine === nextMapping.generatedLine) {
                             mapping.lastGeneratedColumn = nextMapping.generatedColumn - 1;
@@ -1417,12 +1422,12 @@
             BasicSourceMapConsumer.prototype.originalPositionFor = function SourceMapConsumer_originalPositionFor(
                 aArgs,
             ) {
-                var needle = {
+                const needle = {
                     generatedLine: util.getArg(aArgs, 'line'),
                     generatedColumn: util.getArg(aArgs, 'column'),
                 };
 
-                var index = this._findMapping(
+                const index = this._findMapping(
                     needle,
                     this._generatedMappings,
                     'generatedLine',
@@ -1432,10 +1437,10 @@
                 );
 
                 if (index >= 0) {
-                    var mapping = this._generatedMappings[index];
+                    const mapping = this._generatedMappings[index];
 
                     if (mapping.generatedLine === needle.generatedLine) {
-                        var source = util.getArg(mapping, 'source', null);
+                        let source = util.getArg(mapping, 'source', null);
                         if (source !== null) {
                             source = this._sources.at(source);
                             source = util.computeSourceURL(
@@ -1444,7 +1449,7 @@
                                 this._sourceMapURL,
                             );
                         }
-                        var name = util.getArg(mapping, 'name', null);
+                        let name = util.getArg(mapping, 'name', null);
                         if (name !== null) {
                             name = this._names.at(name);
                         }
@@ -1494,23 +1499,23 @@
                     return null;
                 }
 
-                var index = this._findSourceIndex(aSource);
+                const index = this._findSourceIndex(aSource);
                 if (index >= 0) {
                     return this.sourcesContent[index];
                 }
 
-                var relativeSource = aSource;
+                let relativeSource = aSource;
                 if (this.sourceRoot != null) {
                     relativeSource = util.relative(this.sourceRoot, relativeSource);
                 }
 
-                var url;
+                let url;
                 if (this.sourceRoot != null && (url = util.urlParse(this.sourceRoot))) {
                     // XXX: file:// URIs and absolute paths lead to unexpected behavior for
                     // many users. We can help them out when they expect file:// URIs to
                     // behave like it would if they were running a local HTTP server. See
                     // https://bugzilla.mozilla.org/show_bug.cgi?id=885597.
-                    var fileUriAbsPath = relativeSource.replace(/^file:\/\//, '');
+                    const fileUriAbsPath = relativeSource.replace(/^file:\/\//, '');
                     if (url.scheme == 'file' && this._sources.has(fileUriAbsPath)) {
                         return this.sourcesContent[this._sources.indexOf(fileUriAbsPath)];
                     }
@@ -1557,7 +1562,7 @@
             BasicSourceMapConsumer.prototype.generatedPositionFor = function SourceMapConsumer_generatedPositionFor(
                 aArgs,
             ) {
-                var source = util.getArg(aArgs, 'source');
+                let source = util.getArg(aArgs, 'source');
                 source = this._findSourceIndex(source);
                 if (source < 0) {
                     return {
@@ -1567,13 +1572,13 @@
                     };
                 }
 
-                var needle = {
+                const needle = {
                     source: source,
                     originalLine: util.getArg(aArgs, 'line'),
                     originalColumn: util.getArg(aArgs, 'column'),
                 };
 
-                var index = this._findMapping(
+                const index = this._findMapping(
                     needle,
                     this._originalMappings,
                     'originalLine',
@@ -1583,7 +1588,7 @@
                 );
 
                 if (index >= 0) {
-                    var mapping = this._originalMappings[index];
+                    const mapping = this._originalMappings[index];
 
                     if (mapping.source === needle.source) {
                         return {
@@ -1653,13 +1658,13 @@
              * [0]: https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit#heading=h.535es3xeprgt
              */
             function IndexedSourceMapConsumer(aSourceMap, aSourceMapURL) {
-                var sourceMap = aSourceMap;
+                let sourceMap = aSourceMap;
                 if (typeof aSourceMap === 'string') {
                     sourceMap = util.parseSourceMapInput(aSourceMap);
                 }
 
-                var version = util.getArg(sourceMap, 'version');
-                var sections = util.getArg(sourceMap, 'sections');
+                const version = util.getArg(sourceMap, 'version');
+                const sections = util.getArg(sourceMap, 'sections');
 
                 if (version != this._version) {
                     throw new Error('Unsupported version: ' + version);
@@ -1668,7 +1673,7 @@
                 this._sources = new ArraySet();
                 this._names = new ArraySet();
 
-                var lastOffset = {
+                let lastOffset = {
                     line: -1,
                     column: 0,
                 };
@@ -1678,9 +1683,9 @@
                         // See https://github.com/mozilla/source-map/issues/16
                         throw new Error('Support for url field in sections not implemented.');
                     }
-                    var offset = util.getArg(s, 'offset');
-                    var offsetLine = util.getArg(offset, 'line');
-                    var offsetColumn = util.getArg(offset, 'column');
+                    const offset = util.getArg(s, 'offset');
+                    const offsetLine = util.getArg(offset, 'line');
+                    const offsetColumn = util.getArg(offset, 'column');
 
                     if (
                         offsetLine < lastOffset.line ||
@@ -1715,9 +1720,9 @@
              */
             Object.defineProperty(IndexedSourceMapConsumer.prototype, 'sources', {
                 get: function () {
-                    var sources = [];
-                    for (var i = 0; i < this._sections.length; i++) {
-                        for (var j = 0; j < this._sections[i].consumer.sources.length; j++) {
+                    const sources = [];
+                    for (let i = 0; i < this._sections.length; i++) {
+                        for (let j = 0; j < this._sections[i].consumer.sources.length; j++) {
                             sources.push(this._sections[i].consumer.sources[j]);
                         }
                     }
@@ -1747,25 +1752,25 @@
             IndexedSourceMapConsumer.prototype.originalPositionFor = function IndexedSourceMapConsumer_originalPositionFor(
                 aArgs,
             ) {
-                var needle = {
+                const needle = {
                     generatedLine: util.getArg(aArgs, 'line'),
                     generatedColumn: util.getArg(aArgs, 'column'),
                 };
 
                 // Find the section containing the generated position we're trying to map
                 // to an original position.
-                var sectionIndex = binarySearch.search(needle, this._sections, function (
+                const sectionIndex = binarySearch.search(needle, this._sections, function (
                     needle,
                     section,
                 ) {
-                    var cmp = needle.generatedLine - section.generatedOffset.generatedLine;
+                    const cmp = needle.generatedLine - section.generatedOffset.generatedLine;
                     if (cmp) {
                         return cmp;
                     }
 
                     return needle.generatedColumn - section.generatedOffset.generatedColumn;
                 });
-                var section = this._sections[sectionIndex];
+                const section = this._sections[sectionIndex];
 
                 if (!section) {
                     return {
@@ -1806,10 +1811,10 @@
                 aSource,
                 nullOnMissing,
             ) {
-                for (var i = 0; i < this._sections.length; i++) {
-                    var section = this._sections[i];
+                for (let i = 0; i < this._sections.length; i++) {
+                    const section = this._sections[i];
 
-                    var content = section.consumer.sourceContentFor(aSource, true);
+                    const content = section.consumer.sourceContentFor(aSource, true);
                     if (content) {
                         return content;
                     }
@@ -1842,17 +1847,17 @@
             IndexedSourceMapConsumer.prototype.generatedPositionFor = function IndexedSourceMapConsumer_generatedPositionFor(
                 aArgs,
             ) {
-                for (var i = 0; i < this._sections.length; i++) {
-                    var section = this._sections[i];
+                for (let i = 0; i < this._sections.length; i++) {
+                    const section = this._sections[i];
 
                     // Only consider this section if the requested source is in the list of
                     // sources of the consumer.
                     if (section.consumer._findSourceIndex(util.getArg(aArgs, 'source')) === -1) {
                         continue;
                     }
-                    var generatedPosition = section.consumer.generatedPositionFor(aArgs);
+                    const generatedPosition = section.consumer.generatedPositionFor(aArgs);
                     if (generatedPosition) {
-                        var ret = {
+                        const ret = {
                             line:
                                 generatedPosition.line +
                                 (section.generatedOffset.generatedLine - 1),
@@ -1883,13 +1888,13 @@
             ) {
                 this.__generatedMappings = [];
                 this.__originalMappings = [];
-                for (var i = 0; i < this._sections.length; i++) {
-                    var section = this._sections[i];
-                    var sectionMappings = section.consumer._generatedMappings;
-                    for (var j = 0; j < sectionMappings.length; j++) {
-                        var mapping = sectionMappings[j];
+                for (let i = 0; i < this._sections.length; i++) {
+                    const section = this._sections[i];
+                    const sectionMappings = section.consumer._generatedMappings;
+                    for (let j = 0; j < sectionMappings.length; j++) {
+                        const mapping = sectionMappings[j];
 
-                        var source = section.consumer._sources.at(mapping.source);
+                        let source = section.consumer._sources.at(mapping.source);
                         source = util.computeSourceURL(
                             section.consumer.sourceRoot,
                             source,
@@ -1898,7 +1903,7 @@
                         this._sources.add(source);
                         source = this._sources.indexOf(source);
 
-                        var name = null;
+                        let name = null;
                         if (mapping.name) {
                             name = section.consumer._names.at(mapping.name);
                             this._names.add(name);
@@ -1909,7 +1914,7 @@
                         // generated positions relative to the start of the section, so we
                         // need to offset them to be relative to the start of the concatenated
                         // generated file.
-                        var adjustedMapping = {
+                        const adjustedMapping = {
                             source: source,
                             generatedLine:
                                 mapping.generatedLine + (section.generatedOffset.generatedLine - 1),
@@ -1947,10 +1952,10 @@
              * http://opensource.org/licenses/BSD-3-Clause
              */
 
-            var base64VLQ = __nccwpck_require__(777);
-            var util = __nccwpck_require__(932);
-            var ArraySet = __nccwpck_require__(458) /* .ArraySet */.I;
-            var MappingList = __nccwpck_require__(289) /* .MappingList */.H;
+            const base64VLQ = __nccwpck_require__(777);
+            const util = __nccwpck_require__(932);
+            const ArraySet = __nccwpck_require__(458) /* .ArraySet */.I;
+            const MappingList = __nccwpck_require__(289) /* .MappingList */.H;
 
             /**
              * An instance of the SourceMapGenerator represents a source map which is
@@ -1983,13 +1988,13 @@
             SourceMapGenerator.fromSourceMap = function SourceMapGenerator_fromSourceMap(
                 aSourceMapConsumer,
             ) {
-                var sourceRoot = aSourceMapConsumer.sourceRoot;
-                var generator = new SourceMapGenerator({
+                const sourceRoot = aSourceMapConsumer.sourceRoot;
+                const generator = new SourceMapGenerator({
                     file: aSourceMapConsumer.file,
                     sourceRoot: sourceRoot,
                 });
                 aSourceMapConsumer.eachMapping(function (mapping) {
-                    var newMapping = {
+                    const newMapping = {
                         generated: {
                             line: mapping.generatedLine,
                             column: mapping.generatedColumn,
@@ -2015,7 +2020,7 @@
                     generator.addMapping(newMapping);
                 });
                 aSourceMapConsumer.sources.forEach(function (sourceFile) {
-                    var sourceRelative = sourceFile;
+                    let sourceRelative = sourceFile;
                     if (sourceRoot !== null) {
                         sourceRelative = util.relative(sourceRoot, sourceFile);
                     }
@@ -2024,7 +2029,7 @@
                         generator._sources.add(sourceRelative);
                     }
 
-                    var content = aSourceMapConsumer.sourceContentFor(sourceFile);
+                    const content = aSourceMapConsumer.sourceContentFor(sourceFile);
                     if (content != null) {
                         generator.setSourceContent(sourceFile, content);
                     }
@@ -2045,10 +2050,10 @@
             SourceMapGenerator.prototype.addMapping = function SourceMapGenerator_addMapping(
                 aArgs,
             ) {
-                var generated = util.getArg(aArgs, 'generated');
-                var original = util.getArg(aArgs, 'original', null);
-                var source = util.getArg(aArgs, 'source', null);
-                var name = util.getArg(aArgs, 'name', null);
+                const generated = util.getArg(aArgs, 'generated');
+                const original = util.getArg(aArgs, 'original', null);
+                let source = util.getArg(aArgs, 'source', null);
+                let name = util.getArg(aArgs, 'name', null);
 
                 if (!this._skipValidation) {
                     this._validateMapping(generated, original, source, name);
@@ -2085,7 +2090,7 @@
                 aSourceFile,
                 aSourceContent,
             ) {
-                var source = aSourceFile;
+                let source = aSourceFile;
                 if (this._sourceRoot != null) {
                     source = util.relative(this._sourceRoot, source);
                 }
@@ -2128,7 +2133,7 @@
                 aSourceFile,
                 aSourceMapPath,
             ) {
-                var sourceFile = aSourceFile;
+                let sourceFile = aSourceFile;
                 // If aSourceFile is omitted, we will use the file property of the SourceMap
                 if (aSourceFile == null) {
                     if (aSourceMapConsumer.file == null) {
@@ -2139,21 +2144,21 @@
                     }
                     sourceFile = aSourceMapConsumer.file;
                 }
-                var sourceRoot = this._sourceRoot;
+                const sourceRoot = this._sourceRoot;
                 // Make "sourceFile" relative if an absolute Url is passed.
                 if (sourceRoot != null) {
                     sourceFile = util.relative(sourceRoot, sourceFile);
                 }
                 // Applying the SourceMap can add and remove items from the sources and
                 // the names array.
-                var newSources = new ArraySet();
-                var newNames = new ArraySet();
+                const newSources = new ArraySet();
+                const newNames = new ArraySet();
 
                 // Find mappings for the "sourceFile"
                 this._mappings.unsortedForEach(function (mapping) {
                     if (mapping.source === sourceFile && mapping.originalLine != null) {
                         // Check if it can be mapped by the source map, then update the mapping.
-                        var original = aSourceMapConsumer.originalPositionFor({
+                        const original = aSourceMapConsumer.originalPositionFor({
                             line: mapping.originalLine,
                             column: mapping.originalColumn,
                         });
@@ -2174,12 +2179,12 @@
                         }
                     }
 
-                    var source = mapping.source;
+                    const source = mapping.source;
                     if (source != null && !newSources.has(source)) {
                         newSources.add(source);
                     }
 
-                    var name = mapping.name;
+                    const name = mapping.name;
                     if (name != null && !newNames.has(name)) {
                         newNames.add(name);
                     }
@@ -2189,7 +2194,7 @@
 
                 // Copy sourcesContents of applied map.
                 aSourceMapConsumer.sources.forEach(function (sourceFile) {
-                    var content = aSourceMapConsumer.sourceContentFor(sourceFile);
+                    const content = aSourceMapConsumer.sourceContentFor(sourceFile);
                     if (content != null) {
                         if (aSourceMapPath != null) {
                             sourceFile = util.join(aSourceMapPath, sourceFile);
@@ -2280,20 +2285,20 @@
              * specified by the source map format.
              */
             SourceMapGenerator.prototype._serializeMappings = function SourceMapGenerator_serializeMappings() {
-                var previousGeneratedColumn = 0;
-                var previousGeneratedLine = 1;
-                var previousOriginalColumn = 0;
-                var previousOriginalLine = 0;
-                var previousName = 0;
-                var previousSource = 0;
-                var result = '';
-                var next;
-                var mapping;
-                var nameIdx;
-                var sourceIdx;
+                let previousGeneratedColumn = 0;
+                let previousGeneratedLine = 1;
+                let previousOriginalColumn = 0;
+                let previousOriginalLine = 0;
+                let previousName = 0;
+                let previousSource = 0;
+                let result = '';
+                let next;
+                let mapping;
+                let nameIdx;
+                let sourceIdx;
 
-                var mappings = this._mappings.toArray();
-                for (var i = 0, len = mappings.length; i < len; i++) {
+                const mappings = this._mappings.toArray();
+                for (let i = 0, len = mappings.length; i < len; i++) {
                     mapping = mappings[i];
                     next = '';
 
@@ -2353,7 +2358,7 @@
                     if (aSourceRoot != null) {
                         source = util.relative(aSourceRoot, source);
                     }
-                    var key = util.toSetString(source);
+                    const key = util.toSetString(source);
                     return Object.prototype.hasOwnProperty.call(this._sourcesContents, key)
                         ? this._sourcesContents[key]
                         : null;
@@ -2364,7 +2369,7 @@
              * Externalize the source map.
              */
             SourceMapGenerator.prototype.toJSON = function SourceMapGenerator_toJSON() {
-                var map = {
+                const map = {
                     version: this._version,
                     sources: this._sources.toArray(),
                     names: this._names.toArray(),
@@ -2396,7 +2401,7 @@
         },
 
         /***/ 342: /***/ (__unused_webpack_module, exports, __nccwpck_require__) => {
-            var __webpack_unused_export__;
+            let __webpack_unused_export__;
             /* -*- Mode: js; js-indent-level: 2; -*- */
             /*
              * Copyright 2011 Mozilla Foundation and contributors
@@ -2404,20 +2409,20 @@
              * http://opensource.org/licenses/BSD-3-Clause
              */
 
-            var SourceMapGenerator = __nccwpck_require__(179) /* .SourceMapGenerator */.h;
-            var util = __nccwpck_require__(932);
+            const SourceMapGenerator = __nccwpck_require__(179) /* .SourceMapGenerator */.h;
+            const util = __nccwpck_require__(932);
 
             // Matches a Windows-style `\r\n` newline or a `\n` newline used by all other
             // operating systems these days (capturing the result).
-            var REGEX_NEWLINE = /(\r?\n)/;
+            const REGEX_NEWLINE = /(\r?\n)/;
 
             // Newline character code for charCodeAt() comparisons
-            var NEWLINE_CODE = 10;
+            const NEWLINE_CODE = 10;
 
             // Private symbol for identifying `SourceNode`s when multiple versions of
             // the source-map library are loaded. This MUST NOT CHANGE across
             // versions!
-            var isSourceNode = '$$$isSourceNode$$$';
+            const isSourceNode = '$$$isSourceNode$$$';
 
             /**
              * SourceNodes provide a way to abstract over interpolating/concatenating
@@ -2439,7 +2444,9 @@
                 this.source = aSource == null ? null : aSource;
                 this.name = aName == null ? null : aName;
                 this[isSourceNode] = true;
-                if (aChunks != null) this.add(aChunks);
+                if (aChunks != null) {
+                    this.add(aChunks);
+                }
             }
 
             /**
@@ -2457,18 +2464,18 @@
             ) {
                 // The SourceNode we want to fill with the generated code
                 // and the SourceMap
-                var node = new SourceNode();
+                const node = new SourceNode();
 
                 // All even indices of this array are one line of the generated code,
                 // while all odd indices are the newlines between two adjacent lines
                 // (since `REGEX_NEWLINE` captures its match).
                 // Processed fragments are accessed by calling `shiftNextLine`.
-                var remainingLines = aGeneratedCode.split(REGEX_NEWLINE);
-                var remainingLinesIndex = 0;
-                var shiftNextLine = function () {
-                    var lineContents = getNextLine();
+                const remainingLines = aGeneratedCode.split(REGEX_NEWLINE);
+                let remainingLinesIndex = 0;
+                const shiftNextLine = function () {
+                    const lineContents = getNextLine();
                     // The last line of a file might not have a newline.
-                    var newLine = getNextLine() || '';
+                    const newLine = getNextLine() || '';
                     return lineContents + newLine;
 
                     function getNextLine() {
@@ -2479,13 +2486,13 @@
                 };
 
                 // We need to remember the position of "remainingLines"
-                var lastGeneratedLine = 1,
-                    lastGeneratedColumn = 0;
+                let lastGeneratedLine = 1;
+                let lastGeneratedColumn = 0;
 
                 // The generate SourceNodes we need a code range.
                 // To extract it current and last mapping is used.
                 // Here we store the last mapping.
-                var lastMapping = null;
+                let lastMapping = null;
 
                 aSourceMapConsumer.eachMapping(function (mapping) {
                     if (lastMapping !== null) {
@@ -2502,7 +2509,7 @@
                             // Associate the code between "lastGeneratedColumn" and
                             // "mapping.generatedColumn" with "lastMapping"
                             var nextLine = remainingLines[remainingLinesIndex] || '';
-                            var code = nextLine.substr(
+                            const code = nextLine.substr(
                                 0,
                                 mapping.generatedColumn - lastGeneratedColumn,
                             );
@@ -2545,7 +2552,7 @@
 
                 // Copy sourcesContent into SourceNode
                 aSourceMapConsumer.sources.forEach(function (sourceFile) {
-                    var content = aSourceMapConsumer.sourceContentFor(sourceFile);
+                    const content = aSourceMapConsumer.sourceContentFor(sourceFile);
                     if (content != null) {
                         if (aRelativePath != null) {
                             sourceFile = util.join(aRelativePath, sourceFile);
@@ -2560,7 +2567,7 @@
                     if (mapping === null || mapping.source === undefined) {
                         node.add(code);
                     } else {
-                        var source = aRelativePath
+                        const source = aRelativePath
                             ? util.join(aRelativePath, mapping.source)
                             : mapping.source;
                         node.add(
@@ -2608,7 +2615,7 @@
              */
             SourceNode.prototype.prepend = function SourceNode_prepend(aChunk) {
                 if (Array.isArray(aChunk)) {
-                    for (var i = aChunk.length - 1; i >= 0; i--) {
+                    for (let i = aChunk.length - 1; i >= 0; i--) {
                         this.prepend(aChunk[i]);
                     }
                 } else if (aChunk[isSourceNode] || typeof aChunk === 'string') {
@@ -2630,8 +2637,8 @@
              * @param aFn The traversal function.
              */
             SourceNode.prototype.walk = function SourceNode_walk(aFn) {
-                var chunk;
-                for (var i = 0, len = this.children.length; i < len; i++) {
+                let chunk;
+                for (let i = 0, len = this.children.length; i < len; i++) {
                     chunk = this.children[i];
                     if (chunk[isSourceNode]) {
                         chunk.walk(aFn);
@@ -2655,9 +2662,9 @@
              * @param aSep The separator.
              */
             SourceNode.prototype.join = function SourceNode_join(aSep) {
-                var newChildren;
-                var i;
-                var len = this.children.length;
+                let newChildren;
+                let i;
+                const len = this.children.length;
                 if (len > 0) {
                     newChildren = [];
                     for (i = 0; i < len - 1; i++) {
@@ -2681,7 +2688,7 @@
                 aPattern,
                 aReplacement,
             ) {
-                var lastChild = this.children[this.children.length - 1];
+                const lastChild = this.children[this.children.length - 1];
                 if (lastChild[isSourceNode]) {
                     lastChild.replaceRight(aPattern, aReplacement);
                 } else if (typeof lastChild === 'string') {
@@ -2722,7 +2729,7 @@
                     }
                 }
 
-                var sources = Object.keys(this.sourceContents);
+                const sources = Object.keys(this.sourceContents);
                 for (var i = 0, len = sources.length; i < len; i++) {
                     aFn(util.fromSetString(sources[i]), this.sourceContents[sources[i]]);
                 }
@@ -2733,7 +2740,7 @@
              * and concatenates all the various snippets together to one string.
              */
             SourceNode.prototype.toString = function SourceNode_toString() {
-                var str = '';
+                let str = '';
                 this.walk(function (chunk) {
                     str += chunk;
                 });
@@ -2747,17 +2754,17 @@
             SourceNode.prototype.toStringWithSourceMap = function SourceNode_toStringWithSourceMap(
                 aArgs,
             ) {
-                var generated = {
+                const generated = {
                     code: '',
                     line: 1,
                     column: 0,
                 };
-                var map = new SourceMapGenerator(aArgs);
-                var sourceMappingActive = false;
-                var lastOriginalSource = null;
-                var lastOriginalLine = null;
-                var lastOriginalColumn = null;
-                var lastOriginalName = null;
+                const map = new SourceMapGenerator(aArgs);
+                let sourceMappingActive = false;
+                let lastOriginalSource = null;
+                let lastOriginalLine = null;
+                let lastOriginalColumn = null;
+                let lastOriginalName = null;
                 this.walk(function (chunk, original) {
                     generated.code += chunk;
                     if (
@@ -2799,7 +2806,7 @@
                         lastOriginalSource = null;
                         sourceMappingActive = false;
                     }
-                    for (var idx = 0, length = chunk.length; idx < length; idx++) {
+                    for (let idx = 0, length = chunk.length; idx < length; idx++) {
                         if (chunk.charCodeAt(idx) === NEWLINE_CODE) {
                             generated.line++;
                             generated.column = 0;
@@ -2867,11 +2874,11 @@
             }
             exports.getArg = getArg;
 
-            var urlRegexp = /^(?:([\w+\-.]+):)?\/\/(?:(\w+:\w+)@)?([\w.-]*)(?::(\d+))?(.*)$/;
-            var dataUrlRegexp = /^data:.+\,.+$/;
+            const urlRegexp = /^(?:([\w+\-.]+):)?\/\/(?:(\w+:\w+)@)?([\w.-]*)(?::(\d+))?(.*)$/;
+            const dataUrlRegexp = /^data:.+\,.+$/;
 
             function urlParse(aUrl) {
-                var match = aUrl.match(urlRegexp);
+                const match = aUrl.match(urlRegexp);
                 if (!match) {
                     return null;
                 }
@@ -2886,7 +2893,7 @@
             exports.urlParse = urlParse;
 
             function urlGenerate(aParsedUrl) {
-                var url = '';
+                let url = '';
                 if (aParsedUrl.scheme) {
                     url += aParsedUrl.scheme + ':';
                 }
@@ -2919,17 +2926,17 @@
              * @param aPath The path or url to normalize.
              */
             function normalize(aPath) {
-                var path = aPath;
-                var url = urlParse(aPath);
+                let path = aPath;
+                const url = urlParse(aPath);
                 if (url) {
                     if (!url.path) {
                         return aPath;
                     }
                     path = url.path;
                 }
-                var isAbsolute = exports.isAbsolute(path);
+                const isAbsolute = exports.isAbsolute(path);
 
-                var parts = path.split(/\/+/);
+                const parts = path.split(/\/+/);
                 for (var part, up = 0, i = parts.length - 1; i >= 0; i--) {
                     part = parts[i];
                     if (part === '.') {
@@ -2986,8 +2993,8 @@
                 if (aPath === '') {
                     aPath = '.';
                 }
-                var aPathUrl = urlParse(aPath);
-                var aRootUrl = urlParse(aRoot);
+                const aPathUrl = urlParse(aPath);
+                const aRootUrl = urlParse(aRoot);
                 if (aRootUrl) {
                     aRoot = aRootUrl.path || '/';
                 }
@@ -3010,7 +3017,7 @@
                     return urlGenerate(aRootUrl);
                 }
 
-                var joined =
+                const joined =
                     aPath.charAt(0) === '/'
                         ? aPath
                         : normalize(aRoot.replace(/\/+$/, '') + '/' + aPath);
@@ -3044,9 +3051,9 @@
                 // checking whether the root is a prefix of the path won't work. Instead, we
                 // need to remove components from the root one by one, until either we find
                 // a prefix that fits, or we run out of components to remove.
-                var level = 0;
+                let level = 0;
                 while (aPath.indexOf(aRoot + '/') !== 0) {
-                    var index = aRoot.lastIndexOf('/');
+                    const index = aRoot.lastIndexOf('/');
                     if (index < 0) {
                         return aPath;
                     }
@@ -3067,8 +3074,8 @@
             }
             exports.relative = relative;
 
-            var supportsNullProto = (function () {
-                var obj = Object.create(null);
+            const supportsNullProto = (function () {
+                const obj = Object.create(null);
                 return !('__proto__' in obj);
             })();
 
@@ -3108,7 +3115,7 @@
                     return false;
                 }
 
-                var length = s.length;
+                const length = s.length;
 
                 if (length < 9 /* "__proto__".length */) {
                     return false;
@@ -3128,7 +3135,7 @@
                     return false;
                 }
 
-                for (var i = length - 10; i >= 0; i--) {
+                for (let i = length - 10; i >= 0; i--) {
                     if (s.charCodeAt(i) !== 36 /* '$' */) {
                         return false;
                     }
@@ -3146,7 +3153,7 @@
              * stubbed out mapping.
              */
             function compareByOriginalPositions(mappingA, mappingB, onlyCompareOriginal) {
-                var cmp = strcmp(mappingA.source, mappingB.source);
+                let cmp = strcmp(mappingA.source, mappingB.source);
                 if (cmp !== 0) {
                     return cmp;
                 }
@@ -3185,7 +3192,7 @@
              * mapping with a stubbed out mapping.
              */
             function compareByGeneratedPositionsDeflated(mappingA, mappingB, onlyCompareGenerated) {
-                var cmp = mappingA.generatedLine - mappingB.generatedLine;
+                let cmp = mappingA.generatedLine - mappingB.generatedLine;
                 if (cmp !== 0) {
                     return cmp;
                 }
@@ -3239,7 +3246,7 @@
              * the generated positions are compared.
              */
             function compareByGeneratedPositionsInflated(mappingA, mappingB) {
-                var cmp = mappingA.generatedLine - mappingB.generatedLine;
+                let cmp = mappingA.generatedLine - mappingB.generatedLine;
                 if (cmp !== 0) {
                     return cmp;
                 }
@@ -3313,13 +3320,13 @@
                 //   “sourceRoot”, the sources are resolved relative to the
                 //   SourceMap (like resolving script src in a html document).
                 if (sourceMapURL) {
-                    var parsed = urlParse(sourceMapURL);
+                    const parsed = urlParse(sourceMapURL);
                     if (!parsed) {
                         throw new Error('sourceMapURL could not be parsed');
                     }
                     if (parsed.path) {
                         // Strip the last path component, but keep the "/".
-                        var index = parsed.path.lastIndexOf('/');
+                        const index = parsed.path.lastIndexOf('/');
                         if (index >= 0) {
                             parsed.path = parsed.path.substring(0, index + 1);
                         }
@@ -3349,10 +3356,10 @@
 
         /***/ 249: /***/ (module, exports, __nccwpck_require__) => {
             /* module decorator */ module = __nccwpck_require__.nmd(module);
-            var SourceMapConsumer = __nccwpck_require__(309).SourceMapConsumer;
-            var path = __nccwpck_require__(622);
+            const SourceMapConsumer = __nccwpck_require__(309).SourceMapConsumer;
+            const path = __nccwpck_require__(622);
 
-            var fs;
+            let fs;
             try {
                 fs = __nccwpck_require__(747);
                 if (!fs.existsSync || !fs.readFileSync) {
@@ -3363,7 +3370,7 @@
                 /* nop */
             }
 
-            var bufferFrom = __nccwpck_require__(18);
+            const bufferFrom = __nccwpck_require__(18);
 
             /**
              * Requires a module which is protected against bundler minification.
@@ -3376,31 +3383,35 @@
             }
 
             // Only install once if called multiple times
-            var errorFormatterInstalled = false;
-            var uncaughtShimInstalled = false;
+            let errorFormatterInstalled = false;
+            let uncaughtShimInstalled = false;
 
             // If true, the caches are reset before a stack trace formatting operation
-            var emptyCacheBetweenOperations = false;
+            let emptyCacheBetweenOperations = false;
 
             // Supports {browser, node, auto}
-            var environment = 'auto';
+            let environment = 'auto';
 
             // Maps a file path to a string containing the file contents
-            var fileContentsCache = {};
+            let fileContentsCache = {};
 
             // Maps a file path to a source map for that file
-            var sourceMapCache = {};
+            let sourceMapCache = {};
 
             // Regex for detecting source maps
-            var reSourceMap = /^data:application\/json[^,]+base64,/;
+            const reSourceMap = /^data:application\/json[^,]+base64,/;
 
             // Priority list of retrieve handlers
-            var retrieveFileHandlers = [];
-            var retrieveMapHandlers = [];
+            let retrieveFileHandlers = [];
+            let retrieveMapHandlers = [];
 
             function isInBrowser() {
-                if (environment === 'browser') return true;
-                if (environment === 'node') return false;
+                if (environment === 'browser') {
+                    return true;
+                }
+                if (environment === 'node') {
+                    return false;
+                }
                 return (
                     typeof window !== 'undefined' &&
                     typeof XMLHttpRequest === 'function' &&
@@ -3423,8 +3434,8 @@
 
             function handlerExec(list) {
                 return function (arg) {
-                    for (var i = 0; i < list.length; i++) {
-                        var ret = list[i](arg);
+                    for (let i = 0; i < list.length; i++) {
+                        const ret = list[i](arg);
                         if (ret) {
                             return ret;
                         }
@@ -3433,7 +3444,7 @@
                 };
             }
 
-            var retrieveFile = handlerExec(retrieveFileHandlers);
+            let retrieveFile = handlerExec(retrieveFileHandlers);
 
             retrieveFileHandlers.push(function (path) {
                 // Trim the path to make sure there is no extra whitespace.
@@ -3450,11 +3461,11 @@
                     return fileContentsCache[path];
                 }
 
-                var contents = '';
+                let contents = '';
                 try {
                     if (!fs) {
                         // Use SJAX if we are in the browser
-                        var xhr = new XMLHttpRequest();
+                        const xhr = new XMLHttpRequest();
                         xhr.open('GET', path, /** async */ false);
                         xhr.send(null);
                         if (xhr.readyState === 4 && xhr.status === 200) {
@@ -3474,11 +3485,13 @@
             // Support URLs relative to a directory, but be careful about a protocol prefix
             // in case we are in the browser (i.e. directories may start with "http://" or "file:///")
             function supportRelativeURL(file, url) {
-                if (!file) return url;
-                var dir = path.dirname(file);
-                var match = /^\w+:\/\/[^\/]*/.exec(dir);
-                var protocol = match ? match[0] : '';
-                var startPath = dir.slice(protocol.length);
+                if (!file) {
+                    return url;
+                }
+                const dir = path.dirname(file);
+                const match = /^\w+:\/\/[^\/]*/.exec(dir);
+                let protocol = match ? match[0] : '';
+                const startPath = dir.slice(protocol.length);
                 if (protocol && /^\/\w\:/.test(startPath)) {
                     // handle file:///C:/ paths
                     protocol += '/';
@@ -3490,17 +3503,17 @@
             }
 
             function retrieveSourceMapURL(source) {
-                var fileData;
+                let fileData;
 
                 if (isInBrowser()) {
                     try {
-                        var xhr = new XMLHttpRequest();
+                        const xhr = new XMLHttpRequest();
                         xhr.open('GET', source, false);
                         xhr.send(null);
                         fileData = xhr.readyState === 4 ? xhr.responseText : null;
 
                         // Support providing a sourceMappingURL via the SourceMap header
-                        var sourceMapHeader =
+                        const sourceMapHeader =
                             xhr.getResponseHeader('SourceMap') ||
                             xhr.getResponseHeader('X-SourceMap');
                         if (sourceMapHeader) {
@@ -3511,12 +3524,17 @@
 
                 // Get the URL of the source map
                 fileData = retrieveFile(source);
-                var re = /(?:\/\/[@#][\s]*sourceMappingURL=([^\s'"]+)[\s]*$)|(?:\/\*[@#][\s]*sourceMappingURL=([^\s*'"]+)[\s]*(?:\*\/)[\s]*$)/gm;
+                const re = /(?:\/\/[@#][\s]*sourceMappingURL=([^\s'"]+)[\s]*$)|(?:\/\*[@#][\s]*sourceMappingURL=([^\s*'"]+)[\s]*(?:\*\/)[\s]*$)/gm;
                 // Keep executing the search to find the *last* sourceMappingURL to avoid
                 // picking up sourceMappingURLs from comments, strings, etc.
-                var lastMatch, match;
-                while ((match = re.exec(fileData))) lastMatch = match;
-                if (!lastMatch) return null;
+                let lastMatch;
+                let match;
+                while ((match = re.exec(fileData))) {
+                    lastMatch = match;
+                }
+                if (!lastMatch) {
+                    return null;
+                }
                 return lastMatch[1];
             }
 
@@ -3525,16 +3543,18 @@
             // there is no source map.  The map field may be either a string or the parsed
             // JSON object (ie, it must be a valid argument to the SourceMapConsumer
             // constructor).
-            var retrieveSourceMap = handlerExec(retrieveMapHandlers);
+            let retrieveSourceMap = handlerExec(retrieveMapHandlers);
             retrieveMapHandlers.push(function (source) {
-                var sourceMappingURL = retrieveSourceMapURL(source);
-                if (!sourceMappingURL) return null;
+                let sourceMappingURL = retrieveSourceMapURL(source);
+                if (!sourceMappingURL) {
+                    return null;
+                }
 
                 // Read the contents of the source map
-                var sourceMapData;
+                let sourceMapData;
                 if (reSourceMap.test(sourceMappingURL)) {
                     // Support source map URL as a data url
-                    var rawData = sourceMappingURL.slice(sourceMappingURL.indexOf(',') + 1);
+                    const rawData = sourceMappingURL.slice(sourceMappingURL.indexOf(',') + 1);
                     sourceMapData = bufferFrom(rawData, 'base64').toString();
                     sourceMappingURL = source;
                 } else {
@@ -3554,10 +3574,10 @@
             });
 
             function mapSourcePosition(position) {
-                var sourceMap = sourceMapCache[position.source];
+                let sourceMap = sourceMapCache[position.source];
                 if (!sourceMap) {
                     // Call the (overrideable) retrieveSourceMap function to get the source map.
-                    var urlAndMap = retrieveSourceMap(position.source);
+                    const urlAndMap = retrieveSourceMap(position.source);
                     if (urlAndMap) {
                         sourceMap = sourceMapCache[position.source] = {
                             url: urlAndMap.url,
@@ -3568,9 +3588,9 @@
                         // to pretend like they are already loaded. They may not exist on disk.
                         if (sourceMap.map.sourcesContent) {
                             sourceMap.map.sources.forEach(function (source, i) {
-                                var contents = sourceMap.map.sourcesContent[i];
+                                const contents = sourceMap.map.sourcesContent[i];
                                 if (contents) {
-                                    var url = supportRelativeURL(sourceMap.url, source);
+                                    const url = supportRelativeURL(sourceMap.url, source);
                                     fileContentsCache[url] = contents;
                                 }
                             });
@@ -3589,7 +3609,7 @@
                     sourceMap.map &&
                     typeof sourceMap.map.originalPositionFor === 'function'
                 ) {
-                    var originalPosition = sourceMap.map.originalPositionFor(position);
+                    const originalPosition = sourceMap.map.originalPositionFor(position);
 
                     // Only return the original position if a matching line was found. If no
                     // matching line is found then we return position instead, which will cause
@@ -3612,9 +3632,9 @@
             // https://code.google.com/p/v8/source/browse/trunk/src/messages.js
             function mapEvalOrigin(origin) {
                 // Most eval() calls are in this format
-                var match = /^eval at ([^(]+) \((.+):(\d+):(\d+)\)$/.exec(origin);
+                let match = /^eval at ([^(]+) \((.+):(\d+):(\d+)\)$/.exec(origin);
                 if (match) {
-                    var position = mapSourcePosition({
+                    const position = mapSourcePosition({
                         source: match[2],
                         line: +match[3],
                         column: match[4] - 1,
@@ -3649,8 +3669,8 @@
             // did something to the prototype chain and broke the shim. The only fix I
             // could find was copy/paste.
             function CallSiteToString() {
-                var fileName;
-                var fileLocation = '';
+                let fileName;
+                let fileLocation = '';
                 if (this.isNative()) {
                     fileLocation = 'native';
                 } else {
@@ -3668,28 +3688,28 @@
                         // an eval string.
                         fileLocation += '<anonymous>';
                     }
-                    var lineNumber = this.getLineNumber();
+                    const lineNumber = this.getLineNumber();
                     if (lineNumber != null) {
                         fileLocation += ':' + lineNumber;
-                        var columnNumber = this.getColumnNumber();
+                        const columnNumber = this.getColumnNumber();
                         if (columnNumber) {
                             fileLocation += ':' + columnNumber;
                         }
                     }
                 }
 
-                var line = '';
-                var functionName = this.getFunctionName();
-                var addSuffix = true;
-                var isConstructor = this.isConstructor();
-                var isMethodCall = !(this.isToplevel() || isConstructor);
+                let line = '';
+                const functionName = this.getFunctionName();
+                let addSuffix = true;
+                const isConstructor = this.isConstructor();
+                const isMethodCall = !(this.isToplevel() || isConstructor);
                 if (isMethodCall) {
-                    var typeName = this.getTypeName();
+                    let typeName = this.getTypeName();
                     // Fixes shim to be backward compatable with Node v0 to v4
                     if (typeName === '[object Object]') {
                         typeName = 'null';
                     }
-                    var methodName = this.getMethodName();
+                    const methodName = this.getMethodName();
                     if (functionName) {
                         if (typeName && functionName.indexOf(typeName) != 0) {
                             line += typeName + '.';
@@ -3720,7 +3740,7 @@
             }
 
             function cloneCallSite(frame) {
-                var object = {};
+                const object = {};
                 Object.getOwnPropertyNames(Object.getPrototypeOf(frame)).forEach(function (name) {
                     object[name] = /^(?:is|get)/.test(name)
                         ? function () {
@@ -3745,30 +3765,30 @@
                 // Most call sites will return the source file from getFileName(), but code
                 // passed to eval() ending in "//# sourceURL=..." will return the source file
                 // from getScriptNameOrSourceURL() instead
-                var source = frame.getFileName() || frame.getScriptNameOrSourceURL();
+                const source = frame.getFileName() || frame.getScriptNameOrSourceURL();
                 if (source) {
-                    var line = frame.getLineNumber();
-                    var column = frame.getColumnNumber() - 1;
+                    const line = frame.getLineNumber();
+                    let column = frame.getColumnNumber() - 1;
 
                     // Fix position in Node where some (internal) code is prepended.
                     // See https://github.com/evanw/node-source-map-support/issues/36
                     // Header removed in node at ^10.16 || >=11.11.0
                     // v11 is not an LTS candidate, we can just test the one version with it.
                     // Test node versions for: 10.16-19, 10.20+, 12-19, 20-99, 100+, or 11.11
-                    var noHeader = /^v(10\.1[6-9]|10\.[2-9][0-9]|10\.[0-9]{3,}|1[2-9]\d*|[2-9]\d|\d{3,}|11\.11)/;
-                    var headerLength = noHeader.test(process.version) ? 0 : 62;
+                    const noHeader = /^v(10\.1[6-9]|10\.[2-9][0-9]|10\.[0-9]{3,}|1[2-9]\d*|[2-9]\d|\d{3,}|11\.11)/;
+                    const headerLength = noHeader.test(process.version) ? 0 : 62;
                     if (line === 1 && column > headerLength && !isInBrowser() && !frame.isEval()) {
                         column -= headerLength;
                     }
 
-                    var position = mapSourcePosition({
+                    const position = mapSourcePosition({
                         source: source,
                         line: line,
                         column: column,
                     });
                     state.curPosition = position;
                     frame = cloneCallSite(frame);
-                    var originalFunctionName = frame.getFunctionName;
+                    const originalFunctionName = frame.getFunctionName;
                     frame.getFunctionName = function () {
                         if (state.nextPosition == null) {
                             return originalFunctionName();
@@ -3791,7 +3811,7 @@
                 }
 
                 // Code called using eval() needs special handling
-                var origin = frame.isEval() && frame.getEvalOrigin();
+                let origin = frame.isEval() && frame.getEvalOrigin();
                 if (origin) {
                     origin = mapEvalOrigin(origin);
                     frame = cloneCallSite(frame);
@@ -3813,13 +3833,13 @@
                     sourceMapCache = {};
                 }
 
-                var name = error.name || 'Error';
-                var message = error.message || '';
-                var errorString = name + ': ' + message;
+                const name = error.name || 'Error';
+                const message = error.message || '';
+                const errorString = name + ': ' + message;
 
-                var state = {nextPosition: null, curPosition: null};
-                var processedStack = [];
-                for (var i = stack.length - 1; i >= 0; i--) {
+                const state = {nextPosition: null, curPosition: null};
+                const processedStack = [];
+                for (let i = stack.length - 1; i >= 0; i--) {
                     processedStack.push('\n    at ' + wrapCallSite(stack[i], state));
                     state.nextPosition = state.curPosition;
                 }
@@ -3829,14 +3849,14 @@
 
             // Generate position and snippet of original source with pointer
             function getErrorSource(error) {
-                var match = /\n    at [^(]+ \((.*):(\d+):(\d+)\)/.exec(error.stack);
+                const match = /\n    at [^(]+ \((.*):(\d+):(\d+)\)/.exec(error.stack);
                 if (match) {
-                    var source = match[1];
-                    var line = +match[2];
-                    var column = +match[3];
+                    const source = match[1];
+                    const line = +match[2];
+                    const column = +match[3];
 
                     // Support the inline sourceContents inside the source map
-                    var contents = fileContentsCache[source];
+                    let contents = fileContentsCache[source];
 
                     // Support files on disk
                     if (!contents && fs && fs.existsSync(source)) {
@@ -3849,7 +3869,7 @@
 
                     // Format the line from the original source code like node does
                     if (contents) {
-                        var code = contents.split(/(?:\r\n|\r|\n)/)[line - 1];
+                        const code = contents.split(/(?:\r\n|\r|\n)/)[line - 1];
                         if (code) {
                             return (
                                 source +
@@ -3868,7 +3888,7 @@
             }
 
             function printErrorAndExit(error) {
-                var source = getErrorSource(error);
+                const source = getErrorSource(error);
 
                 // Ensure error is printed synchronously and not truncated
                 if (process.stderr._handle && process.stderr._handle.setBlocking) {
@@ -3885,12 +3905,12 @@
             }
 
             function shimEmitUncaughtException() {
-                var origEmit = process.emit;
+                const origEmit = process.emit;
 
                 process.emit = function (type) {
                     if (type === 'uncaughtException') {
-                        var hasStack = arguments[1] && arguments[1].stack;
-                        var hasListeners = this.listeners(type).length > 0;
+                        const hasStack = arguments[1] && arguments[1].stack;
+                        const hasListeners = this.listeners(type).length > 0;
 
                         if (hasStack && !hasListeners) {
                             return printErrorAndExit(arguments[1]);
@@ -3901,8 +3921,8 @@
                 };
             }
 
-            var originalRetrieveFileHandlers = retrieveFileHandlers.slice(0);
-            var originalRetrieveMapHandlers = retrieveMapHandlers.slice(0);
+            const originalRetrieveFileHandlers = retrieveFileHandlers.slice(0);
+            const originalRetrieveMapHandlers = retrieveMapHandlers.slice(0);
 
             exports.wrapCallSite = wrapCallSite;
             exports.getErrorSource = getErrorSource;
@@ -3946,8 +3966,8 @@
                 // Support runtime transpilers that include inline source maps
                 if (options.hookRequire && !isInBrowser()) {
                     // Use dynamicRequire to avoid including in browser bundles
-                    var Module = dynamicRequire(module, 'module');
-                    var $compile = Module.prototype._compile;
+                    const Module = dynamicRequire(module, 'module');
+                    const $compile = Module.prototype._compile;
 
                     if (!$compile.__sourceMapSupport) {
                         Module.prototype._compile = function (content, filename) {
@@ -3975,7 +3995,7 @@
                 }
 
                 if (!uncaughtShimInstalled) {
-                    var installHandler =
+                    let installHandler =
                         'handleUncaughtExceptions' in options
                             ? options.handleUncaughtExceptions
                             : true;
@@ -3985,7 +4005,7 @@
                     // rather than printing something to stderr and exiting.
                     try {
                         // We need to use `dynamicRequire` because `require` on it's own will be optimized by WebPack/Browserify.
-                        var worker_threads = dynamicRequire(module, 'worker_threads');
+                        const worker_threads = dynamicRequire(module, 'worker_threads');
                         if (worker_threads.isMainThread === false) {
                             installHandler = false;
                         }
@@ -4036,17 +4056,17 @@
         /******/
     }; // The module cache
     /************************************************************************/
-    /******/ /******/ var __webpack_module_cache__ = {}; // The require function
+    /******/ /******/ const __webpack_module_cache__ = {}; // The require function
     /******/
 
     /******/ /******/ function __nccwpck_require__(moduleId) {
         /******/ // Check if module is in cache
-        /******/ var cachedModule = __webpack_module_cache__[moduleId];
+        /******/ const cachedModule = __webpack_module_cache__[moduleId];
         /******/ if (cachedModule !== undefined) {
             /******/ return cachedModule.exports;
             /******/
         } // Create a new module (and put it into the cache)
-        /******/ /******/ var module = (__webpack_module_cache__[moduleId] = {
+        /******/ /******/ const module = (__webpack_module_cache__[moduleId] = {
             /******/ id: moduleId,
             /******/ loaded: false,
             /******/ exports: {},
@@ -4054,13 +4074,15 @@
         }); // Execute the module function
         /******/
 
-        /******/ /******/ var threw = true;
+        /******/ /******/ let threw = true;
         /******/ try {
             /******/ __webpack_modules__[moduleId](module, module.exports, __nccwpck_require__);
             /******/ threw = false;
             /******/
         } finally {
-            /******/ if (threw) delete __webpack_module_cache__[moduleId];
+            /******/ if (threw) {
+                delete __webpack_module_cache__[moduleId];
+            }
             /******/
         } // Flag the module as loaded
         /******/
@@ -4077,24 +4099,25 @@
     /******/ /******/ (() => {
         /******/ __nccwpck_require__.nmd = module => {
             /******/ module.paths = [];
-            /******/ if (!module.children) module.children = [];
+            /******/ if (!module.children) {
+                module.children = [];
+            }
             /******/ return module;
             /******/
         };
         /******/
-    })(); /* webpack/runtime/compat */
+    })(); /* webpack/runtime/compat */ /******/
     /******/
 
-    /******/ /******/
-
-    /******/ if (typeof __nccwpck_require__ !== 'undefined')
-        __nccwpck_require__.ab = __dirname + '/'; // startup // Load entry module and return exports // This entry module is referenced by other modules so it can't be inlined
+    /******/ /******/ if (typeof __nccwpck_require__ !== 'undefined') {
+        __nccwpck_require__.ab = __dirname + '/';
+    } // startup // Load entry module and return exports // This entry module is referenced by other modules so it can't be inlined
     /******/
 
     /************************************************************************/
     /******/
 
-    /******/ /******/ /******/ /******/ var __webpack_exports__ = __nccwpck_require__(249);
+    /******/ /******/ /******/ /******/ const __webpack_exports__ = __nccwpck_require__(249);
     /******/ module.exports = __webpack_exports__;
     /******/
     /******/
