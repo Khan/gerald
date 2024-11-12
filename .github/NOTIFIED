@@ -7,6 +7,10 @@ Examples:
 # This rule will notify @owner1 on changes to all files
 # **/*                @owner1
 
+# This rule will notify @owner1 on changes to all files, and the rule
+# has a label "allfiles", which will be included in the github PR info.
+# allfiles: **/*                @owner1
+
 # This rule will notify @owner1 and @Org/team1 on changes to all .js files
 # **/*.js             @owner1 @Org/team1
 

@@ -179,7 +179,8 @@ describe('get notified', () => {
 
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
-**/*.js             @owner`,
+**/*.js		      @owner
+mylabel: src/*Push.js @owner`,
         );
 
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
@@ -197,6 +198,7 @@ describe('get notified', () => {
 
         expect(await getNotified(filesChanged, fileDiffs, {}, 'testAuthor', 'push')).toEqual({
             '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
+            '@owner (mylabel)': ['src/runOnPush.js'],
         });
     });
 
@@ -215,6 +217,7 @@ describe('get notified', () => {
 [ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)
 
 **/*.js             @owner          # HAH Mr. gerald will also ignore you!`;
+        _mock(readFileSync).mockImplementation(() => notifiedFile);
 
         const filesChanged = ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'];
         const fileDiffs = {
