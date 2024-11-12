@@ -22,6 +22,8 @@ import {
     MATCH_COMMENT_HEADER_REGEX,
 } from './constants';
 
+type NameToLabelToFiles = {[name: string]: {[label: string]: string[], ...}, ...};
+
 /**
  * @desc Helper function to update, delete, or create a comment
  * @param comment - existing Github comment to update/delete or undefined
@@ -30,23 +32,23 @@ import {
  */
 const updatePullRequestComment = async (
     comment: ?Octokit$IssuesListCommentsResponseItem,
-    notifyees: {[string]: Array<string>, ...},
-    reviewers: {[string]: Array<string>, ...},
-    requiredReviewers: {[string]: Array<string>, ...},
+    notifyees: NameToLabelToFiles,
+    reviewers: NameToLabelToFiles,
+    requiredReviewers: NameToLabelToFiles,
 ) => {
     let body: string = GERALD_COMMENT_HEADER;
     body += makeCommentBody({
-        peopleToFiles: notifyees,
+        peopleToLabelToFiles: notifyees,
         header: GERALD_COMMENT_NOTIFIED_HEADER,
         tagPerson: true,
     });
     body += makeCommentBody({
-        peopleToFiles: reviewers,
+        peopleToLabelToFiles: reviewers,
         header: GERALD_COMMENT_REVIEWERS_HEADER,
         tagPerson: false,
     });
     body += makeCommentBody({
-        peopleToFiles: requiredReviewers,
+        peopleToLabelToFiles: requiredReviewers,
         header: GERALD_COMMENT_REQ_REVIEWERS_HEADER,
         tagPerson: false,
     });

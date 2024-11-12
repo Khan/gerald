@@ -36,42 +36,47 @@ import {
 
 type Section = 'pull_request' | 'push';
 type GeraldFile = 'NOTIFIED' | 'REVIEWERS';
-type NameAndLabelToFiles = {[nameAndLabel: string]: string[], ...};
+type NameToLabelToFiles = {[name: string]: {[label: string]: string[], ...}, ...};
 type CommentHeaders = 'Reviewers' | 'Required Reviewers' | 'Notified';
 
 /**
  * @desc Make the comment body for each of the Gerald sections.
  *
- * @param peopleToFiles - List of people being notified / requested for review and
+ * @param peopleToLabelToFiles - List of people being notified / requested for review and
  * the files they are being notified for / reviewing.
  * @param sectionHeader - What part of the Gerald comment are we making a section for?
  */
 export const makeCommentBody = ({
-    peopleToFiles,
+    peopleToLabelToFiles,
     header,
     tagPerson,
 }: {
-    peopleToFiles: {[string]: Array<string>, ...},
+    peopleToLabelToFiles: NameToLabelToFiles,
     header: CommentHeaders,
     tagPerson: boolean,
 }) => {
-    const names: string[] = Object.keys(peopleToFiles);
-    if (names.length) {
-        let body = `<details>\n<summary><b>${header}</b></summary>\n\n`;
-        names.forEach((person: string) => {
-            const files = peopleToFiles[person];
+    const names: string[] = Object.keys(peopleToLabelToFiles);
+    if (!names.length) {
+        return '';
+    }
+
+    let body = `<details>\n<summary><b>${header}</b></summary>\n\n`;
+    names.forEach((person: string) => {
+        const labels: string[] = Object.keys(peopleToLabelToFiles[person]);
+        labels.forEach((label: string) => {
+            const files = peopleToLabelToFiles[person][label];
             const filesText = files.join('`, `');
             // escape @ symbols in our files
             const escapedFilesText = filesText.replace(/@/g, '%40@');
             // If we're tagging the person then we don't turn it into an
             // escaped code string.
-            person = tagPerson ? person : `\`${person}\``;
-            body += `* ${person} for changes to \`${escapedFilesText}\`\n`;
+            const personText = tagPerson ? person : `\`${person}\``;
+            const labelText = label ? ` (${label})` : '';
+            body += `* ${personText} for changes to \`${escapedFilesText}\`${labelText}\n`;
         });
-        body += `</details>\n\n`;
-        return body;
-    }
-    return '';
+    });
+    body += `</details>\n\n`;
+    return body;
 };
 
 /**
@@ -165,21 +170,23 @@ const globOptions = {
  */
 const maybeAddIfMatch = (
     pattern: RegExp,
-    nameAndLabel: string,
+    name: string,
+    label: string,
     fileDiffs: {[string]: string, ...},
-    nameAndLabelToFilesObj: NameAndLabelToFiles,
+    nameToLabelToFilesObj: NameToLabelToFiles,
     filesChanged: Array<string> = [],
 ): void => {
     for (const file of Object.keys(fileDiffs)) {
         const diff = fileDiffs[file];
         // Only test the file if it's in the list of files that have changed.
         if (filesChanged.includes(file) && pattern.test(diff)) {
-            if (nameAndLabelToFilesObj[nameAndLabel]) {
-                if (!nameAndLabelToFilesObj[nameAndLabel].includes(file)) {
-                    nameAndLabelToFilesObj[nameAndLabel].push(file);
-                }
-            } else {
-                nameAndLabelToFilesObj[nameAndLabel] = [file];
+            if (!nameToLabelToFilesObj[name]) {
+                nameToLabelToFilesObj[name] = {};
+            }
+            if (!nameToLabelToFilesObj[name][label]) {
+                nameToLabelToFilesObj[name][label] = [file];
+            } else if (!nameToLabelToFilesObj[name][label].includes(file)) {
+                nameToLabelToFilesObj[name][label].push(file);
             }
         }
     }
@@ -227,18 +234,22 @@ const parseUsername = (
  * @param files - The list of files to push.
  */
 const pushOrSetToBin = (
-    bin: NameAndLabelToFiles,
-    usernameAndLabel: string,
+    bin: NameToLabelToFiles,
+    username: string,
+    label: string,
     files: Array<string>,
 ): void => {
-    if (bin[usernameAndLabel]) {
+    if (!bin[username]) {
+        bin[username] = {};
+    }
+    if (!bin[username][label]) {
+        bin[username][label] = files;
+    } else {
         for (const file of files) {
-            if (!bin[usernameAndLabel].includes(file)) {
-                bin[usernameAndLabel].push(file);
+            if (!bin[username][label].includes(file)) {
+                bin[username][label].push(file);
             }
         }
-    } else {
-        bin[usernameAndLabel] = files;
     }
 };
 
@@ -278,10 +289,6 @@ export const getCorrectSection = (rawFile: string, file: GeraldFile, section: Se
     return rawFile.match(sectionRegexp);
 };
 
-const nameAndLabel = (name: string, label: string): string => {
-    return label ? `${name} (${label})` : name;
-};
-
 /**
  * @desc Parse .github/NOTIFIED and return an object where each entry is a
  * unique person to notify and the files that they are being notified for.
@@ -299,7 +306,7 @@ export const getNotified = (
     author: string,
     on: Section,
     __testContent: ?string = undefined,
-): NameAndLabelToFiles => {
+): NameToLabelToFiles => {
     if (!existsSync(NOTIFIED_FILE)) {
         return {};
     }
@@ -314,7 +321,7 @@ export const getNotified = (
         return {};
     }
 
-    const notified: NameAndLabelToFiles = {};
+    const notified: NameToLabelToFiles = {};
     for (const match of matches) {
         if (!match || !match.trim()) {
             continue;
@@ -329,7 +336,7 @@ export const getNotified = (
 
         // TODO(csilvers): also keep track of the line-number the
         // label is on, and make label an href to that line in github.
-        const label = untrimmedPattern[1];
+        const label = untrimmedPattern[1] || '';
         const pattern = untrimmedPattern[2].trim();
 
         // handle dealing with regex
@@ -338,13 +345,7 @@ export const getNotified = (
             const objToUse = againstFileContents ? fileContents : fileDiffs;
             for (const name of names) {
                 if (parseUsername(name).justName !== author) {
-                    maybeAddIfMatch(
-                        regex,
-                        nameAndLabel(name, label),
-                        objToUse,
-                        notified,
-                        filesChanged,
-                    );
+                    maybeAddIfMatch(regex, name, label, objToUse, notified, filesChanged);
                 }
             }
         }
@@ -356,7 +357,7 @@ export const getNotified = (
             if (intersection.length) {
                 for (const name of names) {
                     if (parseUsername(name).justName !== author) {
-                        pushOrSetToBin(notified, nameAndLabel(name, label), intersection);
+                        pushOrSetToBin(notified, name, label, intersection);
                     }
                 }
             }
@@ -380,7 +381,7 @@ export const getReviewers = (
     fileDiffs: {[string]: string, ...},
     fileContents: {[string]: string, ...},
     issuer: string,
-): {reviewers: NameAndLabelToFiles, requiredReviewers: NameAndLabelToFiles} => {
+): {reviewers: NameToLabelToFiles, requiredReviewers: NameToLabelToFiles} => {
     const buf = readFileSync(REVIEWERS_FILE, 'utf-8');
     const section = getCorrectSection(buf, REVIEWERS, PULL_REQUEST);
 
@@ -389,8 +390,8 @@ export const getReviewers = (
     }
 
     const matches = section[0].match(MATCH_NON_COMMENT_LINES_REGEX); // ignore newline comments
-    const reviewers: {[string]: Array<string>, ...} = {};
-    const requiredReviewers: {[string]: Array<string>, ...} = {};
+    const reviewers: NameToLabelToFiles = {};
+    const requiredReviewers: NameToLabelToFiles = {};
     if (!matches) {
         return {reviewers, requiredReviewers};
     }
@@ -408,7 +409,9 @@ export const getReviewers = (
             continue;
         }
 
-        const label = untrimmedPattern[1];
+        // TODO(csilvers): also keep track of the line-number the
+        // label is on, and make label an href to that line in github.
+        const label = untrimmedPattern[1] || '';
         const pattern = untrimmedPattern[2].trim();
 
         // handle dealing with regex
@@ -424,13 +427,7 @@ export const getReviewers = (
                 }
 
                 const correctBin = isRequired ? requiredReviewers : reviewers;
-                maybeAddIfMatch(
-                    regex,
-                    nameAndLabel(username, label),
-                    objToUse,
-                    correctBin,
-                    filesChanged,
-                );
+                maybeAddIfMatch(regex, username, label, objToUse, correctBin, filesChanged);
             }
         } else {
             const matchedFiles: Array<string> = fg.sync(pattern, globOptions); //flow-uncovered-line
@@ -445,7 +442,7 @@ export const getReviewers = (
                     }
 
                     const correctBin = isRequired ? requiredReviewers : reviewers;
-                    pushOrSetToBin(correctBin, nameAndLabel(username, label), intersection);
+                    pushOrSetToBin(correctBin, username, label, intersection);
                 }
             }
         }
@@ -463,9 +460,9 @@ export const getReviewers = (
  * @param removedJustNames - List of people who have commented #removeme
  */
 export const getFilteredLists = (
-    reviewers: NameAndLabelToFiles,
-    requiredReviewers: NameAndLabelToFiles,
-    notified: NameAndLabelToFiles,
+    reviewers: NameToLabelToFiles,
+    requiredReviewers: NameToLabelToFiles,
+    notified: NameToLabelToFiles,
     removedJustNames: Array<string>,
 ): {actualReviewers: Array<string>, teamReviewers: Array<string>} => {
     for (const justName of removedJustNames) {

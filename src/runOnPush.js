@@ -5,16 +5,19 @@ import {execCmd} from './execCmd';
 import {ownerAndRepo, extraPermGithub, type Context} from './setup';
 import {PUSH, GERALD_COMMIT_COMMENT_HEADER} from './constants';
 
-const makeCommitComment = async (
-    peopleToFiles: {[string]: Array<string>, ...},
-    commitSHA: string,
-) => {
-    const names: string[] = Object.keys(peopleToFiles);
-    if (peopleToFiles && names.length) {
+type NameToLabelToFiles = {[name: string]: {[label: string]: string[], ...}, ...};
+
+const makeCommitComment = async (peopleToLabelToFiles: NameToLabelToFiles, commitSHA: string) => {
+    const names: string[] = Object.keys(peopleToLabelToFiles);
+    if (peopleToLabelToFiles && names.length) {
         let body: string = GERALD_COMMIT_COMMENT_HEADER;
         names.forEach((person: string) => {
-            const files = peopleToFiles[person];
-            body += `${person} for changes to \`${files.join('`, `')}\`\n`;
+            const labels: string[] = Object.keys(peopleToLabelToFiles[person]);
+            labels.forEach((label: string) => {
+                const files = peopleToLabelToFiles[person][label];
+                const labelText = label ? ` (${label})` : '';
+                body += `${person} for changes to \`${files.join('`, `')}\`${labelText}\n`;
+            });
         });
 
         await extraPermGithub.repos.createCommitComment({

@@ -63,30 +63,30 @@ describe('maybe add', () => {
         let pattern = /test/;
         let diffs = {testFile: 'a diff with the word test'};
         const name = 'testName';
-        const bin = {testName: []};
+        const bin = {testName: {'': []}};
         const filesChanged = ['testFile'];
 
-        __maybeAddIfMatch(pattern, name, diffs, bin, filesChanged);
+        __maybeAddIfMatch(pattern, name, '', diffs, bin, filesChanged);
 
-        expect(bin).toEqual({testName: ['testFile']});
+        expect(bin).toEqual({testName: {'': ['testFile']}});
 
         // it shouldn't re-add 'testFile' or another testName key
-        __maybeAddIfMatch(pattern, name, diffs, bin, filesChanged);
+        __maybeAddIfMatch(pattern, name, '', diffs, bin, filesChanged);
 
-        expect(bin).toEqual({testName: ['testFile']});
+        expect(bin).toEqual({testName: {'': ['testFile']}});
 
         pattern = /nonexistent/;
 
-        __maybeAddIfMatch(pattern, name, diffs, bin, filesChanged);
+        __maybeAddIfMatch(pattern, name, '', diffs, bin, filesChanged);
 
-        expect(bin).toEqual({testName: ['testFile']});
+        expect(bin).toEqual({testName: {'': ['testFile']}});
 
         pattern = /existent/;
         diffs = {otherFile: 'the word existent exists in this diff'};
 
-        __maybeAddIfMatch(pattern, name, diffs, bin, filesChanged);
+        __maybeAddIfMatch(pattern, name, '', diffs, bin, filesChanged);
 
-        expect(bin).toEqual({testName: ['testFile']});
+        expect(bin).toEqual({testName: {'': ['testFile']}});
     });
 });
 
@@ -150,12 +150,20 @@ describe('push or set to bin', () => {
         const bin = {};
         const username = 'testName';
         let files = ['file1', 'file2'];
-        __pushOrSetToBin(bin, username, files);
-        expect(bin).toEqual({testName: files});
+        __pushOrSetToBin(bin, username, '', files);
+        expect(bin).toEqual({testName: {'': files}});
 
         files = ['file2', 'file3', 'file4'];
-        __pushOrSetToBin(bin, username, files);
-        expect(bin).toEqual({testName: ['file1', 'file2', 'file3', 'file4']});
+        __pushOrSetToBin(bin, username, '', files);
+        expect(bin).toEqual({testName: {'': ['file1', 'file2', 'file3', 'file4']}});
+
+        __pushOrSetToBin(bin, username, 'mylabel', files);
+        expect(bin).toEqual({
+            testName: {
+                '': ['file1', 'file2', 'file3', 'file4'],
+                mylabel: ['file2', 'file3', 'file4'],
+            },
+        });
     });
 });
 
@@ -191,14 +199,18 @@ mylabel: src/*Push.js @owner`,
         expect(
             await getNotified(filesChanged, fileDiffs, {}, 'testAuthor', 'pull_request'),
         ).toEqual({
-            '@yipstanley': ['src/execCmd.js', 'src/runOnPush.js'],
-            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
-            '@testPerson': ['.github/workflows/build.yml'],
+            '@yipstanley': {'': ['src/execCmd.js', 'src/runOnPush.js']},
+            '@githubUser': {
+                '': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
+            },
+            '@testPerson': {'': ['.github/workflows/build.yml']},
         });
 
         expect(await getNotified(filesChanged, fileDiffs, {}, 'testAuthor', 'push')).toEqual({
-            '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
-            '@owner (mylabel)': ['src/runOnPush.js'],
+            '@owner': {
+                '': ['src/execCmd.js', 'src/runOnPush.js'],
+                mylabel: ['src/runOnPush.js'],
+            },
         });
     });
 
@@ -234,15 +246,17 @@ mylabel: src/*Push.js @owner`,
                 notifiedFile,
             ),
         ).toEqual({
-            '@yipstanley': ['src/execCmd.js', 'src/runOnPush.js'],
-            '@githubUser': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
-            '@testPerson': ['.github/workflows/build.yml'],
+            '@yipstanley': {'': ['src/execCmd.js', 'src/runOnPush.js']},
+            '@githubUser': {
+                '': ['.github/workflows/build.yml', 'src/execCmd.js', 'src/runOnPush.js'],
+            },
+            '@testPerson': {'': ['.github/workflows/build.yml']},
         });
 
         expect(
             await getNotified(filesChanged, fileDiffs, {}, '__testUser', 'push', notifiedFile),
         ).toEqual({
-            '@owner': ['src/execCmd.js', 'src/runOnPush.js'],
+            '@owner': {'': ['src/execCmd.js', 'src/runOnPush.js']},
         });
     });
 });
@@ -272,11 +286,11 @@ describe('get reviewers', () => {
             'yipstanley',
         );
         expect(reviewers).toEqual({
-            '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
-            '@testPerson': ['.github/workflows/build.yml'],
+            '@githubUser': {'': ['src/execCmd.js', 'src/runOnPush.js']},
+            '@testPerson': {'': ['.github/workflows/build.yml']},
         });
         expect(requiredReviewers).toEqual({
-            '@githubUser': ['.github/workflows/build.yml'],
+            '@githubUser': {'': ['.github/workflows/build.yml']},
         });
     });
 
@@ -304,10 +318,10 @@ describe('get reviewers', () => {
             'yipstanley',
         );
         expect(reviewers).toEqual({
-            '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
+            '@githubUser': {'': ['src/execCmd.js', 'src/runOnPush.js']},
         });
         expect(requiredReviewers).toEqual({
-            '@githubUser': ['.github/workflows/build.yml'],
+            '@githubUser': {'': ['.github/workflows/build.yml']},
         });
     });
 
@@ -335,11 +349,11 @@ describe('get reviewers', () => {
             'yipstanley',
         );
         expect(reviewers).toEqual({
-            '@githubUser': ['src/execCmd.js', 'src/runOnPush.js'],
-            '@testPerson': ['.github/workflows/build.yml'],
+            '@githubUser': {'': ['src/execCmd.js', 'src/runOnPush.js']},
+            '@testPerson': {'': ['.github/workflows/build.yml']},
         });
         expect(requiredReviewers).toEqual({
-            '@githubUser': ['.github/workflows/build.yml'],
+            '@githubUser': {'': ['.github/workflows/build.yml']},
         });
     });
 
@@ -365,10 +379,10 @@ describe('get reviewers', () => {
             'yipstanley',
         );
         expect(reviewers).toEqual({
-            '@testPerson': ['.github/workflows/build.yml'],
+            '@testPerson': {'': ['.github/workflows/build.yml']},
         });
         expect(requiredReviewers).toEqual({
-            '@githubUser': ['.github/workflows/build.yml'],
+            '@githubUser': {'': ['.github/workflows/build.yml']},
         });
     });
 
@@ -394,10 +408,10 @@ describe('get reviewers', () => {
             'yipstanley',
         );
         expect(reviewers).toEqual({
-            '@testPerson': ['.github/workflows/build.yml'],
+            '@testPerson': {'': ['.github/workflows/build.yml']},
         });
         expect(requiredReviewers).toEqual({
-            '@githubUser': ['.github/workflows/build.yml'],
+            '@githubUser': {'': ['.github/workflows/build.yml']},
         });
     });
 });
@@ -586,22 +600,28 @@ describe('test that ignore files are parsed correctly', () => {
 
 describe('test that makeCommentBody makes a nicely-formatted string', () => {
     it('should format the Gerald pull request comment correctly', async () => {
-        const peopleToFiles = {
-            '@yipstanley': [
-                'src/runOnPush.js',
-                '.github/workflows/build.yml',
-                'flow-typed/npm/@octokit/rest_vx.x.x.js',
-            ],
-            '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
+        const peopleToLabelToFiles = {
+            '@yipstanley': {
+                '': ['src/runOnPush.js', '.github/workflows/build.yml'],
+                typechanges: ['flow-typed/npm/@octokit/rest_vx.x.x.js'],
+            },
+            '@Khan/frontend-infra': {
+                '': ['src/runOnPush.js', '.geraldignore'],
+            },
         };
 
-        const result = await makeCommentBody({peopleToFiles, header: 'Reviewers', tagPerson: true});
+        const result = await makeCommentBody({
+            peopleToLabelToFiles,
+            header: 'Reviewers',
+            tagPerson: true,
+        });
 
         expect(result).toMatchInlineSnapshot(`
             "<details>
             <summary><b>Reviewers</b></summary>
 
-            * @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`, \`flow-typed/npm/%40@octokit/rest_vx.x.x.js\`
+            * @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`
+            * @yipstanley for changes to \`flow-typed/npm/%40@octokit/rest_vx.x.x.js\` (typechanges)
             * @Khan/frontend-infra for changes to \`src/runOnPush.js\`, \`.geraldignore\`
             </details>
 
@@ -610,17 +630,18 @@ describe('test that makeCommentBody makes a nicely-formatted string', () => {
     });
 
     it('should comment out reviewers', async () => {
-        const peopleToFiles = {
-            '@yipstanley': [
-                'src/runOnPush.js',
-                '.github/workflows/build.yml',
-                'flow-typed/npm/@octokit/rest_vx.x.x.js',
-            ],
-            '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
+        const peopleToLabelToFiles = {
+            '@yipstanley': {
+                '': ['src/runOnPush.js', '.github/workflows/build.yml'],
+                typechanges: ['flow-typed/npm/@octokit/rest_vx.x.x.js'],
+            },
+            '@Khan/frontend-infra': {
+                '': ['src/runOnPush.js', '.geraldignore'],
+            },
         };
 
         const result = await makeCommentBody({
-            peopleToFiles,
+            peopleToLabelToFiles,
             header: 'Reviewers',
             tagPerson: false,
         });
@@ -629,7 +650,8 @@ describe('test that makeCommentBody makes a nicely-formatted string', () => {
             "<details>
             <summary><b>Reviewers</b></summary>
 
-            * \`@yipstanley\` for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`, \`flow-typed/npm/%40@octokit/rest_vx.x.x.js\`
+            * \`@yipstanley\` for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`
+            * \`@yipstanley\` for changes to \`flow-typed/npm/%40@octokit/rest_vx.x.x.js\` (typechanges)
             * \`@Khan/frontend-infra\` for changes to \`src/runOnPush.js\`, \`.geraldignore\`
             </details>
 
