@@ -53,7 +53,7 @@ const updatePullRequestComment = async (
     });
     if (body.match(MATCH_COMMENT_HEADER_REGEX)) {
         body += GERALD_COMMENT_FOOTER;
-
+        body += 'LILLI TESTING';
         if (comment) {
             await extraPermGithub.issues.updateComment({
                 ...ownerAndRepo,
