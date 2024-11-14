@@ -314,17 +314,23 @@ describe('test that changes to verified commits dont notify people', () => {
 
 describe('test that makeCommitComment makes well formatted strings', () => {
     it('should format the commit comment nicely', async () => {
-        const peopleToFiles = {
-            '@yipstanley': ['src/runOnPush.js', '.github/workflows/build.yml'],
-            '@Khan/frontend-infra': ['src/runOnPush.js', '.geraldignore'],
+        const peopleToLabelToFiles = {
+            '@yipstanley': {
+                '': ['src/runOnPush.js', '.github/workflows/build.yml'],
+                typechanges: ['flow-typed/npm/@octokit/rest_vx.x.x.js'],
+            },
+            '@Khan/frontend-infra': {
+                '': ['src/runOnPush.js', '.geraldignore'],
+            },
         };
 
-        await __makeCommitComment(peopleToFiles, 'suite5-commit1');
+        await __makeCommitComment(peopleToLabelToFiles, 'suite5-commit1');
 
         expect(await getComment('suite5-commit1')).toMatchInlineSnapshot(`
             "Notify of Push Without Pull Request
 
             @yipstanley for changes to \`src/runOnPush.js\`, \`.github/workflows/build.yml\`
+            @yipstanley for changes to \`flow-typed/npm/@octokit/rest_vx.x.x.js\` (typechanges)
             @Khan/frontend-infra for changes to \`src/runOnPush.js\`, \`.geraldignore\`
             "
         `);
