@@ -7,6 +7,10 @@ Examples:
 # This rule will notify @owner1 on changes to all files
 # **/*                @owner1
 
+# This rule will notify @owner1 on changes to all files, and the rule
+# has a label "allfiles", which will be included in the github PR info.
+# allfiles: **/*                @owner1
+
 # This rule will notify @owner1 and @Org/team1 on changes to all .js files
 # **/*.js             @owner1 @Org/team1
 
@@ -36,6 +40,9 @@ Regex Examples:
 
 # This rule will notify @owner1 on changes that include the word "gerald"
 # "/gerald/ig"                @owner1
+
+# This rule will notify @owner1 on changes that include the word "gerald", and has a label "used_gerald", which will be included in the github PR info.
+# used_gerald: "/gerald/ig"   @owner1
 
 # This rule will notify @owner1 on changes that *add* the word "gerald"
 # "/^\+.*gerald/igm"          @owner1

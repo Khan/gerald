@@ -7,6 +7,9 @@ Examples:
 # This rule will request @owner1 for review on changes to all files. This rule will also request @owner2 for a blocking review.
 # **/*                @owner1 @owner2!
 
+# This rule will request @owner1 for review on changes to all files, and the rule has a label "allfiles", which will be included in the github PR info.
+# allfiles: **/*      @owner1
+
 # This rule will request @owner1 and @Org/team1 for review on changes to all .js files
 # **/*.js             @owner1 @Org/team1
 
@@ -36,6 +39,9 @@ Regex Examples:
 
 # This rule will request @owner1 for review on changes that include the word "gerald"
 # "/gerald/ig"                @owner1
+
+# This rule will request @owner1 for review on changes that include the word "gerald", and has a label "used_gerald", which will be included in the github PR info.
+# used_gerald: "/gerald/ig"   @owner1
 
 # This rule will request @owner1 for review on changes that *add* the word "gerald"
 # "/^\+.*gerald/igm"          @owner1
