@@ -23,6 +23,11 @@ import {
 } from './constants';
 import type {NameToLabelToFiles} from './utils';
 
+// NOTE: We don't want to run Gerald when we're merging a PR into
+// master or main, as this is likely a deploy branch that only contains
+// landed PRs that have already been reviewed.
+const IGNORED_PR_REFS = ['master', 'main'];
+
 /**
  * @desc Helper function to update, delete, or create a comment
  * @param comment - existing Github comment to update/delete or undefined
@@ -147,11 +152,18 @@ export const runOnPullRequest = async () => {
             `no ALL_CHANGED_FILES variable found; it must be set up before gerald runs!`,
         );
     }
-    const filesChanged /*: Array<string> */ = JSON.parse(process.env.ALL_CHANGED_FILES); // flow-uncovered-line
+
+    const baseRef = context.payload.pull_request.base.ref;
+    if (IGNORED_PR_REFS.includes(baseRef)) {
+        console.log(`Skipping PR from ignored base branch ${baseRef}`);
+        return;
+    }
 
     // get the actual diff between the head of this branch adn the origin of the base branch, split by files
-    const fileDiffs = await getFileDiffs('origin/' + context.payload.pull_request.base.ref);
-    const fileContents = await getFileContents('origin/' + context.payload.pull_request.base.ref);
+    const fileDiffs = await getFileDiffs('origin/' + baseRef);
+    const fileContents = await getFileContents('origin/' + baseRef);
+
+    const filesChanged /*: Array<string> */ = JSON.parse(process.env.ALL_CHANGED_FILES); // flow-uncovered-line
 
     // figure out who to notify and request reviews from
     const notified = getNotified(
