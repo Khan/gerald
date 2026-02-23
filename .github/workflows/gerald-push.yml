@@ -9,14 +9,14 @@ jobs:
   gerald:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: '${{ github.ref }}'
           # GitHub Actions doesn't allow us to take the length of github.event.commits, so we have to pass the array into node and take the length there.
           # We add one to the length because we want to get the diff between the last commit and the commit before the first commit.
           fetch-depth: '$(node -e "console.log(${{ github.event.commits }}.length + 1)")'
       - name: Run Gerald
-        uses: Khan/gerald@main
+        uses: Khan/gerald@c9b7069b0a50067c069c90447e92f47c7a1c8334 # main
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           ADMIN_PERMISSION_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'

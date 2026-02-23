@@ -8,20 +8,20 @@ jobs:
     if: github.actor != 'khan-actions-bot'
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Setup Node.js, install deps
         uses: ./.github/actions/setup
 
       - name: Get All Changed Files
-        uses: Khan/actions@get-changed-files-v2
+        uses: Khan/actions@0aa8c5bf8f640cc0d3339dc05c4ee1ed041f2b1e # get-changed-files-v2
         id: changed
         with:
           directories: src/
 
       - id: changed-js
         name: Find .js changed files
-        uses: Khan/actions@filter-files-v1
+        uses: Khan/actions@d1828f83826c23d444aedfc62e348e269727ee16 # filter-files-v1
         if: always()
         with:
           changed-files: ${{ steps.changed.outputs.files }}
@@ -35,6 +35,6 @@ jobs:
         if: steps.changed.outputs.files != '[]'
         run: yarn build
 
-      - uses: Khan/autofix-commit-action@main
+      - uses: Khan/autofix-commit-action@7ad29653a245c4bc54859d8644f233f94a99a183 # main
         env:
           GITHUB_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
