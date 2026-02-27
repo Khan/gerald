@@ -21,7 +21,7 @@ jobs:
 
       - id: changed-js
         name: Find .js changed files
-        uses: Khan/actions@d1828f83826c23d444aedfc62e348e269727ee16 # filter-files-v1
+        uses: Khan/actions@70e6afa0077187462838d024a1773adf217fb2b8 # filter-files-v2
         if: always()
         with:
           changed-files: ${{ steps.changed.outputs.files }}
