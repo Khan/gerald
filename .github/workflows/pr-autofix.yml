@@ -14,7 +14,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Get All Changed Files
-        uses: Khan/actions@0aa8c5bf8f640cc0d3339dc05c4ee1ed041f2b1e # get-changed-files-v2
+        uses: Khan/actions@1662367b281368328845c72f77028f71d768b588 # get-changed-files-v2
         id: changed
         with:
           directories: src/
