@@ -53,10 +53,8 @@ export const runOnComment = async () => {
         ...ownerAndRepo,
         issue_number: context.issue.number,
     });
-    const {
-        megaComment,
-        removedJustNames,
-    } = parseExistingComments<Octokit$IssuesListCommentsResponseItem>(existingComments);
+    const {megaComment, removedJustNames} =
+        parseExistingComments<Octokit$IssuesListCommentsResponseItem>(existingComments);
 
     if (megaComment) {
         const newComment = makeNewComment(megaComment.body, removedJustNames);

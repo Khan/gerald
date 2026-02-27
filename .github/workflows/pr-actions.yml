@@ -13,7 +13,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Run jest coverage
-        run: yarn test --coverage
+        run: pnpm test --coverage
 
       - name: Run flow
-        run: yarn flow
+        run: pnpm flow

@@ -21,7 +21,7 @@ export const gotIt = async (message: string) => {
     await prompts({type: 'text', name: 'ignored', message: 'Got it!'});
 };
 
-export function prom<T>(fn: ((err: ?Error, value: T) => void) => mixed): Promise<T> {
+export function prom<T>(fn: (((err: ?Error, value: T) => void)) => mixed): Promise<T> {
     return new Promise((res, rej) => fn((err, value) => (err ? rej(err) : res(value))));
 }
 

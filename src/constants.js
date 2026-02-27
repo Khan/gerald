@@ -33,16 +33,22 @@ export const MATCH_GIT_DIFF_FILE_SEPERATOR = /^diff --git /m;
 // Gerald Comment Regexes
 export const MATCH_REMOVEME_TAG_REGEX = /\#removeme/i;
 export const MATCH_GERALD_COMMENT_HEADER_REGEX = /^# Gerald/;
-export const MATCH_COMMENT_HEADER_REGEX = /^<summary><b>(Reviewers|Required Reviewers|Notified)<\/b><\/summary>$/m;
+export const MATCH_COMMENT_HEADER_REGEX =
+    /^<summary><b>(Reviewers|Required Reviewers|Notified)<\/b><\/summary>$/m;
 
 // Gerald Files Regexes
 export const MATCH_REGEX_REGEX = /^"\/(.*?)\/([a-z]*)"$/;
 export const MATCH_PATTERN_REGEX = /^(?:(\w+):\s+)?((?:.(?!\s+@))*.)/;
 export const MATCH_USERNAME_OR_TEAM_REGEX = /@([A-Za-z]*\/)?\S*/g;
 export const MATCH_NON_COMMENT_LINES_REGEX = /^[^\#\n].*/gm;
-export const MATCH_PULL_REQUEST_SECTION_HEADER_REGEX = /\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm;
-export const MATCH_PUSH_SECTION_HEADER_REGEX = /\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm;
-export const MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX = /(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm;
-export const MATCH_JUST_PULL_REQUEST_SECTION_REGEX = /(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;
-export const MATCH_JUST_PUSH_SECTION_REGEX = /(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;
+export const MATCH_PULL_REQUEST_SECTION_HEADER_REGEX =
+    /\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm;
+export const MATCH_PUSH_SECTION_HEADER_REGEX =
+    /\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\)/gm;
+export const MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX =
+    /(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*(?=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))/gm;
+export const MATCH_JUST_PULL_REQUEST_SECTION_REGEX =
+    /(?<=\[ON PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;
+export const MATCH_JUST_PUSH_SECTION_REGEX =
+    /(?<=\[ON PUSH WITHOUT PULL REQUEST\] \(DO NOT DELETE THIS LINE\))(.|\n)*/gm;
 export const MATCH_USE_FILE_CONTENTS_REGEX = /--match-contents\s*$/;
