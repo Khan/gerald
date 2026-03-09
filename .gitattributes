@@ -1,2 +1,2 @@
-yarn.lock binary linguist-generated=true
+pnpm-lock.yaml linguist-generated=true
 dist/*.js binary linguist-generated=true

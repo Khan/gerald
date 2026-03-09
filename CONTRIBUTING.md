@@ -25,8 +25,8 @@ To work in the `gerald` repository, follow these steps:
 
 1. Clone the repository
    `gh repo clone Khan/wonder-stuff`
-2. Install `yarn` (see [🔗yarnpkg.com](https://yarnpkg.com))
-3. Run `yarn install` to install the dependencies
+2. Install `pnpm` (see [🔗pnpm.io](https://pnpm.io))
+3. Run `pnpm install` to install the dependencies
 
 You can now work on `gerald`. We prefer [🔗Visual Studio Code](https://code.visualstudio.com/) as our development environment (it's cross-platform and awesome), but please use what you feel comfortable with (we'll even forgive you for using vim).
 
@@ -46,18 +46,18 @@ We love code reviews. If there are open pull requests, please feel free to revie
 
 To ensure code quality, we use prettier, Flow, eslint, and jest. These are executed automatically by the workflows.
 
-To execute these operations outside of a pull request or commit operation, you can use `yarn`.
+To execute these operations outside of a pull request or commit operation, you can use `pnpm`.
 
-- `yarn flow`
-- `yarn lint`
-- `yarn test`
-- `yarn format`
+- `pnpm flow`
+- `pnpm lint`
+- `pnpm test`
+- `pnpm format`
 
 💭**REMEMBER** If you would like to contribute code changes to the project, first make sure there's a corresponding issue for the change you wish to make.
 
 ## 📦 Build And Publish
 
-Anyone can create a local build of the distributed code by running `yarn build`. Our `pr-autofix` workflow will also perform this process and commit the result.
+Anyone can create a local build of the distributed code by running `pnpm build`. Our `pr-autofix` workflow will also perform this process and commit the result.
 
 ### Publishing
 

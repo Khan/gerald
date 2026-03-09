@@ -29,11 +29,11 @@ jobs:
 
       - name: Run prettier
         if: steps.changed-js.outputs.filtered != '[]'
-        run: echo '${{ steps.changed-js.outputs.filtered }}' | jq -r .[] | xargs yarn run format-files
+        run: echo '${{ steps.changed-js.outputs.filtered }}' | jq -r .[] | xargs pnpm run format-files
 
       - name: Rebuild our "dist" file
         if: steps.changed.outputs.files != '[]'
-        run: yarn build
+        run: pnpm build
 
       - uses: Khan/autofix-commit-action@7ad29653a245c4bc54859d8644f233f94a99a183 # main
         env:
