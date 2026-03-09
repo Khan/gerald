@@ -23,6 +23,9 @@ importers:
       '@babel/register':
         specifier: ^7.10.4
         version: 7.28.6(@babel/core@7.29.0)
+      '@babel/runtime':
+        specifier: ^7.28.6
+        version: 7.28.6
       actions-utils:
         specifier: Khan/actions-utils#v1.3.1
         version: https://codeload.github.com/Khan/actions-utils/tar.gz/4f263be899d242d4bc3b9f515e633fa4ebead684(@octokit/core@3.6.0)
@@ -524,6 +527,10 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
+
+  '@babel/runtime@7.28.6':
+    resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
+    engines: {node: '>=6.9.0'}
 
   '@babel/template@7.28.6':
     resolution: {integrity: sha512-YA6Ma2KsCdGb+WC6UpBVFJGXL58MDA6oyONbjyF/+5sBgxY/dwkhLogbMT2GXXyU84/IhRw/2D1Os1B/giz+BQ==}
@@ -4286,6 +4293,8 @@ snapshots:
       make-dir: 2.1.0
       pirates: 4.0.7
       source-map-support: 0.5.21
+
+  '@babel/runtime@7.28.6': {}
 
   '@babel/template@7.28.6':
     dependencies:
