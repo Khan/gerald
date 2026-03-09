@@ -15,6 +15,7 @@ esproposal.nullish_coalescing=enable
 munge_underscores=true
 
 module.file_ext=.js
+module.file_ext=.cjs
 
 suppress_type=$FlowIssue
 suppress_type=$FlowFixMe
