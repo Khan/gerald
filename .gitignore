@@ -3,4 +3,4 @@ js
 coverage
 .vscode
 package-lock.json
-yarn-error.log
+pnpm-debug.log

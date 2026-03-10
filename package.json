@@ -1,5 +1,6 @@
 {
   "version": "4.0.0",
+  "packageManager": "pnpm@10.26.0+sha512.3b3f6c725ebe712506c0ab1ad4133cf86b1f4b687effce62a9b38b4d72e3954242e643190fc51fa1642949c735f403debd44f5cb0edd657abe63a8b6a7e1e402",
   "scripts": {
     "build": "rm -rf js && babel src/*.js -d js/ && npm run dist",
     "dist": "ncc build js/gerald.js",
@@ -16,6 +17,7 @@
     "@actions/github": "^5.1.1",
     "@babel/core": "^7.10.4",
     "@babel/register": "^7.10.4",
+    "@babel/runtime": "^7.28.6",
     "actions-utils": "Khan/actions-utils#v1.3.1",
     "fast-glob": "^3.2.4"
   },
