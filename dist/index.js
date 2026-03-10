@@ -31,35 +31,35 @@ Object.defineProperty(exports, "__esModule", ({value:true}));exports.REVIEWERS_F
 /***/ 3392:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var _interopRequireDefault=__nccwpck_require__(5595);Object.defineProperty(exports, "__esModule", ({value:true}));exports.execCmd=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(4444));var exec=__nccwpck_require__(2851);var execCmd=exports.execCmd=function execCmd(cmd,args){var output,error,options;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:output='';error='';options={};options.listeners={stdout:function stdout(data){output+=data.toString();},stderr:function stderr(data){error+=data.toString();},silent:true};_context.next=1;return _regenerator.default.awrap(exec.exec(cmd,args,options));case 1:if(!error){_context.next=2;break;}throw error;case 2:return _context.abrupt("return",output);case 3:case"end":return _context.stop();}},null,null,null,Promise);};
+var _interopRequireDefault=__nccwpck_require__(1580);Object.defineProperty(exports, "__esModule", ({value:true}));exports.execCmd=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(1002));var exec=__nccwpck_require__(2851);var execCmd=exports.execCmd=function execCmd(cmd,args){var output,error,options;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:output='';error='';options={};options.listeners={stdout:function stdout(data){output+=data.toString();},stderr:function stderr(data){error+=data.toString();},silent:true};_context.next=1;return _regenerator.default.awrap(exec.exec(cmd,args,options));case 1:if(!error){_context.next=2;break;}throw error;case 2:return _context.abrupt("return",output);case 3:case"end":return _context.stop();}},null,null,null,Promise);};
 
 /***/ }),
 
 /***/ 3460:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var _interopRequireDefault=__nccwpck_require__(5595);Object.defineProperty(exports, "__esModule", ({value:true}));exports.readFileSync=void 0;var _fs=_interopRequireDefault(__nccwpck_require__(9896));var readFileSync=exports.readFileSync=function readFileSync(path,options){try{return _fs.default.readFileSync(path,options);}catch(e){console.error('Error reading file:',path);return'';}};
+var _interopRequireDefault=__nccwpck_require__(1580);Object.defineProperty(exports, "__esModule", ({value:true}));exports.readFileSync=void 0;var _fs=_interopRequireDefault(__nccwpck_require__(9896));var readFileSync=exports.readFileSync=function readFileSync(path,options){try{return _fs.default.readFileSync(path,options);}catch(e){console.error('Error reading file:',path);return'';}};
 
 /***/ }),
 
 /***/ 6306:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var _interopRequireDefault=__nccwpck_require__(5595);Object.defineProperty(exports, "__esModule", ({value:true}));exports.runOnComment=exports.__makeNewComment=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(4444));var _extends2=_interopRequireDefault(__nccwpck_require__(3091));var _utils=__nccwpck_require__(2266);var _setup=__nccwpck_require__(1034);function _createForOfIteratorHelperLoose(r,e){var t="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(t)return(t=t.call(r)).next.bind(t);if(Array.isArray(r)||(t=_unsupportedIterableToArray(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0;return function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(r,a){if(r){if("string"==typeof r)return _arrayLikeToArray(r,a);var t={}.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?_arrayLikeToArray(r,a):void 0;}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n;}var makeNewComment=function makeNewComment(existingBody,removedJustNames){var newComment=existingBody;for(var _iterator=_createForOfIteratorHelperLoose(removedJustNames),_step;!(_step=_iterator()).done;){var justName=_step.value;var regex=new RegExp("\n^@"+justName+".*$\n",'gm');if(newComment.match(regex)){newComment=newComment.replace(regex,'');}}return newComment;};var updateOrDeletePRComment=function updateOrDeletePRComment(newComment,commentID,removedJustNames){var keepComment;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:keepComment=newComment.match(/@([A-Za-z]*\/)?\S*/g);if(!keepComment){_context.next=2;break;}_context.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.issues.updateComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:commentID,body:newComment})));case 1:_context.next=3;break;case 2:_context.next=3;return _regenerator.default.awrap(_setup.extraPermGithub.issues.deleteComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:commentID})));case 3:case"end":return _context.stop();}},null,null,null,Promise);};var runOnComment=exports.runOnComment=function runOnComment(){var existingComments,_parseExistingComment,megaComment,removedJustNames,newComment;return _regenerator.default.async(function(_context2){while(1)switch(_context2.prev=_context2.next){case 0:_context2.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.issues.listComments((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number})));case 1:existingComments=_context2.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;if(!megaComment){_context2.next=2;break;}newComment=makeNewComment(megaComment.body,removedJustNames);_context2.next=2;return _regenerator.default.awrap(updateOrDeletePRComment(newComment,megaComment.id,removedJustNames));case 2:case"end":return _context2.stop();}},null,null,null,Promise);};var __makeNewComment=exports.__makeNewComment=makeNewComment;
+var _interopRequireDefault=__nccwpck_require__(1580);Object.defineProperty(exports, "__esModule", ({value:true}));exports.runOnComment=exports.__makeNewComment=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(1002));var _extends2=_interopRequireDefault(__nccwpck_require__(1724));var _utils=__nccwpck_require__(2266);var _setup=__nccwpck_require__(1034);function _createForOfIteratorHelperLoose(r,e){var t="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(t)return(t=t.call(r)).next.bind(t);if(Array.isArray(r)||(t=_unsupportedIterableToArray(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0;return function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(r,a){if(r){if("string"==typeof r)return _arrayLikeToArray(r,a);var t={}.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?_arrayLikeToArray(r,a):void 0;}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n;}var makeNewComment=function makeNewComment(existingBody,removedJustNames){var newComment=existingBody;for(var _iterator=_createForOfIteratorHelperLoose(removedJustNames),_step;!(_step=_iterator()).done;){var justName=_step.value;var regex=new RegExp("\n^@"+justName+".*$\n",'gm');if(newComment.match(regex)){newComment=newComment.replace(regex,'');}}return newComment;};var updateOrDeletePRComment=function updateOrDeletePRComment(newComment,commentID,removedJustNames){var keepComment;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:keepComment=newComment.match(/@([A-Za-z]*\/)?\S*/g);if(!keepComment){_context.next=2;break;}_context.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.issues.updateComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:commentID,body:newComment})));case 1:_context.next=3;break;case 2:_context.next=3;return _regenerator.default.awrap(_setup.extraPermGithub.issues.deleteComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:commentID})));case 3:case"end":return _context.stop();}},null,null,null,Promise);};var runOnComment=exports.runOnComment=function runOnComment(){var existingComments,_parseExistingComment,megaComment,removedJustNames,newComment;return _regenerator.default.async(function(_context2){while(1)switch(_context2.prev=_context2.next){case 0:_context2.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.issues.listComments((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number})));case 1:existingComments=_context2.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;if(!megaComment){_context2.next=2;break;}newComment=makeNewComment(megaComment.body,removedJustNames);_context2.next=2;return _regenerator.default.awrap(updateOrDeletePRComment(newComment,megaComment.id,removedJustNames));case 2:case"end":return _context2.stop();}},null,null,null,Promise);};var __makeNewComment=exports.__makeNewComment=makeNewComment;
 
 /***/ }),
 
 /***/ 1131:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var _interopRequireDefault=__nccwpck_require__(5595);Object.defineProperty(exports, "__esModule", ({value:true}));exports.runOnPullRequest=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(4444));var _extends2=_interopRequireDefault(__nccwpck_require__(3091));var _utils=__nccwpck_require__(2266);var _setup=__nccwpck_require__(1034);var _constants=__nccwpck_require__(5186);function _createForOfIteratorHelperLoose(r,e){var t="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(t)return(t=t.call(r)).next.bind(t);if(Array.isArray(r)||(t=_unsupportedIterableToArray(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0;return function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(r,a){if(r){if("string"==typeof r)return _arrayLikeToArray(r,a);var t={}.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?_arrayLikeToArray(r,a):void 0;}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n;}var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:body=_constants.GERALD_COMMENT_HEADER;body+=(0,_utils.makeCommentBody)({peopleToLabelToFiles:notifyees,header:_constants.GERALD_COMMENT_NOTIFIED_HEADER,tagPerson:true});body+=(0,_utils.makeCommentBody)({peopleToLabelToFiles:reviewers,header:_constants.GERALD_COMMENT_REVIEWERS_HEADER,tagPerson:false});body+=(0,_utils.makeCommentBody)({peopleToLabelToFiles:requiredReviewers,header:_constants.GERALD_COMMENT_REQ_REVIEWERS_HEADER,tagPerson:false});if(!body.match(_constants.MATCH_COMMENT_HEADER_REGEX)){_context.next=4;break;}body+=_constants.GERALD_COMMENT_FOOTER;if(!comment){_context.next=2;break;}_context.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.issues.updateComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id,body:body})));case 1:_context.next=3;break;case 2:_context.next=3;return _regenerator.default.awrap(_setup.extraPermGithub.issues.createComment((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number,body:body})));case 3:_context.next=5;break;case 4:if(!comment){_context.next=5;break;}_context.next=5;return _regenerator.default.awrap(_setup.extraPermGithub.issues.deleteComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id})));case 5:case"end":return _context.stop();}},null,null,null,Promise);};var makeReviewRequests=function makeReviewRequests(reviewers,teamReviewers,issuer){var _await$extraPermGithu,reviews,alreadyReviewed,unfulfilledReviewers,meaningfullyReviewed,unfulfilledTeams,_iterator,_step,team,_await$extraPermGithu2,membership,members,_iterator2,_step2,reviewer;return _regenerator.default.async(function(_context2){while(1)switch(_context2.prev=_context2.next){case 0:_context2.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.pulls.listReviews((0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number})));case 1:_await$extraPermGithu=_context2.sent;reviews=_await$extraPermGithu.data;alreadyReviewed=reviews.map(function(review){return review.user.login;});unfulfilledReviewers=reviewers.filter(function(reviewer){return!alreadyReviewed.includes(reviewer);});if(reviewers.length>unfulfilledReviewers.length){console.log("Not adding "+(reviewers.filter(function(r){return!unfulfilledReviewers.includes(r);}).join(', ')+" ")+"to the review request list as they have already reviewed.");}meaningfullyReviewed=reviews.filter(function(review){return(review.state==='APPROVED'||review.state==='CHANGES_REQUESTED')&&review.user.login!==issuer;}).map(function(review){return review.user.login;});unfulfilledTeams=teamReviewers;_iterator=_createForOfIteratorHelperLoose(teamReviewers);case 2:if((_step=_iterator()).done){_context2.next=7;break;}team=_step.value;_context2.next=3;return _regenerator.default.awrap(_setup.extraPermGithub.teams.listMembersInOrg({org:_setup.ownerAndRepo.owner,team_slug:team}));case 3:_await$extraPermGithu2=_context2.sent;membership=_await$extraPermGithu2.data;members=membership.map(function(member){return member.login;});_iterator2=_createForOfIteratorHelperLoose(meaningfullyReviewed);case 4:if((_step2=_iterator2()).done){_context2.next=6;break;}reviewer=_step2.value;if(!members.includes(reviewer)){_context2.next=5;break;}unfulfilledTeams.splice(unfulfilledTeams.indexOf(team),1);console.log("Not adding team "+team+" to the review-request list as team member "+reviewer+" has already reviewed.");return _context2.abrupt("continue",6);case 5:_context2.next=4;break;case 6:_context2.next=2;break;case 7:_context2.next=8;return _regenerator.default.awrap(_setup.extraPermGithub.pulls.requestReviewers((0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number,reviewers:unfulfilledReviewers,team_reviewers:unfulfilledTeams})));case 8:case"end":return _context2.stop();}},null,null,null,Promise);};var runOnPullRequest=exports.runOnPullRequest=function runOnPullRequest(){var filesChanged,fileDiffs,fileContents,notified,_getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function(_context3){while(1)switch(_context3.prev=_context3.next){case 0:if(process.env.ALL_CHANGED_FILES){_context3.next=1;break;}throw new Error("no ALL_CHANGED_FILES variable found; it must be set up before gerald runs!");case 1:filesChanged=JSON.parse(process.env.ALL_CHANGED_FILES);_context3.next=2;return _regenerator.default.awrap((0,_utils.getFileDiffs)('origin/'+_setup.context.payload.pull_request.base.ref));case 2:fileDiffs=_context3.sent;_context3.next=3;return _regenerator.default.awrap((0,_utils.getFileContents)('origin/'+_setup.context.payload.pull_request.base.ref));case 3:fileContents=_context3.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,fileContents,_setup.context.payload.pull_request.user.login,_constants.PULL_REQUEST);_getReviewers=(0,_utils.getReviewers)(filesChanged,fileDiffs,fileContents,_setup.context.payload.pull_request.user.login),reviewers=_getReviewers.reviewers,requiredReviewers=_getReviewers.requiredReviewers;_context3.next=4;return _regenerator.default.awrap(_setup.extraPermGithub.issues.listComments((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number})));case 4:existingComments=_context3.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=(0,_utils.getFilteredLists)(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=5;return _regenerator.default.awrap((0,_utils.maybeRemoveReviewRequests)(removedJustNames,(0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number}),_setup.extraPermGithub));case 5:_context3.next=6;return _regenerator.default.awrap(makeReviewRequests(actualReviewers,teamReviewers,_setup.context.payload.pull_request.user.login));case 6:_context3.next=7;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 7:case"end":return _context3.stop();}},null,null,null,Promise);};
+var _interopRequireDefault=__nccwpck_require__(1580);Object.defineProperty(exports, "__esModule", ({value:true}));exports.runOnPullRequest=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(1002));var _extends2=_interopRequireDefault(__nccwpck_require__(1724));var _utils=__nccwpck_require__(2266);var _setup=__nccwpck_require__(1034);var _constants=__nccwpck_require__(5186);function _createForOfIteratorHelperLoose(r,e){var t="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(t)return(t=t.call(r)).next.bind(t);if(Array.isArray(r)||(t=_unsupportedIterableToArray(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0;return function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(r,a){if(r){if("string"==typeof r)return _arrayLikeToArray(r,a);var t={}.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?_arrayLikeToArray(r,a):void 0;}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n;}var updatePullRequestComment=function updatePullRequestComment(comment,notifyees,reviewers,requiredReviewers){var body;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:body=_constants.GERALD_COMMENT_HEADER;body+=(0,_utils.makeCommentBody)({peopleToLabelToFiles:notifyees,header:_constants.GERALD_COMMENT_NOTIFIED_HEADER,tagPerson:true});body+=(0,_utils.makeCommentBody)({peopleToLabelToFiles:reviewers,header:_constants.GERALD_COMMENT_REVIEWERS_HEADER,tagPerson:false});body+=(0,_utils.makeCommentBody)({peopleToLabelToFiles:requiredReviewers,header:_constants.GERALD_COMMENT_REQ_REVIEWERS_HEADER,tagPerson:false});if(!body.match(_constants.MATCH_COMMENT_HEADER_REGEX)){_context.next=4;break;}body+=_constants.GERALD_COMMENT_FOOTER;if(!comment){_context.next=2;break;}_context.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.issues.updateComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id,body:body})));case 1:_context.next=3;break;case 2:_context.next=3;return _regenerator.default.awrap(_setup.extraPermGithub.issues.createComment((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number,body:body})));case 3:_context.next=5;break;case 4:if(!comment){_context.next=5;break;}_context.next=5;return _regenerator.default.awrap(_setup.extraPermGithub.issues.deleteComment((0,_extends2.default)({},_setup.ownerAndRepo,{comment_id:comment.id})));case 5:case"end":return _context.stop();}},null,null,null,Promise);};var makeReviewRequests=function makeReviewRequests(reviewers,teamReviewers,issuer){var _await$extraPermGithu,reviews,alreadyReviewed,unfulfilledReviewers,meaningfullyReviewed,unfulfilledTeams,_iterator,_step,team,_await$extraPermGithu2,membership,members,_iterator2,_step2,reviewer;return _regenerator.default.async(function(_context2){while(1)switch(_context2.prev=_context2.next){case 0:_context2.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.pulls.listReviews((0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number})));case 1:_await$extraPermGithu=_context2.sent;reviews=_await$extraPermGithu.data;alreadyReviewed=reviews.map(function(review){return review.user.login;});unfulfilledReviewers=reviewers.filter(function(reviewer){return!alreadyReviewed.includes(reviewer);});if(reviewers.length>unfulfilledReviewers.length){console.log("Not adding "+(reviewers.filter(function(r){return!unfulfilledReviewers.includes(r);}).join(', ')+" ")+"to the review request list as they have already reviewed.");}meaningfullyReviewed=reviews.filter(function(review){return(review.state==='APPROVED'||review.state==='CHANGES_REQUESTED')&&review.user.login!==issuer;}).map(function(review){return review.user.login;});unfulfilledTeams=teamReviewers;_iterator=_createForOfIteratorHelperLoose(teamReviewers);case 2:if((_step=_iterator()).done){_context2.next=7;break;}team=_step.value;_context2.next=3;return _regenerator.default.awrap(_setup.extraPermGithub.teams.listMembersInOrg({org:_setup.ownerAndRepo.owner,team_slug:team}));case 3:_await$extraPermGithu2=_context2.sent;membership=_await$extraPermGithu2.data;members=membership.map(function(member){return member.login;});_iterator2=_createForOfIteratorHelperLoose(meaningfullyReviewed);case 4:if((_step2=_iterator2()).done){_context2.next=6;break;}reviewer=_step2.value;if(!members.includes(reviewer)){_context2.next=5;break;}unfulfilledTeams.splice(unfulfilledTeams.indexOf(team),1);console.log("Not adding team "+team+" to the review-request list as team member "+reviewer+" has already reviewed.");return _context2.abrupt("continue",6);case 5:_context2.next=4;break;case 6:_context2.next=2;break;case 7:_context2.next=8;return _regenerator.default.awrap(_setup.extraPermGithub.pulls.requestReviewers((0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number,reviewers:unfulfilledReviewers,team_reviewers:unfulfilledTeams})));case 8:case"end":return _context2.stop();}},null,null,null,Promise);};var runOnPullRequest=exports.runOnPullRequest=function runOnPullRequest(){var filesChanged,fileDiffs,fileContents,notified,_getReviewers,reviewers,requiredReviewers,existingComments,_parseExistingComment,megaComment,removedJustNames,_getFilteredLists,actualReviewers,teamReviewers;return _regenerator.default.async(function(_context3){while(1)switch(_context3.prev=_context3.next){case 0:if(process.env.ALL_CHANGED_FILES){_context3.next=1;break;}throw new Error("no ALL_CHANGED_FILES variable found; it must be set up before gerald runs!");case 1:filesChanged=JSON.parse(process.env.ALL_CHANGED_FILES);_context3.next=2;return _regenerator.default.awrap((0,_utils.getFileDiffs)('origin/'+_setup.context.payload.pull_request.base.ref));case 2:fileDiffs=_context3.sent;_context3.next=3;return _regenerator.default.awrap((0,_utils.getFileContents)('origin/'+_setup.context.payload.pull_request.base.ref));case 3:fileContents=_context3.sent;notified=(0,_utils.getNotified)(filesChanged,fileDiffs,fileContents,_setup.context.payload.pull_request.user.login,_constants.PULL_REQUEST);_getReviewers=(0,_utils.getReviewers)(filesChanged,fileDiffs,fileContents,_setup.context.payload.pull_request.user.login),reviewers=_getReviewers.reviewers,requiredReviewers=_getReviewers.requiredReviewers;_context3.next=4;return _regenerator.default.awrap(_setup.extraPermGithub.issues.listComments((0,_extends2.default)({},_setup.ownerAndRepo,{issue_number:_setup.context.issue.number})));case 4:existingComments=_context3.sent;_parseExistingComment=(0,_utils.parseExistingComments)(existingComments),megaComment=_parseExistingComment.megaComment,removedJustNames=_parseExistingComment.removedJustNames;_getFilteredLists=(0,_utils.getFilteredLists)(reviewers,requiredReviewers,notified,removedJustNames),actualReviewers=_getFilteredLists.actualReviewers,teamReviewers=_getFilteredLists.teamReviewers;_context3.next=5;return _regenerator.default.awrap((0,_utils.maybeRemoveReviewRequests)(removedJustNames,(0,_extends2.default)({},_setup.ownerAndRepo,{pull_number:_setup.context.issue.number}),_setup.extraPermGithub));case 5:_context3.next=6;return _regenerator.default.awrap(makeReviewRequests(actualReviewers,teamReviewers,_setup.context.payload.pull_request.user.login));case 6:_context3.next=7;return _regenerator.default.awrap(updatePullRequestComment(megaComment,notified,reviewers,requiredReviewers));case 7:case"end":return _context3.stop();}},null,null,null,Promise);};
 
 /***/ }),
 
 /***/ 2311:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var _interopRequireDefault=__nccwpck_require__(5595);Object.defineProperty(exports, "__esModule", ({value:true}));exports.runPush=exports.__makeCommitComment=exports.__extraPermGithub=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(4444));var _extends2=_interopRequireDefault(__nccwpck_require__(3091));var _utils=__nccwpck_require__(2266);var _execCmd=__nccwpck_require__(3392);var _setup=__nccwpck_require__(1034);var _constants=__nccwpck_require__(5186);function _createForOfIteratorHelperLoose(r,e){var t="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(t)return(t=t.call(r)).next.bind(t);if(Array.isArray(r)||(t=_unsupportedIterableToArray(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0;return function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(r,a){if(r){if("string"==typeof r)return _arrayLikeToArray(r,a);var t={}.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?_arrayLikeToArray(r,a):void 0;}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n;}var makeCommitComment=function makeCommitComment(peopleToLabelToFiles,commitSHA){var names,body;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:names=Object.keys(peopleToLabelToFiles);if(!(peopleToLabelToFiles&&names.length)){_context.next=1;break;}body=_constants.GERALD_COMMIT_COMMENT_HEADER;names.forEach(function(person){var labels=Object.keys(peopleToLabelToFiles[person]);labels.forEach(function(label){var files=peopleToLabelToFiles[person][label];var labelText=label?" ("+label+")":'';body+=person+" for changes to `"+files.join('`, `')+"`"+labelText+"\n";});});_context.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.repos.createCommitComment((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commitSHA,body:body})));case 1:case"end":return _context.stop();}},null,null,null,Promise);};var runPush=exports.runPush=function runPush(usedContext){var prevCommit,squashedDiffs,fileContents,_iterator,_step,commit,commitData,verified,filesChanged,thisDiff,fileDiffs,_loop,_iterator2,_step2,file,notified;return _regenerator.default.async(function(_context3){while(1)switch(_context3.prev=_context3.next){case 0:prevCommit=usedContext.payload.before;_context3.next=1;return _regenerator.default.awrap((0,_utils.getFileDiffs)(prevCommit+"..."+usedContext.payload.after));case 1:squashedDiffs=_context3.sent;_context3.next=2;return _regenerator.default.awrap((0,_utils.getFileContents)(prevCommit+"..."+usedContext.payload.after));case 2:fileContents=_context3.sent;_iterator=_createForOfIteratorHelperLoose(usedContext.payload.commits);case 3:if((_step=_iterator()).done){_context3.next=12;break;}commit=_step.value;_context3.next=4;return _regenerator.default.awrap(_setup.extraPermGithub.git.getCommit((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commit.id})));case 4:commitData=_context3.sent;verified=commit.verification&&commit.verification.verified;if(!(commitData.data.parents.length===1&&!verified)){_context3.next=10;break;}_context3.next=5;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',prevCommit+"..."+commitData.data.sha,'--name-only']));case 5:filesChanged=_context3.sent.split('\n');_context3.next=6;return _regenerator.default.awrap((0,_utils.getFileDiffs)(prevCommit+"..."+commitData.data.sha));case 6:thisDiff=_context3.sent;fileDiffs={};_loop=function _loop(){var diffByLines,squashedDiffByLines,committedAndSquashedDiff;return _regenerator.default.async(function(_context2){while(1)switch(_context2.prev=_context2.next){case 0:if(thisDiff[file]&&squashedDiffs[file]){diffByLines=thisDiff[file].split('\n');squashedDiffByLines=squashedDiffs[file].split('\n');committedAndSquashedDiff=diffByLines.filter(function(line){return squashedDiffByLines.includes(line);});fileDiffs[file]=committedAndSquashedDiff.join('\n');}case 1:case"end":return _context2.stop();}},null,null,null,Promise);};_iterator2=_createForOfIteratorHelperLoose(filesChanged);case 7:if((_step2=_iterator2()).done){_context3.next=9;break;}file=_step2.value;_context3.next=8;return _regenerator.default.awrap(_loop());case 8:_context3.next=7;break;case 9:notified=(0,_utils.getNotified)(filesChanged,fileDiffs,fileContents,usedContext.actor,_constants.PUSH);_context3.next=10;return _regenerator.default.awrap(makeCommitComment(notified,commitData.data.sha));case 10:prevCommit=commitData.data.sha;case 11:_context3.next=3;break;case 12:case"end":return _context3.stop();}},null,null,null,Promise);};var __makeCommitComment=exports.__makeCommitComment=makeCommitComment;var __extraPermGithub=exports.__extraPermGithub=_setup.extraPermGithub;
+var _interopRequireDefault=__nccwpck_require__(1580);Object.defineProperty(exports, "__esModule", ({value:true}));exports.runPush=exports.__makeCommitComment=exports.__extraPermGithub=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(1002));var _extends2=_interopRequireDefault(__nccwpck_require__(1724));var _utils=__nccwpck_require__(2266);var _execCmd=__nccwpck_require__(3392);var _setup=__nccwpck_require__(1034);var _constants=__nccwpck_require__(5186);function _createForOfIteratorHelperLoose(r,e){var t="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(t)return(t=t.call(r)).next.bind(t);if(Array.isArray(r)||(t=_unsupportedIterableToArray(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0;return function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(r,a){if(r){if("string"==typeof r)return _arrayLikeToArray(r,a);var t={}.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?_arrayLikeToArray(r,a):void 0;}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n;}var makeCommitComment=function makeCommitComment(peopleToLabelToFiles,commitSHA){var names,body;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:names=Object.keys(peopleToLabelToFiles);if(!(peopleToLabelToFiles&&names.length)){_context.next=1;break;}body=_constants.GERALD_COMMIT_COMMENT_HEADER;names.forEach(function(person){var labels=Object.keys(peopleToLabelToFiles[person]);labels.forEach(function(label){var files=peopleToLabelToFiles[person][label];var labelText=label?" ("+label+")":'';body+=person+" for changes to `"+files.join('`, `')+"`"+labelText+"\n";});});_context.next=1;return _regenerator.default.awrap(_setup.extraPermGithub.repos.createCommitComment((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commitSHA,body:body})));case 1:case"end":return _context.stop();}},null,null,null,Promise);};var runPush=exports.runPush=function runPush(usedContext){var prevCommit,squashedDiffs,fileContents,_iterator,_step,commit,commitData,verified,filesChanged,thisDiff,fileDiffs,_loop,_iterator2,_step2,file,notified;return _regenerator.default.async(function(_context3){while(1)switch(_context3.prev=_context3.next){case 0:prevCommit=usedContext.payload.before;_context3.next=1;return _regenerator.default.awrap((0,_utils.getFileDiffs)(prevCommit+"..."+usedContext.payload.after));case 1:squashedDiffs=_context3.sent;_context3.next=2;return _regenerator.default.awrap((0,_utils.getFileContents)(prevCommit+"..."+usedContext.payload.after));case 2:fileContents=_context3.sent;_iterator=_createForOfIteratorHelperLoose(usedContext.payload.commits);case 3:if((_step=_iterator()).done){_context3.next=12;break;}commit=_step.value;_context3.next=4;return _regenerator.default.awrap(_setup.extraPermGithub.git.getCommit((0,_extends2.default)({},_setup.ownerAndRepo,{commit_sha:commit.id})));case 4:commitData=_context3.sent;verified=commit.verification&&commit.verification.verified;if(!(commitData.data.parents.length===1&&!verified)){_context3.next=10;break;}_context3.next=5;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',prevCommit+"..."+commitData.data.sha,'--name-only']));case 5:filesChanged=_context3.sent.split('\n');_context3.next=6;return _regenerator.default.awrap((0,_utils.getFileDiffs)(prevCommit+"..."+commitData.data.sha));case 6:thisDiff=_context3.sent;fileDiffs={};_loop=function _loop(){var diffByLines,squashedDiffByLines,committedAndSquashedDiff;return _regenerator.default.async(function(_context2){while(1)switch(_context2.prev=_context2.next){case 0:if(thisDiff[file]&&squashedDiffs[file]){diffByLines=thisDiff[file].split('\n');squashedDiffByLines=squashedDiffs[file].split('\n');committedAndSquashedDiff=diffByLines.filter(function(line){return squashedDiffByLines.includes(line);});fileDiffs[file]=committedAndSquashedDiff.join('\n');}case 1:case"end":return _context2.stop();}},null,null,null,Promise);};_iterator2=_createForOfIteratorHelperLoose(filesChanged);case 7:if((_step2=_iterator2()).done){_context3.next=9;break;}file=_step2.value;_context3.next=8;return _regenerator.default.awrap(_loop());case 8:_context3.next=7;break;case 9:notified=(0,_utils.getNotified)(filesChanged,fileDiffs,fileContents,usedContext.actor,_constants.PUSH);_context3.next=10;return _regenerator.default.awrap(makeCommitComment(notified,commitData.data.sha));case 10:prevCommit=commitData.data.sha;case 11:_context3.next=3;break;case 12:case"end":return _context3.stop();}},null,null,null,Promise);};var __makeCommitComment=exports.__makeCommitComment=makeCommitComment;var __extraPermGithub=exports.__extraPermGithub=_setup.extraPermGithub;
 
 /***/ }),
 
@@ -73,7 +73,7 @@ Object.defineProperty(exports, "__esModule", ({value:true}));exports.ownerAndRep
 /***/ 2266:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var _interopRequireDefault=__nccwpck_require__(5595);Object.defineProperty(exports, "__esModule", ({value:true}));exports.parseExistingComments=exports.maybeRemoveReviewRequests=exports.makeCommentBody=exports.getReviewers=exports.getNotified=exports.getFilteredLists=exports.getFileDiffs=exports.getFileContents=exports.getCorrectSection=exports.__turnPatternIntoRegex=exports.__pushOrSetToBin=exports.__parseUsername=exports.__maybeAddIfMatch=exports.__filterIgnoreFiles=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(4444));var _slicedToArray2=_interopRequireDefault(__nccwpck_require__(4180));var _toConsumableArray2=_interopRequireDefault(__nccwpck_require__(3749));var _extends2=_interopRequireDefault(__nccwpck_require__(3091));var _fs=_interopRequireWildcard(__nccwpck_require__(9896));var _fastGlob=_interopRequireDefault(__nccwpck_require__(197));var _fs2=__nccwpck_require__(3460);var _execCmd=__nccwpck_require__(3392);var _constants=__nccwpck_require__(5186);function _interopRequireWildcard(e,t){if("function"==typeof WeakMap)var r=new WeakMap(),n=new WeakMap();return(_interopRequireWildcard=function _interopRequireWildcard(e,t){if(!t&&e&&e.__esModule)return e;var o,i,f={__proto__:null,default:e};if(null===e||"object"!=typeof e&&"function"!=typeof e)return f;if(o=t?n:r){if(o.has(e))return o.get(e);o.set(e,f);}for(var _t in e)"default"!==_t&&{}.hasOwnProperty.call(e,_t)&&((i=(o=Object.defineProperty)&&Object.getOwnPropertyDescriptor(e,_t))&&(i.get||i.set)?o(f,_t,i):f[_t]=e[_t]);return f;})(e,t);}function _createForOfIteratorHelperLoose(r,e){var t="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(t)return(t=t.call(r)).next.bind(t);if(Array.isArray(r)||(t=_unsupportedIterableToArray(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0;return function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(r,a){if(r){if("string"==typeof r)return _arrayLikeToArray(r,a);var t={}.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?_arrayLikeToArray(r,a):void 0;}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n;}var makeCommentBody=exports.makeCommentBody=function makeCommentBody(_ref){var peopleToLabelToFiles=_ref.peopleToLabelToFiles,header=_ref.header,tagPerson=_ref.tagPerson;var names=Object.keys(peopleToLabelToFiles);if(!names.length){return'';}var body="<details>\n<summary><b>"+header+"</b></summary>\n\n";names.forEach(function(person){var labels=Object.keys(peopleToLabelToFiles[person]);labels.forEach(function(label){var files=peopleToLabelToFiles[person][label];var filesText=files.join('`, `');var escapedFilesText=filesText.replace(/@/g,'%40@');var personText=tagPerson?person:"`"+person+"`";var labelText=label?" ("+label+")":'';body+="* "+personText+" for changes to `"+escapedFilesText+"`"+labelText+"\n";});});body+="</details>\n\n";return body;};var filterIgnoreFiles=function filterIgnoreFiles(fileContents){var filteredOutMostCases=fileContents.split('\n').map(function(line){return line.trim();}).filter(Boolean).filter(function(line){return!line.startsWith(_constants.COMMENT_SYMBOL);});return filteredOutMostCases.map(function(line){if(line.indexOf(_constants.COMMENT_SYMBOL)!==-1){return line.split(_constants.COMMENT_SYMBOL)[0].trim();}return line;});};var maybeRemoveReviewRequests=exports.maybeRemoveReviewRequests=function maybeRemoveReviewRequests(removedJustNames,params,githubClient){var _await$githubClient$p,reviewRequests,toRemove;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:_context.next=1;return _regenerator.default.awrap(githubClient.pulls.listRequestedReviewers((0,_extends2.default)({},params)));case 1:_await$githubClient$p=_context.sent;reviewRequests=_await$githubClient$p.data;toRemove=reviewRequests.users.filter(function(user){return removedJustNames.includes(user.login);}).map(function(user){return user.login;});if(!toRemove.length){_context.next=2;break;}_context.next=2;return _regenerator.default.awrap(githubClient.pulls.removeRequestedReviewers((0,_extends2.default)({},params,{reviewers:toRemove})));case 2:case"end":return _context.stop();}},null,null,null,Promise);};var getGeraldIgnore=function getGeraldIgnore(){var ignore=[];if(_fs.default.existsSync(_constants.GERALD_IGNORE_FILE)){var _geraldIgnore=filterIgnoreFiles((0,_fs2.readFileSync)(_constants.GERALD_IGNORE_FILE,'utf-8'));ignore.push.apply(ignore,(0,_toConsumableArray2.default)(_geraldIgnore));}if(_fs.default.existsSync(_constants.GIT_IGNORE_FILE)){var gitIgnore=filterIgnoreFiles((0,_fs2.readFileSync)(_constants.GIT_IGNORE_FILE,'utf-8'));for(var _iterator=_createForOfIteratorHelperLoose(gitIgnore),_step;!(_step=_iterator()).done;){var line=_step.value;if(!ignore.includes(line)){ignore.push(line);}}}return ignore;};var geraldIgnore=getGeraldIgnore();var globOptions={dot:true,ignore:geraldIgnore};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,label,fileDiffs,nameToLabelToFilesObj){var filesChanged=arguments.length>5&&arguments[5]!==undefined?arguments[5]:[];for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(filesChanged.includes(file)&&pattern.test(diff)){if(!nameToLabelToFilesObj[name]){nameToLabelToFilesObj[name]={};}if(!nameToLabelToFilesObj[name][label]){nameToLabelToFilesObj[name][label]=[file];}else if(!nameToLabelToFilesObj[name][label].includes(file)){nameToLabelToFilesObj[name][label].push(file);}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=_constants.MATCH_REGEX_REGEX.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,label,files){if(!bin[username]){bin[username]={};}if(!bin[username][label]){bin[username][label]=files;}else{for(var _iterator2=_createForOfIteratorHelperLoose(files),_step2;!(_step2=_iterator2()).done;){var file=_step2.value;if(!bin[username][label].includes(file)){bin[username][label].push(file);}}}};var getCorrectSection=exports.getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(_constants.MATCH_PULL_REQUEST_SECTION_HEADER_REGEX)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file===_constants.NOTIFIED&&!rawFile.match(_constants.MATCH_PUSH_SECTION_HEADER_REGEX)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section===_constants.PULL_REQUEST){sectionRegexp=file===_constants.NOTIFIED?_constants.MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX:_constants.MATCH_JUST_PULL_REQUEST_SECTION_REGEX;}else if(file===_constants.NOTIFIED){sectionRegexp=_constants.MATCH_JUST_PUSH_SECTION_REGEX;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return rawFile.match(sectionRegexp);};var getNotified=exports.getNotified=function getNotified(filesChanged,fileDiffs,fileContents,author,on){var __testContent=arguments.length>5&&arguments[5]!==undefined?arguments[5]:undefined;if(!(0,_fs.existsSync)(_constants.NOTIFIED_FILE)){return{};}var buf=(0,_fs2.readFileSync)(_constants.NOTIFIED_FILE,'utf-8');var section=getCorrectSection(buf,_constants.NOTIFIED,on);if(!section){return{};}var matches=section[0].match(/^[^#\n]+/gm);if(!matches){return{};}var notified={};for(var _iterator3=_createForOfIteratorHelperLoose(matches),_step3;!(_step3=_iterator3()).done;){var match=_step3.value;if(!match||!match.trim()){continue;}var rule=match.trim();var untrimmedPattern=rule.match(_constants.MATCH_PATTERN_REGEX);var names=rule.match(_constants.MATCH_USERNAME_OR_TEAM_REGEX);var againstFileContents=rule.match(_constants.MATCH_USE_FILE_CONTENTS_REGEX);if(!untrimmedPattern||!names){continue;}var _label=untrimmedPattern[1]||'';var pattern=untrimmedPattern[2].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);var objToUse=againstFileContents?fileContents:fileDiffs;for(var _iterator4=_createForOfIteratorHelperLoose(names),_step4;!(_step4=_iterator4()).done;){var _name=_step4.value;if(parseUsername(_name).justName!==author){maybeAddIfMatch(regex,_name,_label,objToUse,notified,filesChanged);}}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator5=_createForOfIteratorHelperLoose(names),_step5;!(_step5=_iterator5()).done;){var _name2=_step5.value;if(parseUsername(_name2).justName!==author){pushOrSetToBin(notified,_name2,_label,intersection);}}}}}return notified;};var getReviewers=exports.getReviewers=function getReviewers(filesChanged,fileDiffs,fileContents,issuer){var buf=(0,_fs2.readFileSync)(_constants.REVIEWERS_FILE,'utf-8');var section=getCorrectSection(buf,_constants.REVIEWERS,_constants.PULL_REQUEST);if(!section){return{reviewers:{},requiredReviewers:{}};}var matches=section[0].match(_constants.MATCH_NON_COMMENT_LINES_REGEX);var reviewers={};var requiredReviewers={};if(!matches){return{reviewers:reviewers,requiredReviewers:requiredReviewers};}for(var _iterator6=_createForOfIteratorHelperLoose(matches),_step6;!(_step6=_iterator6()).done;){var match=_step6.value;var rule=match;if(match.includes(_constants.COMMENT_SYMBOL)){rule=match.split(_constants.COMMENT_SYMBOL)[0].trim();}var untrimmedPattern=rule.match(_constants.MATCH_PATTERN_REGEX);var names=rule.match(_constants.MATCH_USERNAME_OR_TEAM_REGEX);var againstFileContents=rule.match(_constants.MATCH_USE_FILE_CONTENTS_REGEX);if(!untrimmedPattern||!names){continue;}var _label2=untrimmedPattern[1]||'';var pattern=untrimmedPattern[2].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);var objToUse=againstFileContents?fileContents:fileDiffs;for(var _iterator7=_createForOfIteratorHelperLoose(names),_step7;!(_step7=_iterator7()).done;){var _name3=_step7.value;var _parseUsername=parseUsername(_name3),username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(justName===issuer){continue;}var correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,_label2,objToUse,correctBin,filesChanged);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator8=_createForOfIteratorHelperLoose(names),_step8;!(_step8=_iterator8()).done;){var _name4=_step8.value;var _parseUsername2=parseUsername(_name4),_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(_justName===issuer){continue;}var _correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,_label2,intersection);}}}}return{reviewers:reviewers,requiredReviewers:requiredReviewers};};var getFilteredLists=exports.getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator9=_createForOfIteratorHelperLoose(removedJustNames),_step9;!(_step9=_iterator9()).done;){var justName=_step9.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};var parseExistingComments=exports.parseExistingComments=function parseExistingComments(existingComments){var geraldComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.body.match(_constants.MATCH_GERALD_COMMENT_HEADER_REGEX)){geraldComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(_constants.MATCH_REMOVEME_TAG_REGEX);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});geraldComments.forEach(function(comment){var megaCommentMatch=comment.body.match(_constants.MATCH_GERALD_COMMENT_HEADER_REGEX);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};var getFileDiffs=exports.getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator0,_step0,diff,fileName;return _regenerator.default.async(function(_context2){while(1)switch(_context2.prev=_context2.next){case 0:_context2.next=1;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString]));case 1:rawDiffs=_context2.sent.split(_constants.MATCH_GIT_DIFF_FILE_SEPERATOR);fileToDiff={};for(_iterator0=_createForOfIteratorHelperLoose(rawDiffs);!(_step0=_iterator0()).done;){diff=_step0.value;fileName=diff.match(_constants.MATCH_GIT_DIFF_FILE_NAME);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context2.abrupt("return",fileToDiff);case 2:case"end":return _context2.stop();}},null,null,null,Promise);};var getFileContents=exports.getFileContents=function getFileContents(diffString){var filesChanged,fileToContents,_iterator1,_step1,file,fileContents;return _regenerator.default.async(function(_context3){while(1)switch(_context3.prev=_context3.next){case 0:_context3.next=1;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString,'--name-only']));case 1:filesChanged=_context3.sent.split('\n');fileToContents={};for(_iterator1=_createForOfIteratorHelperLoose(filesChanged);!(_step1=_iterator1()).done;){file=_step1.value;if(_fs.default.existsSync(file)){fileContents=(0,_fs2.readFileSync)(file,'utf-8');fileToContents[file]=fileContents;}}return _context3.abrupt("return",fileToContents);case 2:case"end":return _context3.stop();}},null,null,null,Promise);};var __maybeAddIfMatch=exports.__maybeAddIfMatch=maybeAddIfMatch;var __turnPatternIntoRegex=exports.__turnPatternIntoRegex=turnPatternIntoRegex;var __parseUsername=exports.__parseUsername=parseUsername;var __pushOrSetToBin=exports.__pushOrSetToBin=pushOrSetToBin;var __filterIgnoreFiles=exports.__filterIgnoreFiles=filterIgnoreFiles;
+var _interopRequireDefault=__nccwpck_require__(1580);Object.defineProperty(exports, "__esModule", ({value:true}));exports.parseExistingComments=exports.maybeRemoveReviewRequests=exports.makeCommentBody=exports.getReviewers=exports.getNotified=exports.getFilteredLists=exports.getFileDiffs=exports.getFileContents=exports.getCorrectSection=exports.__turnPatternIntoRegex=exports.__pushOrSetToBin=exports.__parseUsername=exports.__maybeAddIfMatch=exports.__filterIgnoreFiles=void 0;var _regenerator=_interopRequireDefault(__nccwpck_require__(1002));var _slicedToArray2=_interopRequireDefault(__nccwpck_require__(6385));var _toConsumableArray2=_interopRequireDefault(__nccwpck_require__(2606));var _extends2=_interopRequireDefault(__nccwpck_require__(1724));var _fs=_interopRequireWildcard(__nccwpck_require__(9896));var _fastGlob=_interopRequireDefault(__nccwpck_require__(197));var _fs2=__nccwpck_require__(3460);var _execCmd=__nccwpck_require__(3392);var _constants=__nccwpck_require__(5186);function _interopRequireWildcard(e,t){if("function"==typeof WeakMap)var r=new WeakMap(),n=new WeakMap();return(_interopRequireWildcard=function _interopRequireWildcard(e,t){if(!t&&e&&e.__esModule)return e;var o,i,f={__proto__:null,default:e};if(null===e||"object"!=typeof e&&"function"!=typeof e)return f;if(o=t?n:r){if(o.has(e))return o.get(e);o.set(e,f);}for(var _t in e)"default"!==_t&&{}.hasOwnProperty.call(e,_t)&&((i=(o=Object.defineProperty)&&Object.getOwnPropertyDescriptor(e,_t))&&(i.get||i.set)?o(f,_t,i):f[_t]=e[_t]);return f;})(e,t);}function _createForOfIteratorHelperLoose(r,e){var t="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(t)return(t=t.call(r)).next.bind(t);if(Array.isArray(r)||(t=_unsupportedIterableToArray(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0;return function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]};};}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(r,a){if(r){if("string"==typeof r)return _arrayLikeToArray(r,a);var t={}.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?_arrayLikeToArray(r,a):void 0;}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n;}var makeCommentBody=exports.makeCommentBody=function makeCommentBody(_ref){var peopleToLabelToFiles=_ref.peopleToLabelToFiles,header=_ref.header,tagPerson=_ref.tagPerson;var names=Object.keys(peopleToLabelToFiles);if(!names.length){return'';}var body="<details>\n<summary><b>"+header+"</b></summary>\n\n";names.forEach(function(person){var labels=Object.keys(peopleToLabelToFiles[person]);labels.forEach(function(label){var files=peopleToLabelToFiles[person][label];var filesText=files.join('`, `');var escapedFilesText=filesText.replace(/@/g,'%40@');var personText=tagPerson?person:"`"+person+"`";var labelText=label?" ("+label+")":'';body+="* "+personText+" for changes to `"+escapedFilesText+"`"+labelText+"\n";});});body+="</details>\n\n";return body;};var filterIgnoreFiles=function filterIgnoreFiles(fileContents){var filteredOutMostCases=fileContents.split('\n').map(function(line){return line.trim();}).filter(Boolean).filter(function(line){return!line.startsWith(_constants.COMMENT_SYMBOL);});return filteredOutMostCases.map(function(line){if(line.indexOf(_constants.COMMENT_SYMBOL)!==-1){return line.split(_constants.COMMENT_SYMBOL)[0].trim();}return line;});};var maybeRemoveReviewRequests=exports.maybeRemoveReviewRequests=function maybeRemoveReviewRequests(removedJustNames,params,githubClient){var _await$githubClient$p,reviewRequests,toRemove;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:_context.next=1;return _regenerator.default.awrap(githubClient.pulls.listRequestedReviewers((0,_extends2.default)({},params)));case 1:_await$githubClient$p=_context.sent;reviewRequests=_await$githubClient$p.data;toRemove=reviewRequests.users.filter(function(user){return removedJustNames.includes(user.login);}).map(function(user){return user.login;});if(!toRemove.length){_context.next=2;break;}_context.next=2;return _regenerator.default.awrap(githubClient.pulls.removeRequestedReviewers((0,_extends2.default)({},params,{reviewers:toRemove})));case 2:case"end":return _context.stop();}},null,null,null,Promise);};var getGeraldIgnore=function getGeraldIgnore(){var ignore=[];if(_fs.default.existsSync(_constants.GERALD_IGNORE_FILE)){var _geraldIgnore=filterIgnoreFiles((0,_fs2.readFileSync)(_constants.GERALD_IGNORE_FILE,'utf-8'));ignore.push.apply(ignore,(0,_toConsumableArray2.default)(_geraldIgnore));}if(_fs.default.existsSync(_constants.GIT_IGNORE_FILE)){var gitIgnore=filterIgnoreFiles((0,_fs2.readFileSync)(_constants.GIT_IGNORE_FILE,'utf-8'));for(var _iterator=_createForOfIteratorHelperLoose(gitIgnore),_step;!(_step=_iterator()).done;){var line=_step.value;if(!ignore.includes(line)){ignore.push(line);}}}return ignore;};var geraldIgnore=getGeraldIgnore();var globOptions={dot:true,ignore:geraldIgnore};var maybeAddIfMatch=function maybeAddIfMatch(pattern,name,label,fileDiffs,nameToLabelToFilesObj){var filesChanged=arguments.length>5&&arguments[5]!==undefined?arguments[5]:[];for(var _i=0,_Object$keys=Object.keys(fileDiffs);_i<_Object$keys.length;_i++){var file=_Object$keys[_i];var diff=fileDiffs[file];if(filesChanged.includes(file)&&pattern.test(diff)){if(!nameToLabelToFilesObj[name]){nameToLabelToFilesObj[name]={};}if(!nameToLabelToFilesObj[name][label]){nameToLabelToFilesObj[name][label]=[file];}else if(!nameToLabelToFilesObj[name][label].includes(file)){nameToLabelToFilesObj[name][label].push(file);}}}};var turnPatternIntoRegex=function turnPatternIntoRegex(pattern){var match=_constants.MATCH_REGEX_REGEX.exec(pattern);if(!match){throw new Error("The RegExp: "+pattern+" isn't valid");}var _match=(0,_slicedToArray2.default)(match,3),_=_match[0],regexPattern=_match[1],regexFlags=_match[2];return new RegExp(regexPattern,regexFlags);};var parseUsername=function parseUsername(original){var justName=original.match(/[^@!]+/);if(justName&&justName[0]){var isRequired=original.endsWith('!');return{username:"@"+justName[0],justName:justName[0],isRequired:isRequired};}throw new Error('String cannot be parsed as a name');};var pushOrSetToBin=function pushOrSetToBin(bin,username,label,files){if(!bin[username]){bin[username]={};}if(!bin[username][label]){bin[username][label]=files;}else{for(var _iterator2=_createForOfIteratorHelperLoose(files),_step2;!(_step2=_iterator2()).done;){var file=_step2.value;if(!bin[username][label].includes(file)){bin[username][label].push(file);}}}};var getCorrectSection=exports.getCorrectSection=function getCorrectSection(rawFile,file,section){if(!rawFile.match(_constants.MATCH_PULL_REQUEST_SECTION_HEADER_REGEX)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. Anything before this line will be ignored by Gerald, and all rules in this section will be employed on pull requests.");}if(file===_constants.NOTIFIED&&!rawFile.match(_constants.MATCH_PUSH_SECTION_HEADER_REGEX)){throw new Error("Invalid "+file+" file. Could not find a line with the text: '[ON PUSH WITHOUT PULL REQUEST] (DO NOT DELETE THIS LINE)'. Please add this line back. All rules below this line will be employed on changes to master or develop that don't go through a pull request.");}var sectionRegexp;if(section===_constants.PULL_REQUEST){sectionRegexp=file===_constants.NOTIFIED?_constants.MATCH_PULL_REQUEST_TO_PUSH_SECTION_REGEX:_constants.MATCH_JUST_PULL_REQUEST_SECTION_REGEX;}else if(file===_constants.NOTIFIED){sectionRegexp=_constants.MATCH_JUST_PUSH_SECTION_REGEX;}else{throw new Error("The REVIEWERS file does not have a 'push' section.");}return rawFile.match(sectionRegexp);};var getNotified=exports.getNotified=function getNotified(filesChanged,fileDiffs,fileContents,author,on){var __testContent=arguments.length>5&&arguments[5]!==undefined?arguments[5]:undefined;if(!(0,_fs.existsSync)(_constants.NOTIFIED_FILE)){return{};}var buf=(0,_fs2.readFileSync)(_constants.NOTIFIED_FILE,'utf-8');var section=getCorrectSection(buf,_constants.NOTIFIED,on);if(!section){return{};}var matches=section[0].match(/^[^#\n]+/gm);if(!matches){return{};}var notified={};for(var _iterator3=_createForOfIteratorHelperLoose(matches),_step3;!(_step3=_iterator3()).done;){var match=_step3.value;if(!match||!match.trim()){continue;}var rule=match.trim();var untrimmedPattern=rule.match(_constants.MATCH_PATTERN_REGEX);var names=rule.match(_constants.MATCH_USERNAME_OR_TEAM_REGEX);var againstFileContents=rule.match(_constants.MATCH_USE_FILE_CONTENTS_REGEX);if(!untrimmedPattern||!names){continue;}var _label=untrimmedPattern[1]||'';var pattern=untrimmedPattern[2].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);var objToUse=againstFileContents?fileContents:fileDiffs;for(var _iterator4=_createForOfIteratorHelperLoose(names),_step4;!(_step4=_iterator4()).done;){var _name=_step4.value;if(parseUsername(_name).justName!==author){maybeAddIfMatch(regex,_name,_label,objToUse,notified,filesChanged);}}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator5=_createForOfIteratorHelperLoose(names),_step5;!(_step5=_iterator5()).done;){var _name2=_step5.value;if(parseUsername(_name2).justName!==author){pushOrSetToBin(notified,_name2,_label,intersection);}}}}}return notified;};var getReviewers=exports.getReviewers=function getReviewers(filesChanged,fileDiffs,fileContents,issuer){var buf=(0,_fs2.readFileSync)(_constants.REVIEWERS_FILE,'utf-8');var section=getCorrectSection(buf,_constants.REVIEWERS,_constants.PULL_REQUEST);if(!section){return{reviewers:{},requiredReviewers:{}};}var matches=section[0].match(_constants.MATCH_NON_COMMENT_LINES_REGEX);var reviewers={};var requiredReviewers={};if(!matches){return{reviewers:reviewers,requiredReviewers:requiredReviewers};}for(var _iterator6=_createForOfIteratorHelperLoose(matches),_step6;!(_step6=_iterator6()).done;){var match=_step6.value;var rule=match;if(match.includes(_constants.COMMENT_SYMBOL)){rule=match.split(_constants.COMMENT_SYMBOL)[0].trim();}var untrimmedPattern=rule.match(_constants.MATCH_PATTERN_REGEX);var names=rule.match(_constants.MATCH_USERNAME_OR_TEAM_REGEX);var againstFileContents=rule.match(_constants.MATCH_USE_FILE_CONTENTS_REGEX);if(!untrimmedPattern||!names){continue;}var _label2=untrimmedPattern[1]||'';var pattern=untrimmedPattern[2].trim();if(pattern.startsWith('"')&&pattern.endsWith('"')){var regex=turnPatternIntoRegex(pattern);var objToUse=againstFileContents?fileContents:fileDiffs;for(var _iterator7=_createForOfIteratorHelperLoose(names),_step7;!(_step7=_iterator7()).done;){var _name3=_step7.value;var _parseUsername=parseUsername(_name3),username=_parseUsername.username,justName=_parseUsername.justName,isRequired=_parseUsername.isRequired;if(justName===issuer){continue;}var correctBin=isRequired?requiredReviewers:reviewers;maybeAddIfMatch(regex,username,_label2,objToUse,correctBin,filesChanged);}}else{var matchedFiles=_fastGlob.default.sync(pattern,globOptions);var intersection=matchedFiles.filter(function(file){return filesChanged.includes(file);});if(intersection.length){for(var _iterator8=_createForOfIteratorHelperLoose(names),_step8;!(_step8=_iterator8()).done;){var _name4=_step8.value;var _parseUsername2=parseUsername(_name4),_username=_parseUsername2.username,_justName=_parseUsername2.justName,_isRequired=_parseUsername2.isRequired;if(_justName===issuer){continue;}var _correctBin=_isRequired?requiredReviewers:reviewers;pushOrSetToBin(_correctBin,_username,_label2,intersection);}}}}return{reviewers:reviewers,requiredReviewers:requiredReviewers};};var getFilteredLists=exports.getFilteredLists=function getFilteredLists(reviewers,requiredReviewers,notified,removedJustNames){for(var _iterator9=_createForOfIteratorHelperLoose(removedJustNames),_step9;!(_step9=_iterator9()).done;){var justName=_step9.value;var username="@"+justName;if(reviewers[username]){delete reviewers[username];}if(requiredReviewers[username]){delete requiredReviewers[username];}if(notified[username]){delete notified[username];}}var allReviewers=Object.keys(requiredReviewers).concat(Object.keys(reviewers).filter(function(reviewer){return!Object.keys(requiredReviewers).includes(reviewer);})).map(function(username){return username.slice(1);});var actualReviewers=allReviewers.filter(function(justName){return!justName.match(/[A-Z]\/\S*/i);});var teamReviewers=allReviewers.filter(function(justName){return justName.match(/[A-Z]\/\S*/i);}).map(function(slugWithOrg){return slugWithOrg.split('/')[1];});return{actualReviewers:actualReviewers,teamReviewers:teamReviewers};};var parseExistingComments=exports.parseExistingComments=function parseExistingComments(existingComments){var geraldComments=[];var removedJustNames=[];var megaComment;existingComments.data.map(function(cmnt){if(cmnt.body.match(_constants.MATCH_GERALD_COMMENT_HEADER_REGEX)){geraldComments.push(cmnt);}else{var removeMeMatch=cmnt.body.match(_constants.MATCH_REMOVEME_TAG_REGEX);if(removeMeMatch){removedJustNames.push(cmnt.user.login);}}});geraldComments.forEach(function(comment){var megaCommentMatch=comment.body.match(_constants.MATCH_GERALD_COMMENT_HEADER_REGEX);if(megaCommentMatch){megaComment=comment;}});return{megaComment:megaComment,removedJustNames:removedJustNames};};var getFileDiffs=exports.getFileDiffs=function getFileDiffs(diffString){var rawDiffs,fileToDiff,_iterator0,_step0,diff,fileName;return _regenerator.default.async(function(_context2){while(1)switch(_context2.prev=_context2.next){case 0:_context2.next=1;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString]));case 1:rawDiffs=_context2.sent.split(_constants.MATCH_GIT_DIFF_FILE_SEPERATOR);fileToDiff={};for(_iterator0=_createForOfIteratorHelperLoose(rawDiffs);!(_step0=_iterator0()).done;){diff=_step0.value;fileName=diff.match(_constants.MATCH_GIT_DIFF_FILE_NAME);if(fileName){fileToDiff[fileName[0]]=diff;}}return _context2.abrupt("return",fileToDiff);case 2:case"end":return _context2.stop();}},null,null,null,Promise);};var getFileContents=exports.getFileContents=function getFileContents(diffString){var filesChanged,fileToContents,_iterator1,_step1,file,fileContents;return _regenerator.default.async(function(_context3){while(1)switch(_context3.prev=_context3.next){case 0:_context3.next=1;return _regenerator.default.awrap((0,_execCmd.execCmd)('git',['diff',diffString,'--name-only']));case 1:filesChanged=_context3.sent.split('\n');fileToContents={};for(_iterator1=_createForOfIteratorHelperLoose(filesChanged);!(_step1=_iterator1()).done;){file=_step1.value;if(_fs.default.existsSync(file)){fileContents=(0,_fs2.readFileSync)(file,'utf-8');fileToContents[file]=fileContents;}}return _context3.abrupt("return",fileToContents);case 2:case"end":return _context3.stop();}},null,null,null,Promise);};var __maybeAddIfMatch=exports.__maybeAddIfMatch=maybeAddIfMatch;var __turnPatternIntoRegex=exports.__turnPatternIntoRegex=turnPatternIntoRegex;var __parseUsername=exports.__parseUsername=parseUsername;var __pushOrSetToBin=exports.__pushOrSetToBin=pushOrSetToBin;var __filterIgnoreFiles=exports.__filterIgnoreFiles=filterIgnoreFiles;
 
 /***/ }),
 
@@ -5623,7 +5623,7 @@ exports.createFileSystemAdapter = createFileSystemAdapter;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.statSync = exports.stat = exports.Settings = void 0;
 const async = __nccwpck_require__(224);
-const sync = __nccwpck_require__(6385);
+const sync = __nccwpck_require__(8766);
 const settings_1 = __nccwpck_require__(52);
 exports.Settings = settings_1.default;
 function stat(path, optionsOrSettingsOrCallback, callback) {
@@ -5693,7 +5693,7 @@ function callSuccessCallback(callback, result) {
 
 /***/ }),
 
-/***/ 6385:
+/***/ 8766:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -8712,7 +8712,7 @@ function removeHook(state, name, method) {
 const stringify = __nccwpck_require__(8602);
 const compile = __nccwpck_require__(2358);
 const expand = __nccwpck_require__(5671);
-const parse = __nccwpck_require__(1799);
+const parse = __nccwpck_require__(4180);
 
 /**
  * Expand the given pattern or create a regex-compatible string.
@@ -9135,7 +9135,7 @@ module.exports = expand;
 
 /***/ }),
 
-/***/ 1799:
+/***/ 4180:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -34242,46 +34242,6 @@ module.exports = eval("require")("@babel/preset-typescript");
 /***/ ((module) => {
 
 module.exports = eval("require")("@babel/preset-typescript/package.json");
-
-
-/***/ }),
-
-/***/ 3091:
-/***/ ((module) => {
-
-module.exports = eval("require")("@babel/runtime/helpers/extends");
-
-
-/***/ }),
-
-/***/ 5595:
-/***/ ((module) => {
-
-module.exports = eval("require")("@babel/runtime/helpers/interopRequireDefault");
-
-
-/***/ }),
-
-/***/ 4180:
-/***/ ((module) => {
-
-module.exports = eval("require")("@babel/runtime/helpers/slicedToArray");
-
-
-/***/ }),
-
-/***/ 3749:
-/***/ ((module) => {
-
-module.exports = eval("require")("@babel/runtime/helpers/toConsumableArray");
-
-
-/***/ }),
-
-/***/ 4444:
-/***/ ((module) => {
-
-module.exports = eval("require")("@babel/runtime/regenerator");
 
 
 /***/ }),
@@ -66107,6 +66067,534 @@ exports.tokTypes = tokTypes;
 
 /***/ }),
 
+/***/ 4038:
+/***/ ((module) => {
+
+function _OverloadYield(e, d) {
+  this.v = e, this.k = d;
+}
+module.exports = _OverloadYield, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 2573:
+/***/ ((module) => {
+
+function _arrayLikeToArray(r, a) {
+  (null == a || a > r.length) && (a = r.length);
+  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+  return n;
+}
+module.exports = _arrayLikeToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 9405:
+/***/ ((module) => {
+
+function _arrayWithHoles(r) {
+  if (Array.isArray(r)) return r;
+}
+module.exports = _arrayWithHoles, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 8175:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var arrayLikeToArray = __nccwpck_require__(2573);
+function _arrayWithoutHoles(r) {
+  if (Array.isArray(r)) return arrayLikeToArray(r);
+}
+module.exports = _arrayWithoutHoles, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 1724:
+/***/ ((module) => {
+
+function _extends() {
+  return module.exports = _extends = Object.assign ? Object.assign.bind() : function (n) {
+    for (var e = 1; e < arguments.length; e++) {
+      var t = arguments[e];
+      for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
+    }
+    return n;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports, _extends.apply(null, arguments);
+}
+module.exports = _extends, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 1580:
+/***/ ((module) => {
+
+function _interopRequireDefault(e) {
+  return e && e.__esModule ? e : {
+    "default": e
+  };
+}
+module.exports = _interopRequireDefault, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 6097:
+/***/ ((module) => {
+
+function _iterableToArray(r) {
+  if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+}
+module.exports = _iterableToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 3638:
+/***/ ((module) => {
+
+function _iterableToArrayLimit(r, l) {
+  var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+  if (null != t) {
+    var e,
+      n,
+      i,
+      u,
+      a = [],
+      f = !0,
+      o = !1;
+    try {
+      if (i = (t = t.call(r)).next, 0 === l) {
+        if (Object(t) !== t) return;
+        f = !1;
+      } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
+    } catch (r) {
+      o = !0, n = r;
+    } finally {
+      try {
+        if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return;
+      } finally {
+        if (o) throw n;
+      }
+    }
+    return a;
+  }
+}
+module.exports = _iterableToArrayLimit, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 8598:
+/***/ ((module) => {
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+module.exports = _nonIterableRest, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 1515:
+/***/ ((module) => {
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+module.exports = _nonIterableSpread, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 9787:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var regeneratorDefine = __nccwpck_require__(2860);
+function _regenerator() {
+  /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */
+  var e,
+    t,
+    r = "function" == typeof Symbol ? Symbol : {},
+    n = r.iterator || "@@iterator",
+    o = r.toStringTag || "@@toStringTag";
+  function i(r, n, o, i) {
+    var c = n && n.prototype instanceof Generator ? n : Generator,
+      u = Object.create(c.prototype);
+    return regeneratorDefine(u, "_invoke", function (r, n, o) {
+      var i,
+        c,
+        u,
+        f = 0,
+        p = o || [],
+        y = !1,
+        G = {
+          p: 0,
+          n: 0,
+          v: e,
+          a: d,
+          f: d.bind(e, 4),
+          d: function d(t, r) {
+            return i = t, c = 0, u = e, G.n = r, a;
+          }
+        };
+      function d(r, n) {
+        for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) {
+          var o,
+            i = p[t],
+            d = G.p,
+            l = i[2];
+          r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0));
+        }
+        if (o || r > 1) return a;
+        throw y = !0, n;
+      }
+      return function (o, p, l) {
+        if (f > 1) throw TypeError("Generator is already running");
+        for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) {
+          i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u);
+          try {
+            if (f = 2, i) {
+              if (c || (o = "next"), t = i[o]) {
+                if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object");
+                if (!t.done) return t;
+                u = t.value, c < 2 && (c = 0);
+              } else 1 === c && (t = i["return"]) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1);
+              i = e;
+            } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break;
+          } catch (t) {
+            i = e, c = 1, u = t;
+          } finally {
+            f = 1;
+          }
+        }
+        return {
+          value: t,
+          done: y
+        };
+      };
+    }(r, o, i), !0), u;
+  }
+  var a = {};
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+  t = Object.getPrototypeOf;
+  var c = [][n] ? t(t([][n]())) : (regeneratorDefine(t = {}, n, function () {
+      return this;
+    }), t),
+    u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c);
+  function f(e) {
+    return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, regeneratorDefine(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e;
+  }
+  return GeneratorFunction.prototype = GeneratorFunctionPrototype, regeneratorDefine(u, "constructor", GeneratorFunctionPrototype), regeneratorDefine(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", regeneratorDefine(GeneratorFunctionPrototype, o, "GeneratorFunction"), regeneratorDefine(u), regeneratorDefine(u, o, "Generator"), regeneratorDefine(u, n, function () {
+    return this;
+  }), regeneratorDefine(u, "toString", function () {
+    return "[object Generator]";
+  }), (module.exports = _regenerator = function _regenerator() {
+    return {
+      w: i,
+      m: f
+    };
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports)();
+}
+module.exports = _regenerator, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 8119:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var regeneratorAsyncGen = __nccwpck_require__(7045);
+function _regeneratorAsync(n, e, r, t, o) {
+  var a = regeneratorAsyncGen(n, e, r, t, o);
+  return a.next().then(function (n) {
+    return n.done ? n.value : a.next();
+  });
+}
+module.exports = _regeneratorAsync, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 7045:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var regenerator = __nccwpck_require__(9787);
+var regeneratorAsyncIterator = __nccwpck_require__(6037);
+function _regeneratorAsyncGen(r, e, t, o, n) {
+  return new regeneratorAsyncIterator(regenerator().w(r, e, t, o), n || Promise);
+}
+module.exports = _regeneratorAsyncGen, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 6037:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var OverloadYield = __nccwpck_require__(4038);
+var regeneratorDefine = __nccwpck_require__(2860);
+function AsyncIterator(t, e) {
+  function n(r, o, i, f) {
+    try {
+      var c = t[r](o),
+        u = c.value;
+      return u instanceof OverloadYield ? e.resolve(u.v).then(function (t) {
+        n("next", t, i, f);
+      }, function (t) {
+        n("throw", t, i, f);
+      }) : e.resolve(u).then(function (t) {
+        c.value = t, i(c);
+      }, function (t) {
+        return n("throw", t, i, f);
+      });
+    } catch (t) {
+      f(t);
+    }
+  }
+  var r;
+  this.next || (regeneratorDefine(AsyncIterator.prototype), regeneratorDefine(AsyncIterator.prototype, "function" == typeof Symbol && Symbol.asyncIterator || "@asyncIterator", function () {
+    return this;
+  })), regeneratorDefine(this, "_invoke", function (t, o, i) {
+    function f() {
+      return new e(function (e, r) {
+        n(t, i, e, r);
+      });
+    }
+    return r = r ? r.then(f, f) : f();
+  }, !0);
+}
+module.exports = AsyncIterator, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 2860:
+/***/ ((module) => {
+
+function _regeneratorDefine(e, r, n, t) {
+  var i = Object.defineProperty;
+  try {
+    i({}, "", {});
+  } catch (e) {
+    i = 0;
+  }
+  module.exports = _regeneratorDefine = function regeneratorDefine(e, r, n, t) {
+    function o(r, n) {
+      _regeneratorDefine(e, r, function (e) {
+        return this._invoke(r, n, e);
+      });
+    }
+    r ? i ? i(e, r, {
+      value: n,
+      enumerable: !t,
+      configurable: !t,
+      writable: !t
+    }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2));
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports, _regeneratorDefine(e, r, n, t);
+}
+module.exports = _regeneratorDefine, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 4135:
+/***/ ((module) => {
+
+function _regeneratorKeys(e) {
+  var n = Object(e),
+    r = [];
+  for (var t in n) r.unshift(t);
+  return function e() {
+    for (; r.length;) if ((t = r.pop()) in n) return e.value = t, e.done = !1, e;
+    return e.done = !0, e;
+  };
+}
+module.exports = _regeneratorKeys, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 4951:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var OverloadYield = __nccwpck_require__(4038);
+var regenerator = __nccwpck_require__(9787);
+var regeneratorAsync = __nccwpck_require__(8119);
+var regeneratorAsyncGen = __nccwpck_require__(7045);
+var regeneratorAsyncIterator = __nccwpck_require__(6037);
+var regeneratorKeys = __nccwpck_require__(4135);
+var regeneratorValues = __nccwpck_require__(9005);
+function _regeneratorRuntime() {
+  "use strict";
+
+  var r = regenerator(),
+    e = r.m(_regeneratorRuntime),
+    t = (Object.getPrototypeOf ? Object.getPrototypeOf(e) : e.__proto__).constructor;
+  function n(r) {
+    var e = "function" == typeof r && r.constructor;
+    return !!e && (e === t || "GeneratorFunction" === (e.displayName || e.name));
+  }
+  var o = {
+    "throw": 1,
+    "return": 2,
+    "break": 3,
+    "continue": 3
+  };
+  function a(r) {
+    var e, t;
+    return function (n) {
+      e || (e = {
+        stop: function stop() {
+          return t(n.a, 2);
+        },
+        "catch": function _catch() {
+          return n.v;
+        },
+        abrupt: function abrupt(r, e) {
+          return t(n.a, o[r], e);
+        },
+        delegateYield: function delegateYield(r, o, a) {
+          return e.resultName = o, t(n.d, regeneratorValues(r), a);
+        },
+        finish: function finish(r) {
+          return t(n.f, r);
+        }
+      }, t = function t(r, _t, o) {
+        n.p = e.prev, n.n = e.next;
+        try {
+          return r(_t, o);
+        } finally {
+          e.next = n.n;
+        }
+      }), e.resultName && (e[e.resultName] = n.v, e.resultName = void 0), e.sent = n.v, e.next = n.n;
+      try {
+        return r.call(this, e);
+      } finally {
+        n.p = e.prev, n.n = e.next;
+      }
+    };
+  }
+  return (module.exports = _regeneratorRuntime = function _regeneratorRuntime() {
+    return {
+      wrap: function wrap(e, t, n, o) {
+        return r.w(a(e), t, n, o && o.reverse());
+      },
+      isGeneratorFunction: n,
+      mark: r.m,
+      awrap: function awrap(r, e) {
+        return new OverloadYield(r, e);
+      },
+      AsyncIterator: regeneratorAsyncIterator,
+      async: function async(r, e, t, o, u) {
+        return (n(e) ? regeneratorAsyncGen : regeneratorAsync)(a(r), e, t, o, u);
+      },
+      keys: regeneratorKeys,
+      values: regeneratorValues
+    };
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports)();
+}
+module.exports = _regeneratorRuntime, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 9005:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var _typeof = (__nccwpck_require__(4032)["default"]);
+function _regeneratorValues(e) {
+  if (null != e) {
+    var t = e["function" == typeof Symbol && Symbol.iterator || "@@iterator"],
+      r = 0;
+    if (t) return t.call(e);
+    if ("function" == typeof e.next) return e;
+    if (!isNaN(e.length)) return {
+      next: function next() {
+        return e && r >= e.length && (e = void 0), {
+          value: e && e[r++],
+          done: !e
+        };
+      }
+    };
+  }
+  throw new TypeError(_typeof(e) + " is not iterable");
+}
+module.exports = _regeneratorValues, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 6385:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var arrayWithHoles = __nccwpck_require__(9405);
+var iterableToArrayLimit = __nccwpck_require__(3638);
+var unsupportedIterableToArray = __nccwpck_require__(7812);
+var nonIterableRest = __nccwpck_require__(8598);
+function _slicedToArray(r, e) {
+  return arrayWithHoles(r) || iterableToArrayLimit(r, e) || unsupportedIterableToArray(r, e) || nonIterableRest();
+}
+module.exports = _slicedToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 2606:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var arrayWithoutHoles = __nccwpck_require__(8175);
+var iterableToArray = __nccwpck_require__(6097);
+var unsupportedIterableToArray = __nccwpck_require__(7812);
+var nonIterableSpread = __nccwpck_require__(1515);
+function _toConsumableArray(r) {
+  return arrayWithoutHoles(r) || iterableToArray(r) || unsupportedIterableToArray(r) || nonIterableSpread();
+}
+module.exports = _toConsumableArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 4032:
+/***/ ((module) => {
+
+function _typeof(o) {
+  "@babel/helpers - typeof";
+
+  return module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports, _typeof(o);
+}
+module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 7812:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var arrayLikeToArray = __nccwpck_require__(2573);
+function _unsupportedIterableToArray(r, a) {
+  if (r) {
+    if ("string" == typeof r) return arrayLikeToArray(r, a);
+    var t = {}.toString.call(r).slice(8, -1);
+    return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? arrayLikeToArray(r, a) : void 0;
+  }
+}
+module.exports = _unsupportedIterableToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
+
+/***/ }),
+
+/***/ 1002:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// TODO(Babel 8): Remove this file.
+
+var runtime = __nccwpck_require__(4951)();
+module.exports = runtime;
+
+// Copied from https://github.com/facebook/regenerator/blob/main/packages/runtime/runtime.js#L736=
+try {
+  regeneratorRuntime = runtime;
+} catch (accidentalStrictMode) {
+  if (typeof globalThis === "object") {
+    globalThis.regeneratorRuntime = runtime;
+  } else {
+    Function("r", "regeneratorRuntime = r")(runtime);
+  }
+}
+
+
+/***/ }),
+
 /***/ 8400:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -88001,7 +88489,7 @@ module.exports = /*#__PURE__*/JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-var _interopRequireDefault=__nccwpck_require__(5595);var _regenerator=_interopRequireDefault(__nccwpck_require__(4444));__nccwpck_require__(38);var core=__nccwpck_require__(6966);var _require=__nccwpck_require__(6306),runOnComment=_require.runOnComment;var _require2=__nccwpck_require__(2311),runPush=_require2.runPush;var _require3=__nccwpck_require__(1131),runOnPullRequest=_require3.runOnPullRequest;var _require4=__nccwpck_require__(1034),context=_require4.context;var _require5=__nccwpck_require__(5186),PULL_REQUEST=_require5.PULL_REQUEST,ENV_EVENT=_require5.ENV_EVENT,COMMENT=_require5.COMMENT;var run=function run(){var _t;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:_context.prev=0;if(!(process.env[ENV_EVENT]===PULL_REQUEST)){_context.next=2;break;}_context.next=1;return _regenerator.default.awrap(runOnPullRequest());case 1:_context.next=5;break;case 2:if(!(process.env[ENV_EVENT]===COMMENT)){_context.next=4;break;}_context.next=3;return _regenerator.default.awrap(runOnComment());case 3:_context.next=5;break;case 4:_context.next=5;return _regenerator.default.awrap(runPush(context));case 5:_context.next=7;break;case 6:_context.prev=6;_t=_context["catch"](0);console.error(_t);case 7:case"end":return _context.stop();}},null,null,[[0,6]],Promise);};run().catch(function(error){core.setFailed(error.message);});
+var _interopRequireDefault=__nccwpck_require__(1580);var _regenerator=_interopRequireDefault(__nccwpck_require__(1002));__nccwpck_require__(38);var core=__nccwpck_require__(6966);var _require=__nccwpck_require__(6306),runOnComment=_require.runOnComment;var _require2=__nccwpck_require__(2311),runPush=_require2.runPush;var _require3=__nccwpck_require__(1131),runOnPullRequest=_require3.runOnPullRequest;var _require4=__nccwpck_require__(1034),context=_require4.context;var _require5=__nccwpck_require__(5186),PULL_REQUEST=_require5.PULL_REQUEST,ENV_EVENT=_require5.ENV_EVENT,COMMENT=_require5.COMMENT;var run=function run(){var _t;return _regenerator.default.async(function(_context){while(1)switch(_context.prev=_context.next){case 0:_context.prev=0;if(!(process.env[ENV_EVENT]===PULL_REQUEST)){_context.next=2;break;}_context.next=1;return _regenerator.default.awrap(runOnPullRequest());case 1:_context.next=5;break;case 2:if(!(process.env[ENV_EVENT]===COMMENT)){_context.next=4;break;}_context.next=3;return _regenerator.default.awrap(runOnComment());case 3:_context.next=5;break;case 4:_context.next=5;return _regenerator.default.awrap(runPush(context));case 5:_context.next=7;break;case 6:_context.prev=6;_t=_context["catch"](0);console.error(_t);case 7:case"end":return _context.stop();}},null,null,[[0,6]],Promise);};run().catch(function(error){core.setFailed(error.message);});
 module.exports = __webpack_exports__;
 /******/ })()
 ;
