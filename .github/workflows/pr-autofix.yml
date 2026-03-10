@@ -14,14 +14,14 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Get All Changed Files
-        uses: Khan/actions@0aa8c5bf8f640cc0d3339dc05c4ee1ed041f2b1e # get-changed-files-v2
+        uses: Khan/actions@42489a21fc83e59db35ae5be08209db29981c823 # get-changed-files-v2.1.4
         id: changed
         with:
           directories: src/
 
       - id: changed-js
         name: Find .js changed files
-        uses: Khan/actions@d1828f83826c23d444aedfc62e348e269727ee16 # filter-files-v1
+        uses: Khan/actions@b0a6a316f61b34d7eed199051f1130247c86cee1 # filter-files-v2.1.2
         if: always()
         with:
           changed-files: ${{ steps.changed.outputs.files }}
