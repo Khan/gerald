@@ -16,7 +16,7 @@ jobs:
           # We add one to the length because we want to get the diff between the last commit and the commit before the first commit.
           fetch-depth: '$(node -e "console.log(${{ github.event.commits }}.length + 1)")'
       - name: Run Gerald
-        uses: Khan/gerald@5b4582365dafc568f0f67d29f7db637bd0c2ddf9 # main
+        uses: Khan/gerald@c8adc7c2ff208e7a0a76b48d660d00e406d17ee4 # main
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           ADMIN_PERMISSION_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
