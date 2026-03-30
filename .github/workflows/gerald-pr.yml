@@ -18,7 +18,7 @@ jobs:
     if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
     steps:
-      - uses: Khan/actions@14c32221dcaf87e592416d6a4de5d85924d899b7 # gerald-pr-v3
+      - uses: Khan/actions@14c32221dcaf87e592416d6a4de5d85924d899b7 # gerald-pr-v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           admin-token: ${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}
