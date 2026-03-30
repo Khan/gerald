@@ -35,6 +35,6 @@ jobs:
         if: steps.changed.outputs.files != '[]'
         run: pnpm build
 
-      - uses: Khan/autofix-commit-action@7ad29653a245c4bc54859d8644f233f94a99a183 # main
+      - uses: Khan/autofix-commit-action@259499a361ea28f5d93f44b12b5cf0dee9a7b6b4 # main
         env:
           GITHUB_TOKEN: '${{ secrets.KHAN_ACTIONS_BOT_TOKEN }}'
