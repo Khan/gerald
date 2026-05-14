@@ -7,72 +7,82 @@ import {
     getFileDiffs,
     parseExistingComments,
     getFilteredLists,
-    makeCommentBody,
     maybeRemoveReviewRequests,
     getFileContents,
 } from './utils';
 import {ownerAndRepo, context, extraPermGithub} from './setup';
 import {
-    GERALD_COMMENT_FOOTER,
     PULL_REQUEST,
-    GERALD_COMMENT_HEADER,
     GERALD_COMMENT_NOTIFIED_HEADER,
     GERALD_COMMENT_REQ_REVIEWERS_HEADER,
     GERALD_COMMENT_REVIEWERS_HEADER,
-    MATCH_COMMENT_HEADER_REGEX,
 } from './constants';
 import type {NameToLabelToFiles} from './utils';
 
+const core = require('@actions/core'); //flow-uncovered-line
+
 /**
- * @desc Helper function to update, delete, or create a comment
- * @param comment - existing Github comment to update/delete or undefined
- * @param title - this will end up being the first line of the comment
- * @param people - people to tag mapped to the files that each person is tagged for
+ * @desc Build a summary section for a group of people
+ * @param peopleToLabelToFiles - People and the files they are associated with
+ * @param header - Section header (e.g., "Reviewers", "Required Reviewers", "Notified")
  */
-const updatePullRequestComment = async (
-    comment: ?Octokit$IssuesListCommentsResponseItem,
+const makeSummarySection = (peopleToLabelToFiles: NameToLabelToFiles, header: string): string => {
+    const names: string[] = Object.keys(peopleToLabelToFiles);
+    if (!names.length) {
+        return '';
+    }
+
+    let section = `### ${header}\n\n`;
+    names.forEach((person: string) => {
+        const labels: string[] = Object.keys(peopleToLabelToFiles[person]);
+        labels.forEach((label: string) => {
+            const files = peopleToLabelToFiles[person][label];
+            const filesText = files.join('`, `');
+            const labelText = label ? ` (${label})` : '';
+            section += `* \`${person}\` for changes to \`${filesText}\`${labelText}\n`;
+        });
+    });
+    section += '\n';
+    return section;
+};
+
+/**
+ * @desc Write a job summary with reviewer information instead of creating a PR comment.
+ * The summary will be visible when clicking on the Gerald check in the PR.
+ */
+const writeJobSummary = async (
     notifyees: NameToLabelToFiles,
     reviewers: NameToLabelToFiles,
     requiredReviewers: NameToLabelToFiles,
 ) => {
-    let body: string = GERALD_COMMENT_HEADER;
-    body += makeCommentBody({
-        peopleToLabelToFiles: notifyees,
-        header: GERALD_COMMENT_NOTIFIED_HEADER,
-        tagPerson: true,
-    });
-    body += makeCommentBody({
-        peopleToLabelToFiles: reviewers,
-        header: GERALD_COMMENT_REVIEWERS_HEADER,
-        tagPerson: false,
-    });
-    body += makeCommentBody({
-        peopleToLabelToFiles: requiredReviewers,
-        header: GERALD_COMMENT_REQ_REVIEWERS_HEADER,
-        tagPerson: false,
-    });
-    if (body.match(MATCH_COMMENT_HEADER_REGEX)) {
-        body += GERALD_COMMENT_FOOTER;
+    const hasNotifyees = Object.keys(notifyees).length > 0;
+    const hasReviewers = Object.keys(reviewers).length > 0;
+    const hasRequiredReviewers = Object.keys(requiredReviewers).length > 0;
 
-        if (comment) {
-            await extraPermGithub.issues.updateComment({
-                ...ownerAndRepo,
-                comment_id: comment.id,
-                body: body, // flow-uncovered-line
-            });
-        } else {
-            await extraPermGithub.issues.createComment({
-                ...ownerAndRepo,
-                issue_number: context.issue.number,
-                body: body, // flow-uncovered-line
-            });
-        }
-    } else if (comment) {
-        await extraPermGithub.issues.deleteComment({
-            ...ownerAndRepo,
-            comment_id: comment.id,
-        });
+    if (!hasNotifyees && !hasReviewers && !hasRequiredReviewers) {
+        await core.summary
+            .addHeading('Gerald', 1)
+            .addRaw('No reviewers or notifyees matched for this pull request.')
+            .write();
+        return;
     }
+
+    let summaryContent = '';
+
+    if (hasNotifyees) {
+        summaryContent += makeSummarySection(notifyees, GERALD_COMMENT_NOTIFIED_HEADER);
+    }
+    if (hasReviewers) {
+        summaryContent += makeSummarySection(reviewers, GERALD_COMMENT_REVIEWERS_HEADER);
+    }
+    if (hasRequiredReviewers) {
+        summaryContent += makeSummarySection(
+            requiredReviewers,
+            GERALD_COMMENT_REQ_REVIEWERS_HEADER,
+        );
+    }
+
+    await core.summary.addHeading('Gerald', 1).addRaw(summaryContent).write();
 };
 
 const makeReviewRequests = async (
@@ -168,15 +178,13 @@ export const runOnPullRequest = async () => {
         context.payload.pull_request.user.login,
     );
 
-    // find any #removeme or existing khan-actions-bot comments
+    // find any #removeme comments
     const existingComments = await extraPermGithub.issues.listComments({
         ...ownerAndRepo,
         issue_number: context.issue.number,
     });
-    const {
-        megaComment,
-        removedJustNames,
-    } = parseExistingComments<Octokit$IssuesListCommentsResponseItem>(existingComments);
+    const {removedJustNames} =
+        parseExistingComments<Octokit$IssuesListCommentsResponseItem>(existingComments);
 
     // filter out anyone that has commented #removeme
     const {actualReviewers, teamReviewers} = getFilteredLists(
@@ -198,5 +206,9 @@ export const runOnPullRequest = async () => {
         context.payload.pull_request.user.login,
     );
 
-    await updatePullRequestComment(megaComment, notified, reviewers, requiredReviewers);
+    await writeJobSummary(notified, reviewers, requiredReviewers);
 };
+
+// exported for testing
+export const __makeSummarySection = makeSummarySection;
+export const __writeJobSummary = writeJobSummary;
