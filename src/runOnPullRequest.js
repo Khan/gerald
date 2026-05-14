@@ -211,3 +211,7 @@ export const runOnPullRequest = async () => {
 
     await writeJobSummary(notified, reviewers, requiredReviewers);
 };
+
+// exported for testing
+export const __makeSummarySection = makeSummarySection;
+export const __writeJobSummary = writeJobSummary;
