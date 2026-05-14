@@ -1,8 +1,6 @@
 // @flow
 type Octokit$IssuesListCommentsResponseItem = $FlowFixMe;
 
-const core = require('@actions/core'); //flow-uncovered-line
-
 import {
     getReviewers,
     getNotified,
@@ -21,15 +19,14 @@ import {
 } from './constants';
 import type {NameToLabelToFiles} from './utils';
 
+const core = require('@actions/core'); //flow-uncovered-line
+
 /**
  * @desc Build a summary section for a group of people
  * @param peopleToLabelToFiles - People and the files they are associated with
  * @param header - Section header (e.g., "Reviewers", "Required Reviewers", "Notified")
  */
-const makeSummarySection = (
-    peopleToLabelToFiles: NameToLabelToFiles,
-    header: string,
-): string => {
+const makeSummarySection = (peopleToLabelToFiles: NameToLabelToFiles, header: string): string => {
     const names: string[] = Object.keys(peopleToLabelToFiles);
     if (!names.length) {
         return '';
