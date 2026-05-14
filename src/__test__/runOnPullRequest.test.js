@@ -150,13 +150,21 @@ describe('writeJobSummary', () => {
         await __writeJobSummary(notifyees, reviewers, requiredReviewers);
 
         expect(mockAddHeading).toHaveBeenCalledWith('Gerald', 1);
-        const summaryContent = mockAddRaw.mock.calls[0][0];
-        expect(summaryContent).toContain('### Notified');
-        expect(summaryContent).toContain('### Reviewers');
-        expect(summaryContent).toContain('### Required Reviewers');
-        expect(summaryContent).toContain('@notified');
-        expect(summaryContent).toContain('@reviewer');
-        expect(summaryContent).toContain('@required');
+        expect(mockAddRaw.mock.calls[0][0]).toMatchInlineSnapshot(`
+            "### Notified
+
+            * \`@notified\` for changes to \`docs/readme.md\`
+
+            ### Reviewers
+
+            * \`@reviewer\` for changes to \`src/file.js\`
+
+            ### Required Reviewers
+
+            * \`@required\` for changes to \`critical/file.js\`
+
+            "
+        `);
         expect(mockWrite).toHaveBeenCalled();
     });
 });
